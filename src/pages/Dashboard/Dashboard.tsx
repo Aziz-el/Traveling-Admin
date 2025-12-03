@@ -36,7 +36,7 @@ export function Dashboard({ tours }: DashboardProps) {
   return (
     <div className="h-full flex flex-col">
       <header className="bg-white border-b border-slate-200 px-8 py-6">
-        <h2 className="text-slate-900">Обзор</h2>
+        <h2 className="text-slate-900 text-[20px] font-bold">Обзор</h2>
         <p className="text-slate-600 mt-1">Общая статистика и активные маршруты</p>
       </header>
 
