@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Sidebar } from '../../widgets/Sidebar';
 import { Dashboard } from '../Dashboard/Dashboard';
+import Add_Tour from '../Add_Tour/Add_Tour';
 
 
 export interface Tour {
@@ -70,6 +71,8 @@ export default function App() {
     switch (currentPage) {
       case 'dashboard':
         return <Dashboard tours={tours} />;
+      case "add-tour":
+        return <Add_Tour />
     }
   };
 

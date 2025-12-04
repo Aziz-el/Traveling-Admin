@@ -1,8 +1,8 @@
 import type { Tour } from '../Home/Home';
-import { InteractiveMap } from '../../shared/ui/interactiveMap/InterActiveMap';
+import { InteractiveMap } from '../../shared/UI/interactiveMap/InterActiveMap';
 import { StatsCard } from '../../shared/components/StatsCard/StatsCard';
 import { MapPin, Users, TrendingUp, Calendar, Building2, Globe } from 'lucide-react';
-import { Badge } from '../../shared/ui/Badge/Badge';
+import { Badge } from '../../shared/UI/Badge/Badge';
 
 interface DashboardProps {
   tours: Tour[];
