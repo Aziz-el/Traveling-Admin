@@ -1,4 +1,4 @@
-import { Button } from "../../shared/ui/Button/Button";
+import { Button } from "../../shared/UI/Button/Button";
 import Input from "../../shared/UI/Input/Input";
 import {MapPin} from "lucide-react"
 export default function Add_Tour() {
@@ -65,7 +65,7 @@ export default function Add_Tour() {
 
                 </div>
 
-                <div className="btns mt-6 flex gap-3">
+                <div className="btns mt-6 m-auto flex items-center justify-center gap-10">
                     <Button variant={"default"} className="w-[170px] h-[40px] border border-gray-200 cursor-pointer" ><MapPin /> <p>Показать на карте</p></Button>
                     <Button variant={"secondary"} className="w-[170px] h-[40px] border border-gray-200 cursor-pointer bg-black text-white" ><p>Создать тур</p></Button>
                 </div>

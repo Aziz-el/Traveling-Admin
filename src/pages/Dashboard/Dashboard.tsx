@@ -16,7 +16,7 @@ export function Dashboard({ tours }: DashboardProps) {
     : 0;
 
   const categoryStats = tours.reduce((acc, tour) => {
-    acc[tour.category] = (acc[tour.category] || 0) + 1;
+    acc[tour  .category] = (acc[tour.category] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
