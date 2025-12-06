@@ -13,42 +13,42 @@ export default function Add_Tour() {
                 <h3 className="text-[17px] text-gray-500">Информация о туре</h3>
                 <div className="input flex flex-col gap-1 mt-[20px]">
                     <h4 className="text-[15px] font-[500]">Название тура</h4>
-                    <Input type="text" classname="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="Введите название тура" />
+                    <Input type="text" className="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="Введите название тура" />
                 </div>
                 <div className="input flex flex-col gap-1 mt-[10px]">
                     <h4 className="text-[15px] font-[500]">Описание тура</h4>
-                    <Input type="text" classname="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-1 pb-8" label="Опишите тур" />
+                    <Input type="text" className="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-1 pb-8" label="Опишите тур" />
                 </div>
                 <div className="input flex flex-col gap-1 mt-[20px]">
                     <h4 className="text-[15px] font-[500]">Цена</h4>
-                    <Input type="number" classname="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" min={0} value={0}/>
+                    <Input type="number" className="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" min={0} value={0}/>
                 </div>
                  <div className="input flex flex-col gap-1 mt-[20px]">
                     <h4 className="text-[15px] font-[500]">Категория</h4>
-                    <Input type="text" classname="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="Европа" />
+                    <Input type="text" className="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="Европа" />
                 </div>
                  <div className="input flex flex-col gap-1 mt-[20px]">
                     <h4 className="text-[15px] font-[500]">Компания</h4>
-                    <Input type="text" classname="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="Введите название компании" />
+                    <Input type="text" className="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="Введите название компании" />
                 </div>
                 <div className="input flex flex-col gap-1 mt-[20px]">
                     <h4 className="text-[15px] font-[500]">Длительность (дней)</h4>
-                    <Input type="number" classname="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" min={0} value={0} />
+                    <Input type="number" className="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" min={0} value={0} />
                 </div>
                 <div className="input flex flex-col gap-1 mt-[20px]">
                     <h4 className="text-[15px] font-[500]">URL изображения</h4>
-                    <Input type="text" classname="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="https://example.com/image.jpg" />
+                    <Input type="text" className="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="https://example.com/image.jpg" />
                 </div>
                 <hr className=" mt-10 text-gray-300"/>
                 <h3 className="text-[17px] text-gray-500 mt-10">Координаты старта</h3>
                 <div className="coordinat flex">
                     <div className="input flex flex-col gap-1 mt-[20px] px-3">
                         <h4 className="text-[15px] font-[500]">Широта</h4>
-                        <Input type="text" classname="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="45.2342" />
+                        <Input type="text" className="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="45.2342" />
                     </div>
                     <div className="input flex flex-col gap-1 mt-[20px]">
                         <h4 className="text-[15px] font-[500]">Долгота</h4>
-                        <Input type="text" classname="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="4.2422" />
+                        <Input type="text" className="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="4.2422" />
                     </div>
 
                 </div>
@@ -56,16 +56,16 @@ export default function Add_Tour() {
                 <div className="coordinat flex">
                     <div className="input flex flex-col gap-1 mt-[20px] px-3">
                         <h4 className="text-[15px] font-[500]">Широта</h4>
-                        <Input type="text" classname="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="45.2342" />
+                        <Input type="text" className="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="45.2342" />
                     </div>
                     <div className="input flex flex-col gap-1 mt-[20px]">
                         <h4 className="text-[15px] font-[500]">Долгота</h4>
-                        <Input type="text" classname="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="4.2422" />
+                        <Input type="text" className="bg-gray-100 w-full outline-none rounded-[5px] px-5 py-2" label="4.2422" />
                     </div>
 
                 </div>
 
-                <div className="btns mt-6 flex gap-3 justify-between max-w-[80%] mx-auto">
+                <div className="btns mt-6 flex gap-3">
                     <Button variant={"default"} className="w-[170px] h-[40px] border border-gray-200 cursor-pointer" ><MapPin /> <p>Показать на карте</p></Button>
                     <Button variant={"secondary"} className="w-[170px] h-[40px] border border-gray-200 cursor-pointer bg-black text-white" ><p>Создать тур</p></Button>
                 </div>
