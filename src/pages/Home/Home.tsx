@@ -2,6 +2,7 @@ import { Sidebar } from '../../widgets/Sidebar';
 import { Outlet } from 'react-router-dom';
 
 export interface Tour {
+  image: string | undefined;
   id: string;
   name: string;
   description: string;
