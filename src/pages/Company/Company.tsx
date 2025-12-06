@@ -1,5 +1,5 @@
 
-export default function Header() {
+export default function Company() {
   return (
     <div>
       
