@@ -1,15 +1,7 @@
-import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import App from "./App.tsx";
 
-const root = document.getElementById("root") as HTMLElement | null;
+  import { createRoot } from "react-dom/client";
+  import App from "./App.tsx";
+  import "./index.css";
 
-if (!root) {
-  throw new Error("Root element not found");
-}
-
-createRoot(root).render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>
-);
+  createRoot(document.getElementById("root")!).render(<App />);
+  
