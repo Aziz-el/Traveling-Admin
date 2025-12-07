@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { Tour } from '../../app/App';
+import { Tour } from '../app/App';
 import { Edit, Trash2, MapPin, DollarSign } from 'lucide-react';
-import { ImageWithFallback } from '../ui/ImageWithFallback';
+import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 
 interface ToursListProps {
   tours: Tour[];
   onUpdateTour: (id: string, tour: Tour) => void;
   onDeleteTour: (id: string) => void;
   categoryImages: Record<string, string>;
+  onSelectTour?: (id: string) => void;
+  selectedTourId?: string | null;
 }
 
-export function ToursList({ tours, onUpdateTour, onDeleteTour, categoryImages }: ToursListProps) {
+export function ToursList({ tours, onUpdateTour, onDeleteTour, categoryImages, onSelectTour, selectedTourId }: ToursListProps) {
   const [editingTour, setEditingTour] = useState<Tour | null>(null);
   const [formData, setFormData] = useState<Tour | null>(null);
 
@@ -57,7 +59,8 @@ export function ToursList({ tours, onUpdateTour, onDeleteTour, categoryImages }:
         {tours.map((tour) => (
           <div 
             key={tour.id} 
-            className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-lg transition-shadow group"
+            onClick={() => onSelectTour?.(tour.id)}
+            className={`bg-white dark:bg-gray-900 rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer ${selectedTourId === tour.id ? 'border-blue-600 dark:border-blue-400 ring-2 ring-blue-100 dark:ring-blue-900' : 'border-gray-200 dark:border-gray-800'}`}
           >
             <div className="aspect-video relative overflow-hidden">
               <ImageWithFallback
@@ -77,6 +80,13 @@ export function ToursList({ tours, onUpdateTour, onDeleteTour, categoryImages }:
             </div>
 
             <div className="p-5">
+              {selectedTourId === tour.id && (
+                <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-950 rounded">
+                  <div className="text-sm font-medium text-slate-900 dark:text-white">Выбранный тур</div>
+                  <div className="text-xs text-slate-600 dark:text-slate-400">{tour.description}</div>
+                  <div className="text-xs text-slate-600 dark:text-slate-400 mt-2">Цена: ${tour.price}</div>
+                </div>
+              )}
               <div className="mb-3">
                 <h3 className="text-gray-900 dark:text-white mb-1 truncate">{tour.name}</h3>
                 <p className="text-gray-600 dark:text-gray-400 line-clamp-2 h-10">
@@ -106,14 +116,14 @@ export function ToursList({ tours, onUpdateTour, onDeleteTour, categoryImages }:
 
               <div className="flex gap-2">
                 <button
-                  onClick={() => handleEdit(tour)}
+                  onClick={(e) => { e.stopPropagation(); handleEdit(tour); }}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   <Edit className="w-4 h-4" />
                   Изменить
                 </button>
                 <button
-                  onClick={() => handleDelete(tour.id, tour.name)}
+                  onClick={(e) => { e.stopPropagation(); handleDelete(tour.id, tour.name); }}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />

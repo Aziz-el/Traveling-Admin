@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { Sidebar } from '../widgets/Sidebar';
-import { Dashboard } from '../shared/components/Dashboard';
-import { AddTour } from '../shared/components/AddTour';
-import { ToursList } from '../shared/components/ToursList';
-import { Companies } from '../shared/components/Companies';
-import { Bookings } from '../shared/components/Bookings';
-import { Users } from '../shared/components/Users';
-import { Routes } from '../shared/components/Routes';
-import { Settings } from '../shared/components/Settings';
-
+import { ErrorBoundary } from '../shared/components/ErrorBoundary';
+import { Dashboard } from '../pages/Dashboard';
+import { AddTour } from '../pages/AddTour';
+import { ToursList } from '../pages/ToursList';
+import { Companies } from '../pages/Companies';
+import { Bookings } from '../pages/Bookings';
+import { Users } from '../pages/Users';
+import { Routes,Route } from 'react-router';
+import { Settings } from '../pages/Settings';
+import { RoutesPage } from '../pages/RoutesPage';
 export interface Tour {
   id: string;
   name: string;
@@ -34,7 +35,8 @@ const categoryImages: Record<string, string> = {
 };
 
 export default function App() {
-  const [activeSection, setActiveSection] = useState('dashboard');
+  const [selectedTourId, setSelectedTourId] = useState<string | null>(null);
+  const [miniCard, setMiniCard] = useState<{ tourId: string; x: number; y: number } | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
     return saved === 'true';
@@ -192,6 +194,15 @@ export default function App() {
     setTours([...tours, tour]);
   };
 
+  const handleSelectTour = (id: string) => {
+    setSelectedTourId(id);
+  };
+
+  const handleMapItemClick = (tourId: string, x: number, y: number) => {
+    setMiniCard({ tourId, x, y });
+    setTimeout(() => setMiniCard(null), 4000);
+  };
+
   const updateTour = (id: string, updatedTour: Tour) => {
     setTours(tours.map(tour => tour.id === id ? updatedTour : tour));
   };
@@ -202,31 +213,43 @@ export default function App() {
 
   return (
     <div className={isDarkMode ? 'dark' : ''}>
-      <div className="flex h-screen bg-gray-50 dark:bg-gray-950">
-        <Sidebar 
-          activeSection={activeSection} 
-          setActiveSection={setActiveSection}
-          isDarkMode={isDarkMode}
-          toggleDarkMode={toggleDarkMode}
-        />
-        <main className="flex-1 overflow-y-auto">
-          {activeSection === 'dashboard' && <Dashboard tours={tours} />}
-          {activeSection === 'add-tour' && <AddTour onAddTour={addTour} categoryImages={categoryImages} />}
-          {activeSection === 'tours' && (
-            <ToursList 
-              tours={tours} 
-              onUpdateTour={updateTour} 
-              onDeleteTour={deleteTour}
-              categoryImages={categoryImages}
-            />
-          )}
-          {activeSection === 'companies' && <Companies tours={tours} />}
-          {activeSection === 'bookings' && <Bookings tours={tours} />}
-          {activeSection === 'users' && <Users />}
-          {activeSection === 'routes' && <Routes />}
-          {activeSection === 'settings' && <Settings />}
-        </main>
-      </div>
+      <ErrorBoundary>
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-950">
+          <Sidebar 
+            isDarkMode={isDarkMode}
+            toggleDarkMode={toggleDarkMode}
+          />
+          <Routes>
+            
+            <Route path='dashboard' element={<Dashboard tours={tours} onMapItemClick={handleMapItemClick} onSelectTour={handleSelectTour} />} />
+            <Route path='add-tour' element={<AddTour onAddTour={addTour} categoryImages={categoryImages} />}/>
+            <Route path='tours' element={<ToursList 
+                tours={tours} 
+                onUpdateTour={updateTour} 
+                onDeleteTour={deleteTour}
+                categoryImages={categoryImages}
+                onSelectTour={handleSelectTour}
+                selectedTourId={selectedTourId}
+              />} />
+            <Route path='companies' element={<Companies tours={tours} />}/>
+            <Route path='bookings' element={<Bookings tours={tours} />}/>
+            <Route path='users' element={<Users />}/>
+            <Route path='routes' element={<RoutesPage />}/>
+            <Route path='settings' element={<Settings />}/>
+          </Routes>
+        </div>
+      </ErrorBoundary>
+      {/* Мини-карточка при клике на карте */}
+      {miniCard && tours.find(t => t.id === miniCard.tourId) && (
+        <div style={{ position: 'fixed', left: miniCard.x, top: miniCard.y, transform: 'translate(-50%, -120%)' }}>
+          <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-2 shadow-lg max-w-xs pointer-events-auto">
+            <div className="text-sm font-medium text-slate-900 dark:text-white">
+              {tours.find(t => t.id === miniCard.tourId)?.name}
+            </div>
+            <div className="text-xs text-slate-600 dark:text-slate-400">${tours.find(t => t.id === miniCard.tourId)?.price}</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

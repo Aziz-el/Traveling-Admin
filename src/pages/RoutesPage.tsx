@@ -1,6 +1,6 @@
 import { Route, MapPin, Navigation } from 'lucide-react';
 
-export function Routes() {
+export function RoutesPage() {
   const routes = [
     { id: 1, name: 'Азия - Круговой маршрут', points: 5, distance: '8,450 км', status: 'Активный' },
     { id: 2, name: 'Европа - Классический тур', points: 7, distance: '5,200 км', status: 'Активный' },

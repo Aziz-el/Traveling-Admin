@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Tour } from '../../app/App';
-import { InteractiveMap } from './InteractiveMap';
-import { ImageWithFallback } from '../ui/ImageWithFallback';
+import { Tour } from '../app/App';
+import { InteractiveMap } from '../shared/components/InteractiveMap';
+import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 
 interface AddTourProps {
   onAddTour: (tour: Tour) => void;
@@ -88,7 +88,6 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
 
     onAddTour(tour);
     
-    // Сброс формы
     setFormData({
       name: '',
       description: '',

@@ -1,4 +1,4 @@
-import { Tour } from '../../app/App';
+import { Tour } from '../app/App';
 import { Building2, MapPin, DollarSign, TrendingUp } from 'lucide-react';
 
 interface CompaniesProps {

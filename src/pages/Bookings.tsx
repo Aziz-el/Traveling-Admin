@@ -1,6 +1,6 @@
-import { Tour } from '../../app/App';
+import { Tour } from '../app/App';
 import { Calendar, DollarSign, CheckCircle, Clock, XCircle, TrendingUp } from 'lucide-react';
-import { ImageWithFallback } from '../ui/ImageWithFallback';
+import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 
 interface BookingsProps {
   tours: Tour[];

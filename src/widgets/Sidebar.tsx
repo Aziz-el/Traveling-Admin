@@ -1,13 +1,11 @@
 import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun } from 'lucide-react';
-import {NavLink} from 'react-router';
+import {Link, NavLink} from 'react-router';
 interface SidebarProps {
-  activeSection: string;
-  setActiveSection: (section: string) => void;
   isDarkMode: boolean;
   toggleDarkMode: () => void;
 }
 
-export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDarkMode }: SidebarProps) {
+export function Sidebar({ isDarkMode, toggleDarkMode }: SidebarProps) {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'add-tour', label: 'Добавить тур', icon: Plus },
@@ -29,18 +27,15 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (
-            <NavLink
+            <Link
               key={item.id}
               to={`/${item.id}`}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                activeSection === item.id
-                  ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-              }`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
+               `}
             >
               <Icon className="w-5 h-5" />
               <span>{item.label}</span>
-            </NavLink>
+            </Link>
           );
         })}
       </nav>
