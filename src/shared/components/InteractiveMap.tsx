@@ -1,441 +1,429 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Tour } from '../../app/App';
-import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { MapPin, Navigation, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { Button } from '../../shared/ui/button';
 
 interface InteractiveMapProps {
   tours: Tour[];
+  selectedRoute?: { startLat: number; startLng: number; endLat: number; endLng: number };
+  onMapItemClick?: (tourId: string, x: number, y: number) => void;
+  onSelectTour?: (tourId: string) => void;
 }
 
-const TILE_SIZE = 256;
-const MIN_ZOOM = 2;
-const MAX_ZOOM = 10;
-
-export function InteractiveMap({ tours }: InteractiveMapProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const animationFrameRef = useRef<number | null>(null);
-  
-  const [zoom, setZoom] = useState(3);
-  const [center, setCenter] = useState({ lat: 20, lng: 0 });
+export function InteractiveMap({ tours, selectedRoute, onMapItemClick, onSelectTour }: InteractiveMapProps) {
+  const [hoveredTour, setHoveredTour] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(2);
+  const [center, setCenter] = useState({ lat: 40, lng: 20 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [dragCenter, setDragCenter] = useState({ lat: 20, lng: 0 });
-  const [hoveredTour, setHoveredTour] = useState<Tour | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [needsRedraw, setNeedsRedraw] = useState(true);
-  
-  const tilesCache = useRef<Map<string, HTMLImageElement>>(new Map());
+  const [tiles, setTiles] = useState<{ x: number; y: number; z: number }[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Преобразование координат lat/lng в пиксели на карте
-  const latLngToPixel = useCallback((lat: number, lng: number, mapZoom: number, mapWidth: number, mapHeight: number, mapCenter: { lat: number; lng: number }) => {
-    const scale = Math.pow(2, mapZoom);
-    const worldWidth = TILE_SIZE * scale;
-    
-    // Меркаторская проекция
-    const x = ((lng + 180) / 360) * worldWidth;
-    const latRad = (lat * Math.PI) / 180;
-    const mercN = Math.log(Math.tan(Math.PI / 4 + latRad / 2));
-    const y = (worldWidth / 2) - (worldWidth * mercN / (2 * Math.PI));
-    
-    // Центрирование относительно центра карты
-    const centerX = ((mapCenter.lng + 180) / 360) * worldWidth;
-    const centerLatRad = (mapCenter.lat * Math.PI) / 180;
-    const centerMercN = Math.log(Math.tan(Math.PI / 4 + centerLatRad / 2));
-    const centerY = (worldWidth / 2) - (worldWidth * centerMercN / (2 * Math.PI));
-    
-    return {
-      x: mapWidth / 2 + (x - centerX),
-      y: mapHeight / 2 + (y - centerY),
-    };
-  }, []);
-
-  // Загрузка тайла карты
-  const loadTile = (x: number, y: number, z: number): Promise<HTMLImageElement> => {
-    const key = `${z}-${x}-${y}`;
-    
-    if (tilesCache.current.has(key)) {
-      return Promise.resolve(tilesCache.current.get(key)!);
-    }
-
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      
-      // OpenStreetMap тайлы
-      img.src = `https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
-      
-      img.onload = () => {
-        tilesCache.current.set(key, img);
-        resolve(img);
-      };
-      
-      img.onerror = reject;
-    });
+  // Конвертация координат в пиксели
+  const latLngToPixel = (lat: number, lng: number, zoom: number) => {
+    const scale = 256 * Math.pow(2, zoom);
+    const x = (lng + 180) / 360 * scale;
+    const y = (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * scale;
+    return { x, y };
   };
 
-  // Отрисовка карты
-  const drawMap = useCallback(async (currentCenter: { lat: number; lng: number }, animate = false) => {
-    const canvas = canvasRef.current;
-    const container = containerRef.current;
-    if (!canvas || !container) return;
+  // Конвертация пикселей в координаты
+  const pixelToLatLng = (x: number, y: number, zoom: number) => {
+    const scale = 256 * Math.pow(2, zoom);
+    const lng = x / scale * 360 - 180;
+    const n = Math.PI - 2 * Math.PI * y / scale;
+    const lat = 180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
+    return { lat, lng };
+  };
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+  // Вычисление необходимых тайлов
+  useEffect(() => {
+    if (!containerRef.current) return;
     
-    canvas.width = width;
-    canvas.height = height;
-
-    // Очистка
-    ctx.fillStyle = '#e5e7eb';
-    ctx.fillRect(0, 0, width, height);
-
-    // Рисуем тайлы карты
-    const scale = Math.pow(2, zoom);
-    const centerTileX = ((currentCenter.lng + 180) / 360) * scale;
-    const centerLatRad = (currentCenter.lat * Math.PI) / 180;
-    const centerMercN = Math.log(Math.tan(Math.PI / 4 + centerLatRad / 2));
-    const centerTileY = ((1 - centerMercN / Math.PI) / 2) * scale;
-
-    const numTilesX = Math.ceil(width / TILE_SIZE) + 2;
-    const numTilesY = Math.ceil(height / TILE_SIZE) + 2;
-
-    const startTileX = Math.floor(centerTileX - numTilesX / 2);
-    const startTileY = Math.floor(centerTileY - numTilesY / 2);
-
-    // Загружаем и рисуем тайлы
+    const { width, height } = containerRef.current.getBoundingClientRect();
+    const centerPixel = latLngToPixel(center.lat, center.lng, zoom);
+    
+    const numTilesX = Math.ceil(width / 256) + 2;
+    const numTilesY = Math.ceil(height / 256) + 2;
+    
+    const startTileX = Math.floor(centerPixel.x / 256) - Math.floor(numTilesX / 2);
+    const startTileY = Math.floor(centerPixel.y / 256) - Math.floor(numTilesY / 2);
+    
+    const newTiles = [];
     for (let i = 0; i < numTilesX; i++) {
       for (let j = 0; j < numTilesY; j++) {
         const tileX = startTileX + i;
         const tileY = startTileY + j;
+        const maxTile = Math.pow(2, zoom);
         
-        if (tileX >= 0 && tileY >= 0 && tileX < scale && tileY < scale) {
-          try {
-            const tile = await loadTile(tileX, tileY, Math.floor(zoom));
-            const offsetX = width / 2 + (tileX - centerTileX) * TILE_SIZE;
-            const offsetY = height / 2 + (tileY - centerTileY) * TILE_SIZE;
-            ctx.drawImage(tile, offsetX, offsetY, TILE_SIZE, TILE_SIZE);
-          } catch (e) {
-            // Тайл не загрузился, рисуем заглушку
-            const offsetX = width / 2 + (tileX - centerTileX) * TILE_SIZE;
-            const offsetY = height / 2 + (tileY - centerTileY) * TILE_SIZE;
-            ctx.fillStyle = '#d1d5db';
-            ctx.fillRect(offsetX, offsetY, TILE_SIZE, TILE_SIZE);
-          }
+        if (tileX >= 0 && tileX < maxTile && tileY >= 0 && tileY < maxTile) {
+          newTiles.push({ x: tileX, y: tileY, z: zoom });
         }
       }
     }
-
-    // Рисуем маршруты туров
-    tours.forEach((tour) => {
-      const start = latLngToPixel(tour.startLat, tour.startLng, zoom, width, height, currentCenter);
-      const end = latLngToPixel(tour.endLat, tour.endLng, zoom, width, height, currentCenter);
-
-      // Рисуем изогнутую линию маршрута
-      const midX = (start.x + end.x) / 2;
-      const midY = (start.y + end.y) / 2;
-      const dx = end.x - start.x;
-      const dy = end.y - start.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const curvature = dist * 0.2;
-      
-      const controlX = midX - (dy / dist) * curvature;
-      const controlY = midY + (dx / dist) * curvature;
-
-      ctx.beginPath();
-      ctx.moveTo(start.x, start.y);
-      ctx.quadraticCurveTo(controlX, controlY, end.x, end.y);
-      ctx.strokeStyle = hoveredTour?.id === tour.id ? '#3b82f6' : '#60a5fa';
-      ctx.lineWidth = hoveredTour?.id === tour.id ? 3 : 2;
-      ctx.setLineDash([5, 5]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Стрелка направления
-      const arrowSize = 8;
-      const angle = Math.atan2(end.y - controlY, end.x - controlX);
-      ctx.beginPath();
-      ctx.moveTo(end.x, end.y);
-      ctx.lineTo(
-        end.x - arrowSize * Math.cos(angle - Math.PI / 6),
-        end.y - arrowSize * Math.sin(angle - Math.PI / 6)
-      );
-      ctx.lineTo(
-        end.x - arrowSize * Math.cos(angle + Math.PI / 6),
-        end.y - arrowSize * Math.sin(angle + Math.PI / 6)
-      );
-      ctx.closePath();
-      ctx.fillStyle = hoveredTour?.id === tour.id ? '#3b82f6' : '#60a5fa';
-      ctx.fill();
-
-      // Маркер старта (зеленый)
-      ctx.beginPath();
-      ctx.arc(start.x, start.y, 8, 0, 2 * Math.PI);
-      ctx.fillStyle = '#10b981';
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Маркер финиша (красный)
-      ctx.beginPath();
-      ctx.arc(end.x, end.y, 8, 0, 2 * Math.PI);
-      ctx.fillStyle = '#ef4444';
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Анимированный пульс при наведении
-      if (hoveredTour?.id === tour.id && animate) {
-        const pulse = (Date.now() % 1000) / 1000;
-        const radius = 8 + pulse * 10;
-        
-        ctx.beginPath();
-        ctx.arc(start.x, start.y, radius, 0, 2 * Math.PI);
-        ctx.strokeStyle = `rgba(16, 185, 129, ${1 - pulse})`;
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(end.x, end.y, radius, 0, 2 * Math.PI);
-        ctx.strokeStyle = `rgba(239, 68, 68, ${1 - pulse})`;
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      }
-    });
-  }, [tours, zoom, hoveredTour, latLngToPixel]);
-
-  // Обработка наведения мыши
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    setMousePos({ x: e.clientX, y: e.clientY });
-
-    // Проверка наведения на маршрут
-    let found = false;
-    const currentCenter = isDragging ? dragCenter : center;
     
-    for (const tour of tours) {
-      const start = latLngToPixel(tour.startLat, tour.startLng, zoom, canvas.width, canvas.height, currentCenter);
-      const end = latLngToPixel(tour.endLat, tour.endLng, zoom, canvas.width, canvas.height, currentCenter);
+    setTiles(newTiles);
+  }, [center, zoom]);
 
-      // Проверка близости к линии маршрута
-      const distToLine = pointToLineDistance(x, y, start.x, start.y, end.x, end.y);
-      if (distToLine < 10) {
-        if (hoveredTour?.id !== tour.id) {
-          setHoveredTour(tour);
-        }
-        found = true;
-        break;
-      }
-    }
-
-    if (!found && hoveredTour) {
-      setHoveredTour(null);
-    }
-
-    // Обработка драга
-    if (isDragging) {
-      const dx = e.clientX - dragStart.x;
-      const dy = e.clientY - dragStart.y;
-      
-      const scale = Math.pow(2, zoom);
-      const worldWidth = TILE_SIZE * scale;
-      
-      const deltaLng = -(dx / worldWidth) * 360;
-      const deltaLat = (dy / worldWidth) * 180;
-      
-      const newCenter = {
-        lat: Math.max(-85, Math.min(85, center.lat + deltaLat)),
-        lng: ((center.lng + deltaLng + 180) % 360) - 180,
-      };
-      
-      setDragCenter(newCenter);
-      setNeedsRedraw(true);
-    }
-  };
-
-  const pointToLineDistance = (px: number, py: number, x1: number, y1: number, x2: number, y2: number) => {
-    const A = px - x1;
-    const B = py - y1;
-    const C = x2 - x1;
-    const D = y2 - y1;
-
-    const dot = A * C + B * D;
-    const lenSq = C * C + D * D;
-    let param = -1;
-
-    if (lenSq !== 0) param = dot / lenSq;
-
-    let xx, yy;
-
-    if (param < 0) {
-      xx = x1;
-      yy = y1;
-    } else if (param > 1) {
-      xx = x2;
-      yy = y2;
-    } else {
-      xx = x1 + param * C;
-      yy = y1 + param * D;
-    }
-
-    const dx = px - xx;
-    const dy = py - yy;
-    return Math.sqrt(dx * dx + dy * dy);
-  };
-
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
     setDragStart({ x: e.clientX, y: e.clientY });
-    setDragCenter(center);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !containerRef.current) return;
+    
+    const dx = e.clientX - dragStart.x;
+    const dy = e.clientY - dragStart.y;
+    
+    const { width, height } = containerRef.current.getBoundingClientRect();
+    const centerPixel = latLngToPixel(center.lat, center.lng, zoom);
+    
+    const newCenterPixel = {
+      x: centerPixel.x - dx,
+      y: centerPixel.y - dy,
+    };
+    
+    const newCenter = pixelToLatLng(newCenterPixel.x, newCenterPixel.y, zoom);
+    setCenter(newCenter);
+    setDragStart({ x: e.clientX, y: e.clientY });
   };
 
   const handleMouseUp = () => {
-    if (isDragging) {
-      setCenter(dragCenter);
-      setIsDragging(false);
-    }
+    setIsDragging(false);
   };
 
   const handleZoomIn = () => {
-    setZoom(Math.min(MAX_ZOOM, zoom + 1));
-    setNeedsRedraw(true);
+    setZoom(Math.min(zoom + 1, 10));
   };
 
   const handleZoomOut = () => {
-    setZoom(Math.max(MIN_ZOOM, zoom - 1));
-    setNeedsRedraw(true);
+    setZoom(Math.max(zoom - 1, 1));
   };
 
   const handleReset = () => {
-    setZoom(3);
-    setCenter({ lat: 20, lng: 0 });
-    setNeedsRedraw(true);
+    setZoom(2);
+    setCenter({ lat: 40, lng: 20 });
   };
 
-  // Основной эффект для отрисовки
-  useEffect(() => {
-    if (needsRedraw || isDragging) {
-      const currentCenter = isDragging ? dragCenter : center;
-      drawMap(currentCenter, false);
-      setNeedsRedraw(false);
-    }
-  }, [needsRedraw, isDragging, dragCenter, center, drawMap]);
-
-  // Эффект для анимации при наведении
-  useEffect(() => {
-    if (hoveredTour) {
-      const animate = () => {
-        const currentCenter = isDragging ? dragCenter : center;
-        drawMap(currentCenter, true);
-        animationFrameRef.current = requestAnimationFrame(animate);
-      };
-      animate();
-      
-      return () => {
-        if (animationFrameRef.current) {
-          cancelAnimationFrame(animationFrameRef.current);
-        }
-      };
-    }
-  }, [hoveredTour, isDragging, dragCenter, center, drawMap]);
-
-  // Эффект для перерисовки при изменении tours или zoom
-  useEffect(() => {
-    setNeedsRedraw(true);
-  }, [tours, zoom]);
+  // Конвертация координат маршрутов в позиции на экране
+  const getScreenPosition = (lat: number, lng: number) => {
+    if (!containerRef.current) return { x: 0, y: 0 };
+    
+    const { width, height } = containerRef.current.getBoundingClientRect();
+    const centerPixel = latLngToPixel(center.lat, center.lng, zoom);
+    const pointPixel = latLngToPixel(lat, lng, zoom);
+    
+    return {
+      x: width / 2 + (pointPixel.x - centerPixel.x),
+      y: height / 2 + (pointPixel.y - centerPixel.y),
+    };
+  };
 
   return (
-    <div ref={containerRef} className="relative w-full h-full bg-gray-200 dark:bg-gray-800">
-      <canvas
-        ref={canvasRef}
-        onMouseMove={handleMouseMove}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        className="w-full h-full cursor-move"
-      />
+    <div
+      ref={containerRef}
+      className="relative w-full h-full bg-slate-200 overflow-hidden"
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+    >
+      {/* Тайлы карты OpenStreetMap */}
+      <div className="absolute inset-0">
+        {tiles.map((tile) => {
+          const centerPixel = latLngToPixel(center.lat, center.lng, zoom);
+          const tilePixel = { x: tile.x * 256, y: tile.y * 256 };
+          const containerWidth = containerRef.current?.getBoundingClientRect().width || 0;
+          const containerHeight = containerRef.current?.getBoundingClientRect().height || 0;
+          
+          const left = containerWidth / 2 + (tilePixel.x - centerPixel.x);
+          const top = containerHeight / 2 + (tilePixel.y - centerPixel.y);
+          
+          return (
+            <img
+              key={`${tile.z}-${tile.x}-${tile.y}`}
+              src={`https://tile.openstreetmap.org/${tile.z}/${tile.x}/${tile.y}.png`}
+              alt=""
+              className="absolute pointer-events-none"
+              style={{
+                left: `${left}px`,
+                top: `${top}px`,
+                width: '256px',
+                height: '256px',
+              }}
+            />
+          );
+        })}
+      </div>
 
-      {/* Контролы карты */}
-      <div className="absolute top-4 right-4 flex flex-col gap-2">
-        <button
-          onClick={handleZoomIn}
-          className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all hover:scale-110"
-          title="Увеличить"
-        >
-          <ZoomIn className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-        </button>
-        <button
-          onClick={handleZoomOut}
-          className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all hover:scale-110"
-          title="Уменьшить"
-        >
-          <ZoomOut className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-        </button>
-        <button
-          onClick={handleReset}
-          className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all hover:scale-110"
-          title="Сбросить"
-        >
-          <Maximize2 className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-        </button>
+      {/* SVG overlay для маршрутов */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none">
+        {/* Маршруты */}
+        {tours.map((tour) => {
+          const start = getScreenPosition(tour.startLat, tour.startLng);
+          const end = getScreenPosition(tour.endLat, tour.endLng);
+          const isHovered = hoveredTour === tour.id;
+          
+          const midX = (start.x + end.x) / 2;
+          const midY = (start.y + end.y) / 2;
+          const distance = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
+          const controlOffset = Math.min(distance * 0.15, 80);
+
+          return (
+            <g key={tour.id}>
+              {/* Подсветка */}
+              {isHovered && (
+                <path
+                  d={`M ${start.x} ${start.y} Q ${midX} ${midY - controlOffset} ${end.x} ${end.y}`}
+                  fill="none"
+                  stroke="#3b82f6"
+                  strokeWidth="12"
+                  opacity="0.2"
+                />
+              )}
+
+              {/* Основная линия */}
+              <path
+                d={`M ${start.x} ${start.y} Q ${midX} ${midY - controlOffset} ${end.x} ${end.y}`}
+                fill="none"
+                stroke="#3b82f6"
+                strokeWidth={isHovered ? 4 : 3}
+                strokeDasharray="8,4"
+                opacity={isHovered ? 1 : 0.8}
+                className="pointer-events-auto cursor-pointer"
+                onMouseEnter={() => setHoveredTour(tour.id)}
+                onMouseLeave={() => setHoveredTour(null)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMapItemClick?.(tour.id, midX, midY - controlOffset);
+                  onSelectTour?.(tour.id);
+                }}
+              >
+                <animate
+                  attributeName="stroke-dashoffset"
+                  from="0"
+                  to="12"
+                  dur="1s"
+                  repeatCount="indefinite"
+                />
+              </path>
+
+              {/* Стрелка направления */}
+              <defs>
+                <marker
+                  id={`arrow-${tour.id}`}
+                  markerWidth="10"
+                  markerHeight="10"
+                  refX="5"
+                  refY="3"
+                  orient="auto"
+                  markerUnits="strokeWidth"
+                >
+                  <path d="M0,0 L0,6 L9,3 z" fill="#3b82f6" />
+                </marker>
+              </defs>
+              
+              <path
+                d={`M ${midX} ${midY - controlOffset} L ${end.x} ${end.y}`}
+                fill="none"
+                stroke="transparent"
+                strokeWidth="3"
+                markerEnd={`url(#arrow-${tour.id})`}
+              />
+
+              {/* Точка старта */}
+              <g
+                className="pointer-events-auto cursor-pointer"
+                onMouseEnter={() => setHoveredTour(tour.id)}
+                onMouseLeave={() => setHoveredTour(null)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMapItemClick?.(tour.id, start.x, start.y);
+                  onSelectTour?.(tour.id);
+                }}
+              >
+                <circle
+                  cx={start.x}
+                  cy={start.y}
+                  r={isHovered ? 12 : 9}
+                  fill="#10b981"
+                  stroke="white"
+                  strokeWidth="3"
+                />
+                {isHovered && (
+                  <circle
+                    cx={start.x}
+                    cy={start.y}
+                    r="18"
+                    fill="none"
+                    stroke="#10b981"
+                    strokeWidth="2"
+                    opacity="0.5"
+                  >
+                    <animate attributeName="r" from="18" to="24" dur="1.5s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" from="0.5" to="0" dur="1.5s" repeatCount="indefinite" />
+                  </circle>
+                )}
+              </g>
+
+              {/* Точка финиша */}
+              <g
+                className="pointer-events-auto cursor-pointer"
+                onMouseEnter={() => setHoveredTour(tour.id)}
+                onMouseLeave={() => setHoveredTour(null)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMapItemClick?.(tour.id, end.x, end.y);
+                  onSelectTour?.(tour.id);
+                }}
+              >
+                <circle
+                  cx={end.x}
+                  cy={end.y}
+                  r={isHovered ? 12 : 9}
+                  fill="#ef4444"
+                  stroke="white"
+                  strokeWidth="3"
+                />
+                {isHovered && (
+                  <circle
+                    cx={end.x}
+                    cy={end.y}
+                    r="18"
+                    fill="none"
+                    stroke="#ef4444"
+                    strokeWidth="2"
+                    opacity="0.5"
+                  >
+                    <animate attributeName="r" from="18" to="24" dur="1.5s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" from="0.5" to="0" dur="1.5s" repeatCount="indefinite" />
+                  </circle>
+                )}
+              </g>
+            </g>
+          );
+        })}
+
+        {/* Предпросмотр маршрута */}
+        {selectedRoute && (() => {
+          const start = getScreenPosition(selectedRoute.startLat, selectedRoute.startLng);
+          const end = getScreenPosition(selectedRoute.endLat, selectedRoute.endLng);
+          const midX = (start.x + end.x) / 2;
+          const midY = (start.y + end.y) / 2;
+          const distance = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
+          const controlOffset = Math.min(distance * 0.15, 80);
+
+          return (
+            <g>
+              <path
+                d={`M ${start.x} ${start.y} Q ${midX} ${midY - controlOffset} ${end.x} ${end.y}`}
+                fill="none"
+                stroke="#8b5cf6"
+                strokeWidth="4"
+                strokeDasharray="10,5"
+                opacity="0.9"
+              >
+                <animate attributeName="stroke-dashoffset" from="0" to="15" dur="0.8s" repeatCount="indefinite" />
+              </path>
+              <circle cx={start.x} cy={start.y} r="10" fill="#8b5cf6" stroke="white" strokeWidth="3">
+                <animate attributeName="r" values="10;13;10" dur="1.5s" repeatCount="indefinite" />
+              </circle>
+              <circle cx={end.x} cy={end.y} r="10" fill="#8b5cf6" stroke="white" strokeWidth="3">
+                <animate attributeName="r" values="10;13;10" dur="1.5s" repeatCount="indefinite" />
+              </circle>
+            </g>
+          );
+        })()}
+      </svg>
+
+      {/* Контролы */}
+      <div className="absolute top-4 right-4 flex flex-col gap-2 pointer-events-auto">
+        <Button size="sm" variant="outline" className="bg-white shadow-lg" onClick={handleZoomIn}>
+          <ZoomIn className="w-4 h-4" />
+        </Button>
+        <Button size="sm" variant="outline" className="bg-white shadow-lg" onClick={handleZoomOut}>
+          <ZoomOut className="w-4 h-4" />
+        </Button>
+        <Button size="sm" variant="outline" className="bg-white shadow-lg" onClick={handleReset}>
+          <Maximize2 className="w-4 h-4" />
+        </Button>
       </div>
 
       {/* Легенда */}
-      <div className="absolute bottom-4 left-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg p-4">
+      <div className="absolute bottom-4 left-4 bg-white rounded-lg border border-slate-200 p-3 shadow-lg pointer-events-auto">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-            <span className="text-gray-700 dark:text-gray-300">Точка старта</span>
+            <div className="w-3 h-3 rounded-full bg-green-500 border-2 border-white shadow-sm"></div>
+            <span className="text-slate-700">Точка старта</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-            <span className="text-gray-700 dark:text-gray-300">Точка финиша</span>
+            <div className="w-3 h-3 rounded-full bg-red-500 border-2 border-white shadow-sm"></div>
+            <span className="text-slate-700">Точка финиша</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-0.5 bg-blue-400"></div>
-            <span className="text-gray-700 dark:text-gray-300">Маршрут</span>
+            <svg width="24" height="12">
+              <line x1="0" y1="6" x2="24" y2="6" stroke="#3b82f6" strokeWidth="2" strokeDasharray="8,4" />
+            </svg>
+            <span className="text-slate-700">Маршрут</span>
           </div>
+          {selectedRoute && (
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-purple-500 border-2 border-white shadow-sm"></div>
+              <span className="text-slate-700">Предпросмотр</span>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Tooltip при наведении */}
-      {hoveredTour && (
-        <div
-          className="fixed z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 pointer-events-none border border-gray-200 dark:border-gray-700 max-w-sm animate-in fade-in duration-200"
-          style={{
-            left: mousePos.x + 15,
-            top: mousePos.y + 15,
-          }}
-        >
-          <h3 className="text-gray-900 dark:text-white mb-1">{hoveredTour.name}</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-2">{hoveredTour.description}</p>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
-                {hoveredTour.category}
-              </span>
-              <span className="text-gray-600 dark:text-gray-400">{hoveredTour.company}</span>
+      {/* Информация о туре */}
+      {hoveredTour && tours.find((t) => t.id === hoveredTour) && (
+        <div className="absolute top-4 left-4 bg-white rounded-lg border border-slate-200 p-4 shadow-xl max-w-sm pointer-events-auto">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0">
+              <Navigation className="w-5 h-5 text-blue-600" />
             </div>
-            <p className="text-gray-600 dark:text-gray-400">
-              Старт: {hoveredTour.startLat.toFixed(4)}, {hoveredTour.startLng.toFixed(4)}
-            </p>
-            <p className="text-gray-600 dark:text-gray-400">
-              Финиш: {hoveredTour.endLat.toFixed(4)}, {hoveredTour.endLng.toFixed(4)}
-            </p>
-            <p className="text-gray-900 dark:text-white">${hoveredTour.price}</p>
+            <div className="flex-1">
+              <div className="text-slate-900 mb-1">
+                {tours.find((t) => t.id === hoveredTour)?.name}
+              </div>
+              <div className="text-slate-600 mb-3">
+                {tours.find((t) => t.id === hoveredTour)?.description}
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-slate-600">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span>
+                    Старт: {tours.find((t) => t.id === hoveredTour)?.startLat.toFixed(4)}°,{' '}
+                    {tours.find((t) => t.id === hoveredTour)?.startLng.toFixed(4)}°
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-600">
+                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  <span>
+                    Финиш: {tours.find((t) => t.id === hoveredTour)?.endLat.toFixed(4)}°,{' '}
+                    {tours.find((t) => t.id === hoveredTour)?.endLng.toFixed(4)}°
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
+
+      {/* Подсказка */}
+      <div className="absolute bottom-4 right-4 bg-white/95 rounded-lg border border-slate-200 px-3 py-2 text-slate-600 shadow-sm pointer-events-auto">
+        <div className="flex items-center gap-2">
+          <MapPin className="w-4 h-4" />
+          <span>Перетаскивайте карту • Zoom: {zoom}</span>
+        </div>
+      </div>
+
+      {/* Атрибуция OpenStreetMap */}
+      <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-slate-500 bg-white/80 px-2 py-0.5 rounded pointer-events-auto">
+        © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" className="underline">OpenStreetMap</a> contributors
+      </div>
     </div>
   );
 }
