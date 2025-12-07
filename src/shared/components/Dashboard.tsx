@@ -6,9 +6,11 @@ import { ImageWithFallback } from '../ui/ImageWithFallback';
 
 interface DashboardProps {
   tours: Tour[];
+  onMapItemClick?: (tourId: string, x: number, y: number) => void;
+  onSelectTour?: (tourId: string) => void;
 }
 
-export function Dashboard({ tours }: DashboardProps) {
+export function Dashboard({ tours, onMapItemClick, onSelectTour }: DashboardProps) {
   const activeTours = tours.filter(t => t.status === 'Активный');
   const totalRevenue = tours.reduce((sum, tour) => sum + tour.price, 0);
   const avgPrice = tours.length > 0 ? totalRevenue / tours.length : 0;
@@ -58,7 +60,7 @@ export function Dashboard({ tours }: DashboardProps) {
             <p className="text-gray-600 dark:text-gray-400">Все активные туры на карте</p>
           </div>
           <div className="h-[600px]">
-            <InteractiveMap tours={activeTours} />
+            <InteractiveMap tours={activeTours} onMapItemClick={onMapItemClick} onSelectTour={onSelectTour} />
           </div>
         </div>
 

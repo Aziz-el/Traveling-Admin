@@ -88,7 +88,6 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
 
     onAddTour(tour);
     
-    // Сброс формы
     setFormData({
       name: '',
       description: '',
