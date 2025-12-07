@@ -1,5 +1,5 @@
 import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun } from 'lucide-react';
-
+import {NavLink} from 'react-router';
 interface SidebarProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
@@ -29,9 +29,9 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (
-            <button
+            <NavLink
               key={item.id}
-              onClick={() => setActiveSection(item.id)}
+              to={`/${item.id}`}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                 activeSection === item.id
                   ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400'
@@ -40,7 +40,7 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
             >
               <Icon className="w-5 h-5" />
               <span>{item.label}</span>
-            </button>
+            </NavLink>
           );
         })}
       </nav>
