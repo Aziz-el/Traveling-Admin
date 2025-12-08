@@ -1,11 +1,13 @@
 import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun } from 'lucide-react';
-import {Link, NavLink} from 'react-router';
+
 interface SidebarProps {
+  activeSection?: string;
+  setActiveSection?: (s: string) => void;
   isDarkMode: boolean;
   toggleDarkMode: () => void;
 }
 
-export function Sidebar({ isDarkMode, toggleDarkMode }: SidebarProps) {
+export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDarkMode }: SidebarProps) {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'add-tour', label: 'Добавить тур', icon: Plus },
@@ -18,24 +20,37 @@ export function Sidebar({ isDarkMode, toggleDarkMode }: SidebarProps) {
   ];
 
   return (
-    <aside className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
+    <aside className="fixed top-0 h-screen w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col overflow-y-auto">
       <div className="p-6 border-b border-gray-200 dark:border-gray-800">
         <h1 className="text-blue-600 dark:text-blue-400">TravelAdmin</h1>
       </div>
       
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 p-4 space-y-1 ">
         {menuItems.map((item) => {
           const Icon = item.icon;
+          const active = activeSection === item.id;
+          if (setActiveSection) {
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveSection(item.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${active ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
+              >
+                <Icon className="w-5 h-5" />
+                <span>{item.label}</span>
+              </button>
+            );
+          }
+
           return (
-            <Link
+            <a
               key={item.id}
-              to={`/${item.id}`}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
-               `}
+              href={`/${item.id}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${active ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
             >
               <Icon className="w-5 h-5" />
               <span>{item.label}</span>
-            </Link>
+            </a>
           );
         })}
       </nav>

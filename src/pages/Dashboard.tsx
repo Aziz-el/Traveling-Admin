@@ -101,7 +101,7 @@ export function Dashboard({ tours, onMapItemClick, onSelectTour }: DashboardProp
         <h2 className="text-gray-900 dark:text-white mb-4">Последние туры</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {tours.slice(0, 8).map((tour) => (
-            <div key={tour.id} className="group cursor-pointer">
+            <div key={tour.id} className="group cursor-pointer border border-gray-200 dark:border-gray-800 rounded-lg p-4 hover:shadow-md  transition-shadow">
               <div className="aspect-video rounded-lg overflow-hidden mb-3">
                 <ImageWithFallback
                   src={tour.image}

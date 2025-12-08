@@ -10,6 +10,16 @@
         "label": "off"
       }
     ],
-    "no-inline-styles": "off"
+    "no-inline-styles": "off",
+    "compat-api/css": [
+      "default",
+      {
+        "ignore": [
+          "-webkit-text-size-adjust",
+          "background-color: color-mix(in srgb, oklch(.551 .027 264.364) 90%, transparent)",
+          "background-color: color-mix(in srgb, oklch(.278 .033 256.848) 90%, transparent)"
+        ]
+      }
+    ]
   }
 }
