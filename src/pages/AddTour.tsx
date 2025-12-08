@@ -30,7 +30,6 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
     setFormData(prev => {
       const updated = { ...prev, [name]: value };
       
-      // Автоматически обновляем изображение при изменении категории
       if (name === 'category') {
         updated.image = categoryImages[value] || '';
       }
