@@ -1,25 +1,24 @@
 import axios from 'axios';
 
-const baseURL = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV
-  ? '/api/v1'
-  : 'https://genbiadmin1.vercel.app/api/v1';
+const baseURL =  'https://genbiadmin1.vercel.app/api/v1';
 
-const isnatance = axios.create({
+const instance = axios.create({
   baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-isnatance.interceptors.request.use((config => {
+instance.interceptors.request.use((config => {
     const token = localStorage.getItem('token');
     if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        config.headers = config.headers || {} as any;
+        (config.headers as any).Authorization = `Bearer ${token}`;
     }
     return config;
 }));
 
-isnatance.interceptors.response.use(
+instance.interceptors.response.use(
   (response) => {
     return response;
   },
@@ -30,4 +29,4 @@ isnatance.interceptors.response.use(
   }
 );
 
-export default isnatance;
+export default instance;

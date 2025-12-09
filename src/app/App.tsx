@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Sidebar } from '../widgets/Sidebar';
-import { ErrorBoundary } from '../shared/components/ErrorBoundary';
 import { Dashboard } from '../pages/Dashboard';
 import { AddTour } from '../pages/AddTour';
 import { ToursList } from '../pages/ToursList';
@@ -10,9 +9,8 @@ import { Users } from '../pages/Users';
 import { Routes,Route } from 'react-router';
 import { Settings } from '../pages/Settings';
 import { RoutesPage } from '../pages/RoutesPage';
-import path from 'path';
-import LoginPage from '../pages/Login/Login';
-import RegisterPage from '../pages/register/register';
+import Login from '../pages/Login/Login';
+import Register from '../pages/register/register';
 export interface Tour {
   id: string;
   name: string;
@@ -214,29 +212,27 @@ export default function App() {
     setTours(tours.filter(tour => tour.id !== id));
   };
 
-  function ProtectedLayout({ children }: { children: any }) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (!token) {
-      if (typeof window !== 'undefined') window.location.href = '/login';
-      return null;
-    }
-    return <>{children}</>;
-  }
+  // function ProtectedLayout({ children }: { children: any }) {
+  //   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  //   if (!token) {
+  //     if (typeof window !== 'undefined') window.location.href = '/login';
+  //     return null;
+  //   }
+  //   return <>{children}</>;
+  // }
 
   return (
     <div className={isDarkMode ? 'dark' : ''}>
-      <ErrorBoundary>
         <Routes>
-          <Route path ="login" element={<LoginPage />} />
-          <Route path ="register" element={<RegisterPage />} />
+          <Route path ="login" element={<Login />} />
+          <Route path ="register" element={<Register />} />
           <Route path="*" element={
-            <ProtectedLayout>
+            // <ProtectedLayout>
               <div className="flex h-full bg-gray-50 dark:bg-gray-950">
                 <Sidebar 
                   isDarkMode={isDarkMode}
                   toggleDarkMode={toggleDarkMode}
                 />
-                <div className="w-64 "></div>
                 <div className="flex-1 ml-64">
                 <Routes>
                   <Route path='/' element={<Dashboard tours={tours} onMapItemClick={handleMapItemClick} onSelectTour={handleSelectTour} />} />
@@ -258,20 +254,9 @@ export default function App() {
                 </Routes>
               </div>
               </div>
-            </ProtectedLayout>
+            // </ProtectedLayout>
           } />
         </Routes>
-        {miniCard && tours.find(t => t.id === miniCard.tourId) && (
-          <div style={{ position: 'fixed', left: miniCard.x, top: miniCard.y, transform: 'translate(-50%, -120%)' }}>
-            <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-2 shadow-lg max-w-xs pointer-events-auto">
-              <div className="text-sm font-medium text-slate-900 dark:text-white">
-                {tours.find(t => t.id === miniCard.tourId)?.name}
-              </div>
-              <div className="text-xs text-slate-600 dark:text-slate-400">${tours.find(t => t.id === miniCard.tourId)?.price}</div>
-            </div>
-          </div>
-        )}
-      </ErrorBoundary>
     </div>
   );
 }

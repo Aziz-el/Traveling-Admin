@@ -2,14 +2,14 @@
   import { createRoot } from "react-dom/client";
   import App from "./App.tsx";
   import "./index.css";
-  import { UserProvider } from "../shared/hooks/userContext";
   import { BrowserRouter } from "react-router";
+import { ErrorBoundary } from './../shared/components/ErrorBoundary';
 
   createRoot(document.getElementById("root")!).render(
-    <UserProvider>
+    <ErrorBoundary >
       <BrowserRouter>
         <App />
       </BrowserRouter>
-    </UserProvider>
+      </ErrorBoundary>
   );
   
