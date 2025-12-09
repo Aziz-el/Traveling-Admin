@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Tour } from '../app/App';
+import { useCompaniesStore } from '../shared/hooks/useCompanies';
+import { useNavigate } from 'react-router';
 import { InteractiveMap } from '../shared/components/InteractiveMap';
 import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 
@@ -9,12 +11,15 @@ interface AddTourProps {
 }
 
 export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
+  const companies = useCompaniesStore(state => state.companies);
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
     category: 'Азия' as Tour['category'],
-    company: 'GitLens Travel',
+    company: companies[0] ?? 'GitLens Travel',
     startTime: '',
     endTime: '',
     startLat: '',
@@ -97,13 +102,16 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
     };
 
     onAddTour(tour);
-    
-    setFormData({
+    // Перейти на список туров — тур добавлен в состояние в `App`
+    navigate('/tours');
+
+    setFormData(prev => ({
+      ...prev,
       name: '',
       description: '',
       price: '',
       category: 'Азия',
-      company: 'GitLens Travel',
+      company: companies[0] ?? 'GitLens Travel',
       startTime: '',
       endTime: '',
       startLat: '',
@@ -112,7 +120,7 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
       endLng: '',
       status: 'Активный',
       image: '',
-    });
+    }));
     setPreviewTour(null);
 
     alert('Тур успешно создан!');
@@ -186,8 +194,9 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                 >
-                  <option value="GitLens Travel">GitLens Travel</option>
-                  <option value="Aviasales Tours">Aviasales Tours</option>
+                    {companies.map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
                 </select>
               </div>
             </div>

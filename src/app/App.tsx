@@ -18,7 +18,6 @@ export interface Tour {
   description: string;
   price: number;
   category: 'Азия' | 'Европа' | 'Америка' | 'Африка' | 'Океания' | 'Антарктида';
-  // Новый формат времени: когда начинается и когда заканчивается (строки, например "2025-06-01 09:00")
   startTime: string;
   endTime: string;
   company: string;

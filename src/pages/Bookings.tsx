@@ -1,5 +1,7 @@
+import React, { useState, useEffect } from 'react';
 import { Tour } from '../app/App';
 import { Calendar, DollarSign, CheckCircle, Clock, XCircle, TrendingUp } from 'lucide-react';
+import { useCompaniesStore } from '../shared/hooks/useCompanies';
 import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 
 interface BookingsProps {
@@ -20,7 +22,7 @@ interface Booking {
 
 export function Bookings({ tours }: BookingsProps) {
   // Моковые данные бронирований
-  const bookings: Booking[] = [
+  const initialBookings: Booking[] = [
     {
       id: '1',
       tourId: '1',
@@ -110,6 +112,59 @@ export function Bookings({ tours }: BookingsProps) {
       guests: 2,
     },
   ];
+
+  const [bookings, setBookings] = useState<Booking[]>(() => {
+    try {
+      const raw = localStorage.getItem('bookings');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed as Booking[];
+      }
+    } catch {}
+    return initialBookings;
+  });
+  useEffect(() => {
+    try { localStorage.setItem('bookings', JSON.stringify(bookings)); } catch {}
+  }, [bookings]);
+  const { companies } = useCompaniesStore();
+  const [createOpen, setCreateOpen] = useState(false);
+  const [newBooking, setNewBooking] = useState<Partial<Booking>>({
+    customerName: '',
+    email: '',
+    tourId: tours[0]?.id ?? '',
+    date: '',
+    status: 'В ожидании',
+    paymentStatus: 'Ожидает оплаты',
+    amount: 0,
+    guests: 1,
+  });
+
+  const handleCreateChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setNewBooking(prev => ({ ...prev, [name]: name === 'amount' || name === 'guests' ? Number(value) : value }));
+  };
+
+  const handleCreateSave = () => {
+    if (!newBooking.customerName || !newBooking.email || !newBooking.tourId || !newBooking.date) {
+      alert('Пожалуйста, заполните все обязательные поля');
+      return;
+    }
+
+    const booking: Booking = {
+      id: Date.now().toString(),
+      tourId: newBooking.tourId as string,
+      customerName: newBooking.customerName as string,
+      email: newBooking.email as string,
+      date: newBooking.date as string,
+      status: (newBooking.status as Booking['status']) || 'В ожидании',
+      paymentStatus: (newBooking.paymentStatus as Booking['paymentStatus']) || 'Ожидает оплаты',
+      amount: newBooking.amount || 0,
+      guests: newBooking.guests || 1,
+    };
+
+    setBookings(prev => [booking, ...prev]);
+    setCreateOpen(false);
+  };
 
   const getTourById = (id: string) => {
     return tours.find(t => t.id === id);
@@ -257,6 +312,11 @@ export function Bookings({ tours }: BookingsProps) {
         </div>
 
         <div className="space-y-6">
+          <div className="flex items-center justify-end">
+            <button onClick={() => setCreateOpen(true)} className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              Создать бронирование
+            </button>
+          </div>
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
             <div className="p-6 border-b border-gray-200 dark:border-gray-800 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950">
               <h2 className="text-gray-900 dark:text-white">Статистика</h2>
@@ -335,6 +395,64 @@ export function Bookings({ tours }: BookingsProps) {
           </div>
         </div>
       </div>
+      {createOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-full max-w-2xl">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Создать бронирование</h3>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-gray-700 dark:text-gray-300 mb-1">Тур</label>
+                <select name="tourId" value={newBooking.tourId} onChange={handleCreateChange} className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800">
+                  {tours.map(t => (
+                    <option key={t.id} value={t.id}>{t.name} — {t.company}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-gray-700 dark:text-gray-300 mb-1">Имя клиента</label>
+                <input name="customerName" value={newBooking.customerName} onChange={handleCreateChange} className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800" />
+              </div>
+
+              <div>
+                <label className="block text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                <input name="email" value={newBooking.email} onChange={handleCreateChange} className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-700 dark:text-gray-300 mb-1">Дата</label>
+                  <input name="date" type="date" value={newBooking.date} onChange={handleCreateChange} className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800" />
+                </div>
+                <div>
+                  <label className="block text-gray-700 dark:text-gray-300 mb-1">Гостей</label>
+                  <input name="guests" type="number" min={1} value={newBooking.guests as number} onChange={handleCreateChange} className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-700 dark:text-gray-300 mb-1">Сумма</label>
+                  <input name="amount" type="number" value={newBooking.amount as number} onChange={handleCreateChange} className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800" />
+                </div>
+                <div>
+                  <label className="block text-gray-700 dark:text-gray-300 mb-1">Статус оплаты</label>
+                  <select name="paymentStatus" value={newBooking.paymentStatus} onChange={handleCreateChange} className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800">
+                    <option>Ожидает оплаты</option>
+                    <option>Оплачено</option>
+                    <option>Возврат</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button onClick={() => setCreateOpen(false)} className="px-4 py-2 border rounded-md">Отмена</button>
+              <button onClick={handleCreateSave} className="px-4 py-2 bg-blue-600 text-white rounded-md">Сохранить</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { Tour } from '../app/App';
 import { Edit, Trash2, MapPin, DollarSign } from 'lucide-react';
 import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
@@ -15,6 +16,7 @@ interface ToursListProps {
 export function ToursList({ tours, onUpdateTour, onDeleteTour, categoryImages, onSelectTour, selectedTourId }: ToursListProps) {
   const [editingTour, setEditingTour] = useState<Tour | null>(null);
   const [formData, setFormData] = useState<Tour | null>(null);
+  const navigate = useNavigate();
 
   const handleEdit = (tour: Tour) => {
     setEditingTour(tour);
@@ -59,7 +61,7 @@ export function ToursList({ tours, onUpdateTour, onDeleteTour, categoryImages, o
         {tours.map((tour) => (
           <div 
             key={tour.id} 
-            onClick={() => onSelectTour?.(tour.id)}
+            onClick={() => { onSelectTour?.(tour.id); navigate(`/tours/${tour.id}`); }}
             className={`bg-white dark:bg-gray-900 rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer ${selectedTourId === tour.id ? 'border-blue-600 dark:border-blue-400 ring-2 ring-blue-100 dark:ring-blue-900' : 'border-gray-200 dark:border-gray-800'}`}
           >
             <div className="aspect-video relative overflow-hidden">
@@ -80,16 +82,9 @@ export function ToursList({ tours, onUpdateTour, onDeleteTour, categoryImages, o
             </div>
 
             <div className="p-5">
-              {selectedTourId === tour.id && (
-                <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-950 rounded">
-                  <div className="text-sm font-medium text-slate-900 dark:text-white">Выбранный тур</div>
-                  <div className="text-xs text-slate-600 dark:text-slate-400">{tour.description}</div>
-                  <div className="text-xs text-slate-600 dark:text-slate-400 mt-2">Цена: ${tour.price}</div>
-                </div>
-              )}
               <div className="mb-3">
                 <h3 className="text-gray-900 dark:text-white mb-1 truncate">{tour.name}</h3>
-                <p className="text-gray-600 dark:text-gray-400 line-clamp-2 h-10">
+                <p className="text-gray-600 dark:text-gray-400 line-clamp-2 h-25">
                   {tour.description}
                 </p>
               </div>
