@@ -4,6 +4,8 @@ import { Link } from 'react-router';
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -2,11 +2,11 @@ import { Users as UsersIcon, UserCheck, UserX, TrendingUp } from 'lucide-react';
 
 export function Users() {
   const users = [
-    { id: 1, name: 'Иван Петров', email: 'ivan@example.com', status: 'Активный', bookings: 3, spent: 4500 },
-    { id: 2, name: 'Мария Сидорова', email: 'maria@example.com', status: 'Активный', bookings: 1, spent: 2200 },
-    { id: 3, name: 'Алексей Иванов', email: 'alexey@example.com', status: 'Активный', bookings: 2, spent: 6000 },
-    { id: 4, name: 'Ольга Смирнова', email: 'olga@example.com', status: 'Неактивный', bookings: 0, spent: 0 },
-    { id: 5, name: 'Дмитрий Козлов', email: 'dmitry@example.com', status: 'Активный', bookings: 1, spent: 3500 },
+    { id: 1, name: 'Иван Петров', role: 'Администратор', email: 'ivan@example.com', status: 'Активный', bookings: 3, spent: 4500 },
+    { id: 2, name: 'Мария Сидорова', role: 'Пользователь', email: 'maria@example.com', status: 'Активный', bookings: 1, spent: 2200 },
+    { id: 3, name: 'Алексей Иванов', role: 'Компания', email: 'alexey@example.com', status: 'Активный', bookings: 2, spent: 6000 },
+    { id: 4, name: 'Ольга Смирнова', role: 'Пользователь', email: 'olga@example.com', status: 'Неактивный', bookings: 0, spent: 0 },
+    { id: 5, name: 'Дмитрий Козлов', role: 'Пользователь', email: 'dmitry@example.com', status: 'Активный', bookings: 1, spent: 3500 },
   ];
 
   const activeUsers = users.filter(u => u.status === 'Активный').length;

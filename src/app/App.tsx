@@ -11,12 +11,16 @@ import { Settings } from '../pages/Settings';
 import { RoutesPage } from '../pages/RoutesPage';
 import Login from '../pages/Login/Login';
 import Register from '../pages/register/register';
+import TourDetails from '../pages/TourDetails';
 export interface Tour {
   id: string;
   name: string;
   description: string;
   price: number;
   category: 'Азия' | 'Европа' | 'Америка' | 'Африка' | 'Океания' | 'Антарктида';
+  // Новый формат времени: когда начинается и когда заканчивается (строки, например "2025-06-01 09:00")
+  startTime: string;
+  endTime: string;
   company: string;
   startLat: number;
   startLng: number;
@@ -51,6 +55,8 @@ export default function App() {
       price: 1500,
       category: 'Азия',
       company: 'GitLens Travel',
+      startTime: '2025-06-01 09:00',
+      endTime: '2025-06-10 18:00',
       startLat: 35.6762,
       startLng: 139.6503,
       endLat: 35.0116,
@@ -65,6 +71,8 @@ export default function App() {
       price: 2200,
       category: 'Европа',
       company: 'Aviasales Tours',
+      startTime: '2025-05-10 09:00',
+      endTime: '2025-05-17 20:00',
       startLat: 48.8566,
       startLng: 2.3522,
       endLat: 51.5074,
@@ -79,6 +87,8 @@ export default function App() {
       price: 3000,
       category: 'Америка',
       company: 'GitLens Travel',
+      startTime: '2025-07-01 08:00',
+      endTime: '2025-07-08 22:00',
       startLat: 40.7128,
       startLng: -74.0060,
       endLat: 34.0522,
@@ -93,6 +103,8 @@ export default function App() {
       price: 2800,
       category: 'Африка',
       company: 'Aviasales Tours',
+      startTime: '2025-08-12 06:00',
+      endTime: '2025-08-20 19:00',
       startLat: -2.1540,
       startLng: 34.6857,
       endLat: -3.0674,
@@ -107,6 +119,8 @@ export default function App() {
       price: 3500,
       category: 'Океания',
       company: 'GitLens Travel',
+      startTime: '2025-09-05 07:00',
+      endTime: '2025-09-12 17:00',
       startLat: -33.8688,
       startLng: 151.2093,
       endLat: -16.5000,
@@ -121,6 +135,8 @@ export default function App() {
       price: 1800,
       category: 'Азия',
       company: 'Aviasales Tours',
+      startTime: '2025-10-01 09:00',
+      endTime: '2025-10-07 18:00',
       startLat: -8.3405,
       startLng: 115.0920,
       endLat: -8.5069,
@@ -135,6 +151,8 @@ export default function App() {
       price: 2500,
       category: 'Европа',
       company: 'GitLens Travel',
+      startTime: '2025-06-15 10:00',
+      endTime: '2025-06-22 19:00',
       startLat: 36.3932,
       startLng: 25.4615,
       endLat: 37.9838,
@@ -149,6 +167,8 @@ export default function App() {
       price: 2100,
       category: 'Америка',
       company: 'Aviasales Tours',
+      startTime: '2025-04-20 07:00',
+      endTime: '2025-04-25 17:00',
       startLat: 36.1069,
       startLng: -112.1129,
       endLat: 36.0544,
@@ -163,6 +183,8 @@ export default function App() {
       price: 3200,
       category: 'Азия',
       company: 'GitLens Travel',
+      startTime: '2025-11-05 10:00',
+      endTime: '2025-11-12 21:00',
       startLat: 25.2048,
       startLng: 55.2708,
       endLat: 25.0762,
@@ -177,6 +199,8 @@ export default function App() {
       price: 4500,
       category: 'Азия',
       company: 'Aviasales Tours',
+      startTime: '2025-12-01 08:00',
+      endTime: '2025-12-10 20:00',
       startLat: 4.1755,
       startLng: 73.5093,
       endLat: 3.2028,
@@ -246,6 +270,7 @@ export default function App() {
                       onSelectTour={handleSelectTour}
                       selectedTourId={selectedTourId}
                     />} />
+                  <Route path='tours/:id' element={<TourDetails tours={tours} />} />
                   <Route path='companies' element={<Companies tours={tours} />}/>
                   <Route path='bookings' element={<Bookings tours={tours} />}/>
                   <Route path='users' element={<Users />}/>

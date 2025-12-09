@@ -3,6 +3,7 @@ import { StatsCard } from '../shared/components/StatsCard';
 import { InteractiveMap } from '../shared/components/InteractiveMap';
 import { MapPin, Users, DollarSign, TrendingUp } from 'lucide-react';
 import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
+import { formatDateRange } from '../shared/utils/formatDate';
 
 interface DashboardProps {
   tours: Tour[];
@@ -84,6 +85,9 @@ export function Dashboard({ tours, onMapItemClick, onSelectTour }: DashboardProp
                     {tour.name}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400 truncate">{tour.company}</p>
+                    { (tour.startTime || tour.endTime) && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatDateRange(tour.startTime, tour.endTime)}</p>
+                    ) }
                   <div className="flex items-center gap-2 mt-1">
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
                       {tour.category}
