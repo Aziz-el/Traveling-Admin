@@ -1,10 +1,19 @@
 import axios from 'axios';
 
+interface ImportMetaEnv {
+  readonly VITE_API_URL: string;
+}
+
+declare global {
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+}
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/x-www-form-urlencoded',
   },
 });
 

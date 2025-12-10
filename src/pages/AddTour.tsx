@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Tour } from '../app/App';
-import { useCompaniesStore } from '../shared/hooks/useCompanies';
+import { useCompaniesStore } from '../entities/Companies/model/useCompanyStore';
 import { useNavigate } from 'react-router';
 import { InteractiveMap } from '../shared/components/InteractiveMap';
 import { ImageWithFallback } from '../shared/ui/ImageWithFallback';

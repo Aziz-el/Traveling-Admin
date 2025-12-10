@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { redirect } from 'react-router';
-import { Sidebar } from '../widgets/Sidebar';
+import { Sidebar } from '../../widgets/Sidebar';
 
 export default function ProtectedLayout({children}: {children: React.ReactNode}) {
    const [isDarkMode, setIsDarkMode] = useState(() => {

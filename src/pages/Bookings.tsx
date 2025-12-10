@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Tour } from '../app/App';
 import { Calendar, DollarSign, CheckCircle, Clock, XCircle, TrendingUp } from 'lucide-react';
-import { useCompaniesStore } from '../shared/hooks/useCompanies';
+import { useCompaniesStore } from '../entities/Companies/model/useCompanyStore';
 import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
+import { useTourStore } from '../entities/Tour/model/useTourStore';
 
-interface BookingsProps {
-  tours: Tour[];
-}
 
 interface Booking {
   id: string;
@@ -20,8 +18,8 @@ interface Booking {
   guests: number;
 }
 
-export function Bookings({ tours }: BookingsProps) {
-  // Моковые данные бронирований
+export function Bookings() {
+  let tours = useTourStore().tours;
   const initialBookings: Booking[] = [
     {
       id: '1',
@@ -179,61 +177,61 @@ export function Bookings({ tours }: BookingsProps) {
   const totalGuests = bookings.reduce((sum, b) => sum + b.guests, 0);
 
   return (
-    <div className="p-8 dark:bg-gray-950 min-h-screen">
+    <div className="min-h-screen p-8 dark:bg-gray-950">
       <div className="mb-8">
-        <h1 className="text-gray-900 dark:text-white mb-2">Бронирования</h1>
+        <h1 className="mb-2 text-gray-900 dark:text-white">Бронирования</h1>
         <p className="text-gray-600 dark:text-gray-400">Управление бронированиями туров</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 rounded-xl p-6 shadow-sm border border-green-200 dark:border-green-800 hover:shadow-lg transition-all hover:scale-105">
+      <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4">
+        <div className="p-6 transition-all border border-green-200 shadow-sm bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 rounded-xl dark:border-green-800 hover:shadow-lg hover:scale-105">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+            <div className="p-3 bg-white shadow-sm dark:bg-gray-800 rounded-xl">
               <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
             <span className="text-green-600 dark:text-green-400">+5%</span>
           </div>
-          <h3 className="text-green-700 dark:text-green-300 mb-1">Подтверждено</h3>
+          <h3 className="mb-1 text-green-700 dark:text-green-300">Подтверждено</h3>
           <p className="text-green-900 dark:text-white">{confirmedBookings}</p>
         </div>
 
-        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950 dark:to-yellow-900 rounded-xl p-6 shadow-sm border border-yellow-200 dark:border-yellow-800 hover:shadow-lg transition-all hover:scale-105">
+        <div className="p-6 transition-all border border-yellow-200 shadow-sm bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950 dark:to-yellow-900 rounded-xl dark:border-yellow-800 hover:shadow-lg hover:scale-105">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+            <div className="p-3 bg-white shadow-sm dark:bg-gray-800 rounded-xl">
               <Clock className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
             </div>
             <span className="text-yellow-600 dark:text-yellow-400">+12%</span>
           </div>
-          <h3 className="text-yellow-700 dark:text-yellow-300 mb-1">В ожидании</h3>
+          <h3 className="mb-1 text-yellow-700 dark:text-yellow-300">В ожидании</h3>
           <p className="text-yellow-900 dark:text-white">{pendingBookings}</p>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-xl p-6 shadow-sm border border-blue-200 dark:border-blue-800 hover:shadow-lg transition-all hover:scale-105">
+        <div className="p-6 transition-all border border-blue-200 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-xl dark:border-blue-800 hover:shadow-lg hover:scale-105">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+            <div className="p-3 bg-white shadow-sm dark:bg-gray-800 rounded-xl">
               <DollarSign className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
             <span className="text-green-600 dark:text-green-400">+8%</span>
           </div>
-          <h3 className="text-blue-700 dark:text-blue-300 mb-1">Оплачено</h3>
+          <h3 className="mb-1 text-blue-700 dark:text-blue-300">Оплачено</h3>
           <p className="text-blue-900 dark:text-white">{paidBookings}</p>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 rounded-xl p-6 shadow-sm border border-purple-200 dark:border-purple-800 hover:shadow-lg transition-all hover:scale-105">
+        <div className="p-6 transition-all border border-purple-200 shadow-sm bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 rounded-xl dark:border-purple-800 hover:shadow-lg hover:scale-105">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+            <div className="p-3 bg-white shadow-sm dark:bg-gray-800 rounded-xl">
               <TrendingUp className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
             <span className="text-green-600 dark:text-green-400">+15%</span>
           </div>
-          <h3 className="text-purple-700 dark:text-purple-300 mb-1">Общая выручка</h3>
+          <h3 className="mb-1 text-purple-700 dark:text-purple-300">Общая выручка</h3>
           <p className="text-purple-900 dark:text-white">${totalRevenue.toLocaleString()}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+          <div className="overflow-hidden bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
             <div className="p-6 border-b border-gray-200 dark:border-gray-800 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950">
               <h2 className="text-gray-900 dark:text-white">Все бронирования</h2>
               <p className="text-gray-600 dark:text-gray-400">Полный список бронирований</p>
@@ -246,27 +244,27 @@ export function Bookings({ tours }: BookingsProps) {
                 return (
                   <div 
                     key={booking.id} 
-                    className="flex gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-750 transition-all hover:shadow-md group border border-gray-200 dark:border-gray-700"
+                    className="flex gap-4 p-4 transition-all border border-gray-200 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-750 hover:shadow-md group dark:border-gray-700"
                   >
-                    <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 shadow-md">
+                    <div className="flex-shrink-0 w-24 h-24 overflow-hidden rounded-lg shadow-md">
                       <ImageWithFallback
                         src={tour?.image || ''}
                         alt={tour?.name || 'Tour'}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
                       />
                     </div>
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <h3 className="text-gray-900 dark:text-white truncate">{tour?.name || 'N/A'}</h3>
+                          <h3 className="text-gray-900 truncate dark:text-white">{tour?.name || 'N/A'}</h3>
                           <p className="text-gray-600 dark:text-gray-400">{booking.customerName}</p>
                         </div>
-                        <span className="text-gray-900 dark:text-white ml-4">${booking.amount}</span>
+                        <span className="ml-4 text-gray-900 dark:text-white">${booking.amount}</span>
                       </div>
                       
                       <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
+                        <span className="inline-flex items-center px-2 py-1 text-blue-600 rounded-full bg-blue-50 dark:bg-blue-950 dark:text-blue-400">
                           {tour?.category}
                         </span>
                         <span className={`inline-flex items-center px-2 py-1 rounded-full ${
@@ -313,18 +311,18 @@ export function Bookings({ tours }: BookingsProps) {
 
         <div className="space-y-6">
           <div className="flex items-center justify-end">
-            <button onClick={() => setCreateOpen(true)} className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button onClick={() => setCreateOpen(true)} className="inline-flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">
               Создать бронирование
             </button>
           </div>
-          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+          <div className="overflow-hidden bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
             <div className="p-6 border-b border-gray-200 dark:border-gray-800 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950">
               <h2 className="text-gray-900 dark:text-white">Статистика</h2>
               <p className="text-gray-600 dark:text-gray-400">Ключевые показатели</p>
             </div>
             
             <div className="p-6 space-y-4">
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="p-4 border border-blue-200 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 dark:border-blue-800">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-blue-700 dark:text-blue-300">Всего бронирований</span>
                   <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -332,7 +330,7 @@ export function Bookings({ tours }: BookingsProps) {
                 <p className="text-blue-900 dark:text-white">{bookings.length}</p>
               </div>
 
-              <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="p-4 border border-green-200 rounded-lg bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 dark:border-green-800">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-green-700 dark:text-green-300">Всего гостей</span>
                   <Users className="w-5 h-5 text-green-600 dark:text-green-400" />
@@ -340,7 +338,7 @@ export function Bookings({ tours }: BookingsProps) {
                 <p className="text-green-900 dark:text-white">{totalGuests}</p>
               </div>
 
-              <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 rounded-lg border border-purple-200 dark:border-purple-800">
+              <div className="p-4 border border-purple-200 rounded-lg bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 dark:border-purple-800">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-purple-700 dark:text-purple-300">Средний чек</span>
                   <DollarSign className="w-5 h-5 text-purple-600 dark:text-purple-400" />
@@ -350,7 +348,7 @@ export function Bookings({ tours }: BookingsProps) {
                 </p>
               </div>
 
-              <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 rounded-lg border border-orange-200 dark:border-orange-800">
+              <div className="p-4 border border-orange-200 rounded-lg bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 dark:border-orange-800">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-orange-700 dark:text-orange-300">Коэффициент конверсии</span>
                   <TrendingUp className="w-5 h-5 text-orange-600 dark:text-orange-400" />
@@ -362,7 +360,7 @@ export function Bookings({ tours }: BookingsProps) {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+          <div className="overflow-hidden bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
             <div className="p-6 border-b border-gray-200 dark:border-gray-800 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950">
               <h2 className="text-gray-900 dark:text-white">Популярные туры</h2>
               <p className="text-gray-600 dark:text-gray-400">По числу бронирований</p>
@@ -377,16 +375,16 @@ export function Bookings({ tours }: BookingsProps) {
                 .sort((a, b) => b.count - a.count)
                 .slice(0, 5)
                 .map(({ tour, count }) => tour && (
-                  <div key={tour.id} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors">
-                    <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                  <div key={tour.id} className="flex items-center gap-3 p-3 transition-colors rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750">
+                    <div className="flex-shrink-0 w-12 h-12 overflow-hidden rounded-lg">
                       <ImageWithFallback
                         src={tour.image}
                         alt={tour.name}
-                        className="w-full h-full object-cover"
+                        className="object-cover w-full h-full"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-gray-900 dark:text-white truncate">{tour.name}</p>
+                      <p className="text-gray-900 truncate dark:text-white">{tour.name}</p>
                       <p className="text-gray-600 dark:text-gray-400">{count} бронирований</p>
                     </div>
                   </div>
@@ -397,12 +395,12 @@ export function Bookings({ tours }: BookingsProps) {
       </div>
       {createOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-full max-w-2xl">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Создать бронирование</h3>
+          <div className="w-full max-w-2xl p-6 bg-white rounded-lg dark:bg-gray-900">
+            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Создать бронирование</h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-gray-700 dark:text-gray-300 mb-1">Тур</label>
-                <select name="tourId" value={newBooking.tourId} onChange={handleCreateChange} className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800">
+                <label className="block mb-1 text-gray-700 dark:text-gray-300">Тур</label>
+                <select name="tourId" value={newBooking.tourId} onChange={handleCreateChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800">
                   {tours.map(t => (
                     <option key={t.id} value={t.id}>{t.name} — {t.company}</option>
                   ))}
@@ -410,34 +408,34 @@ export function Bookings({ tours }: BookingsProps) {
               </div>
 
               <div>
-                <label className="block text-gray-700 dark:text-gray-300 mb-1">Имя клиента</label>
-                <input name="customerName" value={newBooking.customerName} onChange={handleCreateChange} className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800" />
+                <label className="block mb-1 text-gray-700 dark:text-gray-300">Имя клиента</label>
+                <input name="customerName" value={newBooking.customerName} onChange={handleCreateChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800" />
               </div>
 
               <div>
-                <label className="block text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                <input name="email" value={newBooking.email} onChange={handleCreateChange} className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800" />
+                <label className="block mb-1 text-gray-700 dark:text-gray-300">Email</label>
+                <input name="email" value={newBooking.email} onChange={handleCreateChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-gray-700 dark:text-gray-300 mb-1">Дата</label>
-                  <input name="date" type="date" value={newBooking.date} onChange={handleCreateChange} className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800" />
+                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Дата</label>
+                  <input name="date" type="date" value={newBooking.date} onChange={handleCreateChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800" />
                 </div>
                 <div>
-                  <label className="block text-gray-700 dark:text-gray-300 mb-1">Гостей</label>
-                  <input name="guests" type="number" min={1} value={newBooking.guests as number} onChange={handleCreateChange} className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800" />
+                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Гостей</label>
+                  <input name="guests" type="number" min={1} value={newBooking.guests as number} onChange={handleCreateChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-gray-700 dark:text-gray-300 mb-1">Сумма</label>
-                  <input name="amount" type="number" value={newBooking.amount as number} onChange={handleCreateChange} className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800" />
+                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Сумма</label>
+                  <input name="amount" type="number" value={newBooking.amount as number} onChange={handleCreateChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800" />
                 </div>
                 <div>
-                  <label className="block text-gray-700 dark:text-gray-300 mb-1">Статус оплаты</label>
-                  <select name="paymentStatus" value={newBooking.paymentStatus} onChange={handleCreateChange} className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800">
+                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Статус оплаты</label>
+                  <select name="paymentStatus" value={newBooking.paymentStatus} onChange={handleCreateChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800">
                     <option>Ожидает оплаты</option>
                     <option>Оплачено</option>
                     <option>Возврат</option>
@@ -446,9 +444,9 @@ export function Bookings({ tours }: BookingsProps) {
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="flex justify-end gap-3 mt-6">
               <button onClick={() => setCreateOpen(false)} className="px-4 py-2 border rounded-md">Отмена</button>
-              <button onClick={handleCreateSave} className="px-4 py-2 bg-blue-600 text-white rounded-md">Сохранить</button>
+              <button onClick={handleCreateSave} className="px-4 py-2 text-white bg-blue-600 rounded-md">Сохранить</button>
             </div>
           </div>
         </div>

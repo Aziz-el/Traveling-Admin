@@ -4,12 +4,11 @@ import { Tour } from '../app/App';
 import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 import { InteractiveMap } from '../shared/components/InteractiveMap';
 import { formatDateRange } from '../shared/utils/formatDate';
+import { useTourStore } from '../entities/Tour/model/useTourStore';
 
-interface TourDetailsProps {
-  tours: Tour[];
-}
 
-export default function TourDetails({ tours }: TourDetailsProps) {
+export default function TourDetails() {
+  let tours = useTourStore().tours;
   const { id } = useParams();
   const navigate = useNavigate();
   const tour = tours.find(t => t.id === id);
@@ -64,23 +63,23 @@ export default function TourDetails({ tours }: TourDetailsProps) {
     return (
       <div className="p-8">
         <h2 className="text-lg font-medium">Тур не найден</h2>
-        <button onClick={() => navigate('/tours')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Назад к турам</button>
+        <button onClick={() => navigate('/tours')} className="px-4 py-2 mt-4 text-white bg-blue-600 rounded">Назад к турам</button>
       </div>
     );
   }
 
   return (
     <>
-      <div className="p-8 h-screen dark:bg-gray-950">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
-          <h1 className="text-2xl font-semibold mb-2 dark:text-white">{tour.name}</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">{tour.company} • {tour.category}</p>
+      <div className="h-screen p-8 dark:bg-gray-950">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="p-6 bg-white border border-gray-200 shadow-sm lg:col-span-2 dark:bg-gray-900 rounded-xl dark:border-gray-800">
+          <h1 className="mb-2 text-2xl font-semibold dark:text-white">{tour.name}</h1>
+          <p className="mb-4 text-gray-600 dark:text-gray-400">{tour.company} • {tour.category}</p>
           <div className="flex justify-end mb-4">
-            <button onClick={() => setCreateOpen(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg">Забронировать</button>
+            <button onClick={() => setCreateOpen(true)} className="px-4 py-2 text-white bg-blue-600 rounded-lg">Забронировать</button>
           </div>
           <div className="mb-4">
-            <ImageWithFallback src={tour.image} alt={tour.name} className="w-full h-64 object-cover rounded" />
+            <ImageWithFallback src={tour.image} alt={tour.name} className="object-cover w-full h-64 rounded" />
           </div>
           <div className="mb-4 text-gray-700 dark:text-gray-300">{tour.description}</div>
           <div className="flex gap-4 mb-4">
@@ -88,11 +87,11 @@ export default function TourDetails({ tours }: TourDetailsProps) {
             <div className="text-sm text-gray-600 dark:text-gray-400">Статус: <span className="text-gray-900 dark:text-white">{tour.status}</span></div>
           </div>
           { (tour.startTime || tour.endTime) && (
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">{formatDateRange(tour.startTime, tour.endTime)}</div>
+            <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">{formatDateRange(tour.startTime, tour.endTime)}</div>
           ) }
         </div>
 
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+        <div className="p-6 bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
           <h3 className="mb-4 dark:text-white">Карта</h3>
           <div className="h-64">
             <InteractiveMap tours={[tour]} />
@@ -105,34 +104,34 @@ export default function TourDetails({ tours }: TourDetailsProps) {
       </div>
       {createOpen && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-        <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-full max-w-lg">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Создать бронирование</h3>
+        <div className="w-full max-w-lg p-6 bg-white rounded-lg dark:bg-gray-900">
+          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Создать бронирование</h3>
           <div className="grid grid-cols-1 gap-3">
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 mb-1">Имя клиента</label>
-              <input name="customerName" value={bookingData.customerName} onChange={handleBookingChange} className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800" />
+              <label className="block mb-1 text-gray-700 dark:text-gray-300">Имя клиента</label>
+              <input name="customerName" value={bookingData.customerName} onChange={handleBookingChange} className="w-full px-3 py-2 bg-white border rounded dark:bg-gray-800" />
             </div>
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 mb-1">Email</label>
-              <input name="email" value={bookingData.email} onChange={handleBookingChange} className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800" />
+              <label className="block mb-1 text-gray-700 dark:text-gray-300">Email</label>
+              <input name="email" value={bookingData.email} onChange={handleBookingChange} className="w-full px-3 py-2 bg-white border rounded dark:bg-gray-800" />
             </div>
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 mb-1">Дата</label>
-              <input name="date" type="date" value={bookingData.date} onChange={handleBookingChange} className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800" />
+              <label className="block mb-1 text-gray-700 dark:text-gray-300">Дата</label>
+              <input name="date" type="date" value={bookingData.date} onChange={handleBookingChange} className="w-full px-3 py-2 bg-white border rounded dark:bg-gray-800" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-gray-700 dark:text-gray-300 mb-1">Гостей</label>
-                <input name="guests" type="number" min={1} value={bookingData.guests} onChange={handleBookingChange} className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800" />
+                <label className="block mb-1 text-gray-700 dark:text-gray-300">Гостей</label>
+                <input name="guests" type="number" min={1} value={bookingData.guests} onChange={handleBookingChange} className="w-full px-3 py-2 bg-white border rounded dark:bg-gray-800" />
               </div>
               <div>
-                <label className="block text-gray-700 dark:text-gray-300 mb-1">Сумма</label>
-                <input name="amount" type="number" value={bookingData.amount} onChange={handleBookingChange} className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800" />
+                <label className="block mb-1 text-gray-700 dark:text-gray-300">Сумма</label>
+                <input name="amount" type="number" value={bookingData.amount} onChange={handleBookingChange} className="w-full px-3 py-2 bg-white border rounded dark:bg-gray-800" />
               </div>
             </div>
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 mb-1">Статус оплаты</label>
-              <select name="paymentStatus" value={bookingData.paymentStatus} onChange={handleBookingChange} className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800">
+              <label className="block mb-1 text-gray-700 dark:text-gray-300">Статус оплаты</label>
+              <select name="paymentStatus" value={bookingData.paymentStatus} onChange={handleBookingChange} className="w-full px-3 py-2 bg-white border rounded dark:bg-gray-800">
                 <option>Ожидает оплаты</option>
                 <option>Оплачено</option>
                 <option>Возврат</option>
@@ -140,9 +139,9 @@ export default function TourDetails({ tours }: TourDetailsProps) {
             </div>
           </div>
 
-          <div className="mt-4 flex justify-end gap-3">
+          <div className="flex justify-end gap-3 mt-4">
             <button onClick={() => setCreateOpen(false)} className="px-4 py-2 border rounded">Отмена</button>
-            <button onClick={handleSaveBooking} className="px-4 py-2 bg-blue-600 text-white rounded">Сохранить</button>
+            <button onClick={handleSaveBooking} className="px-4 py-2 text-white bg-blue-600 rounded">Сохранить</button>
           </div>
         </div>
       </div>

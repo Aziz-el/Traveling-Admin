@@ -9,12 +9,11 @@ import { Users } from '../pages/Users';
 import { Routes,Route } from 'react-router';
 import { Settings } from '../pages/Settings';
 import { RoutesPage } from '../pages/RoutesPage';
-import Login from '../pages/Login/Login';
-import Register from '../pages/register/register';
+import Login from '../pages/Login';
+import Register from '../pages/register';
 import TourDetails from '../pages/TourDetails';
-import ProtectedLayout from './ProtectedLayout';
-import {toursData} from "../shared/lib/data/fakeData.json"
-
+import ProtectedLayout from '../app/Loyouts/ProtectedLayout';
+import { useTourStore } from '../entities/Tour/model/useTourStore';
 export interface Tour {
   id: string;
   name: string;
@@ -48,7 +47,7 @@ export default function App() {
     const saved = localStorage.getItem('darkMode');
     return saved === 'true';
   });
-
+  let toursData = useTourStore().tours
   const [tours, setTours] = useState<Tour[]>(toursData as Tour[]);
 
   const toggleDarkMode = () => {
@@ -83,19 +82,19 @@ export default function App() {
           <Route path="*" element={
            <ProtectedLayout>
                 <Routes>
-                  <Route path='dashboard' element={<Dashboard tours={tours} onMapItemClick={handleMapItemClick} onSelectTour={handleSelectTour} />} />
+                  <Route path='dashboard' element={<Dashboard onMapItemClick={handleMapItemClick} onSelectTour={handleSelectTour} />} />
                   <Route path='add-tour' element={<AddTour onAddTour={addTour} categoryImages={categoryImages} />}/>
                   <Route path='tours' element={<ToursList 
-                      tours={tours} 
+                      
                       onUpdateTour={updateTour} 
                       onDeleteTour={deleteTour}
                       categoryImages={categoryImages}
                       onSelectTour={handleSelectTour}
                       selectedTourId={selectedTourId}
                     />} />
-                  <Route path='tours/:id' element={<TourDetails tours={tours} />} />
-                  <Route path='companies' element={<Companies tours={tours} />}/>
-                  <Route path='bookings' element={<Bookings tours={tours} />}/>
+                  <Route path='tours/:id' element={<TourDetails />} />
+                  <Route path='companies' element={<Companies />}/>
+                  <Route path='bookings' element={<Bookings />}/>
                   <Route path='users' element={<Users />}/>
                   <Route path='routes' element={<RoutesPage />}/>
                   <Route path='settings' element={<Settings />}/>

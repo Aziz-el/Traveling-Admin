@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Tour } from '../../app/App';
+import { Tour } from '../../../app/App';
 
 type CompaniesState = {
   companies: string[];

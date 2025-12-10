@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import instance from '../../shared/lib/axios/axios';
+import instance from '../shared/lib/axios/axios';
 import {  Plane} from 'lucide-react';
 
 export default function RegisterPage() {
@@ -54,62 +54,62 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4">
+    <div className="relative flex items-center justify-center min-h-screen p-4">
       <div className="absolute inset-0 z-0">
         <img
           src="https://images.unsplash.com/photo-1613356522023-e95206f99214?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWFjaCUyMHN1bnNldCUyMHRyYXZlbHxlbnwxfHx8fDE3NjUxODE4MzN8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
           alt="Background"
-          className="w-full h-full object-cover"
+          className="object-cover w-full h-full"
         />
         <div className="absolute inset-0 bg-black/25" />
       </div>
 
       <div className="w-full max-w-[700px] mx-auto relative z-10">
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700">
+        <div className="p-6 bg-white border border-gray-200 shadow-md dark:bg-gray-900 rounded-2xl dark:border-gray-700">
           <div className="flex justify-center mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600">
               <Plane className="w-6 h-6 text-white" />
             </div>
           </div>
 
-          <h2 className="text-xl font-semibold mb-1 text-gray-900 dark:text-white">Создать аккаунт</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">Выберите роль и заполните поля</p>
+          <h2 className="mb-1 text-xl font-semibold text-gray-900 dark:text-white">Создать аккаунт</h2>
+          <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">Выберите роль и заполните поля</p>
 
           {error && <div className="mb-3 text-sm text-red-500">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">ФИО</label>
-                <input value={fullName} onChange={(e) => setFullName(e.target.value)} type="text" className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="Иван Иванов" />
+                <label className="block mb-1 text-sm text-gray-700 dark:text-gray-300">ФИО</label>
+                <input value={fullName} onChange={(e) => setFullName(e.target.value)} type="text" className="w-full px-3 py-2 text-gray-900 bg-white border rounded-lg dark:bg-gray-800 dark:text-white" placeholder="Иван Иванов" />
               </div>
               <div>
-                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="mail@domain.com" />
+                <label className="block mb-1 text-sm text-gray-700 dark:text-gray-300">Email</label>
+                <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" className="w-full px-3 py-2 text-gray-900 bg-white border rounded-lg dark:bg-gray-800 dark:text-white" placeholder="mail@domain.com" />
               </div>
               <div>
-                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Телефон</label>
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="+7 900 000 00 00" />
+                <label className="block mb-1 text-sm text-gray-700 dark:text-gray-300">Телефон</label>
+                <input value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" className="w-full px-3 py-2 text-gray-900 bg-white border rounded-lg dark:bg-gray-800 dark:text-white" placeholder="+7 900 000 00 00" />
               </div>
               <div>
-                <label className="block text-sm text-white/90 mb-1">&nbsp;</label>
+                <label className="block mb-1 text-sm text-white/90">&nbsp;</label>
                 <div className="w-full h-8" />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Пароль</label>
-                <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="••••••••" />
+                <label className="block mb-1 text-sm text-gray-700 dark:text-gray-300">Пароль</label>
+                <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" className="w-full px-3 py-2 text-gray-900 bg-white border rounded-lg dark:bg-gray-800 dark:text-white" placeholder="••••••••" />
               </div>
               <div>
-                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Повторите пароль</label>
-                <input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} type="password" className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="••••••••" />
+                <label className="block mb-1 text-sm text-gray-700 dark:text-gray-300">Повторите пароль</label>
+                <input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} type="password" className="w-full px-3 py-2 text-gray-900 bg-white border rounded-lg dark:bg-gray-800 dark:text-white" placeholder="••••••••" />
               </div>
             </div>
 
               <div>
-                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Роль</label>
+                <label className="block mb-1 text-sm text-gray-700 dark:text-gray-300">Роль</label>
                 <div className="flex gap-3">
                   <button type="button" onClick={() => setRole('client')} className={`px-3 py-2 rounded-lg ${role === 'client' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white'}`}>Клиент</button>
                   <button type="button" onClick={() => setRole('admin')} className={`px-3 py-2 rounded-lg ${role === 'admin' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white'}`}>Админ</button>
@@ -119,8 +119,8 @@ export default function RegisterPage() {
 
             {role === 'company' && (
               <div>
-                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Компания</label>
-                <input value={company} onChange={(e) => setCompany(e.target.value)} type="text" className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="Название компании" />
+                <label className="block mb-1 text-sm text-gray-700 dark:text-gray-300">Компания</label>
+                <input value={company} onChange={(e) => setCompany(e.target.value)} type="text" className="w-full px-3 py-2 text-gray-900 bg-white border rounded-lg dark:bg-gray-800 dark:text-white" placeholder="Название компании" />
               </div>
             )}
 
@@ -130,8 +130,8 @@ export default function RegisterPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <button type="submit" disabled={loading} className="flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg shadow">{loading ? 'Регистрация...' : 'Создать аккаунт'}</button>
-              <button type="button" onClick={() => { setFullName(''); setEmail(''); setPassword(''); setConfirmPassword(''); setPhone(''); setCompany(''); setAgree(false); setRole('client'); }} className="px-3 py-2 border rounded-lg text-gray-700 dark:text-gray-300">Сброс</button>
+              <button type="submit" disabled={loading} className="flex-1 px-3 py-2 text-white rounded-lg shadow bg-gradient-to-r from-blue-600 to-blue-500">{loading ? 'Регистрация...' : 'Создать аккаунт'}</button>
+              <button type="button" onClick={() => { setFullName(''); setEmail(''); setPassword(''); setConfirmPassword(''); setPhone(''); setCompany(''); setAgree(false); setRole('client'); }} className="px-3 py-2 text-gray-700 border rounded-lg dark:text-gray-300">Сброс</button>
             </div>
           </form>
 
