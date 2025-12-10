@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
+import { useBookingStore } from '../entities/Booking/model/useBookingStore';
 
 export default function TourDetails() {
   let toursStore = useTourStore();
@@ -16,11 +17,24 @@ export default function TourDetails() {
 
   const tour = tours.find(t => t.id == id);
 
+  const bookingStore = useBookingStore();
   const [createOpen, setCreateOpen] = useState(false);
+  const toLocalInput = (iso?: string) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const YYYY = d.getFullYear();
+    const MM = pad(d.getMonth() + 1);
+    const DD = pad(d.getDate());
+    const hh = pad(d.getHours());
+    const mm = pad(d.getMinutes());
+    return `${YYYY}-${MM}-${DD}T${hh}:${mm}`;
+  };
+
   const [bookingData, setBookingData] = useState({
     customerName: '',
     email: '',
-    date: '',
+    date: toLocalInput(new Date().toISOString()),
     guests: 1,
     paymentStatus: 'Ожидает оплаты',
     amount: tour?.price || 0,
@@ -34,37 +48,30 @@ export default function TourDetails() {
     }));
   };
 
-  const handleSaveBooking = () => {
+  const handleSaveBooking = async () => {
     if (!bookingData.customerName || !bookingData.email || !bookingData.date) {
       alert('Пожалуйста, заполните имя клиента, email и дату');
       return;
     }
 
-    const stored = localStorage.getItem('bookings');
-    let arr = [] as any[];
-
     try {
-      if (stored) arr = JSON.parse(stored);
-    } catch {}
+      const isoDate = new Date(bookingData.date).toISOString();
+      await bookingStore.addBooking({
+        tour_id: Number(tour!.id),
+        participants_count: Number(bookingData.guests),
+        date: isoDate,
+        amount: Number(bookingData.amount),
+        customer_name: bookingData.customerName,
+        email: bookingData.email,
+      } as any);
 
-    const newBooking = {
-      id: Date.now().toString(),
-      tourId: tour!.id,
-      customerName: bookingData.customerName,
-      email: bookingData.email,
-      date: bookingData.date,
-      status: 'В ожидании',
-      paymentStatus: bookingData.paymentStatus,
-      amount: bookingData.amount,
-      guests: bookingData.guests,
-    };
-
-    arr.unshift(newBooking);
-    try { localStorage.setItem('bookings', JSON.stringify(arr)); } catch {}
-
-    setCreateOpen(false);
-    alert('Бронирование создано');
-    navigate('/bookings');
+      setCreateOpen(false);
+      alert('Бронирование создано');
+      navigate('/bookings');
+    } catch (err) {
+      console.error('Failed to create booking', err);
+      alert('Ошибка при создании бронирования');
+    }
   };
 
   if (!tour) {
@@ -151,8 +158,8 @@ export default function TourDetails() {
                 <input name="email" value={bookingData.email} onChange={handleBookingChange} className="w-full px-3 py-2 bg-white border rounded dark:bg-gray-800" />
               </div>
               <div>
-                <label className="block mb-1 text-gray-700 dark:text-gray-300">Дата</label>
-                <input name="date" type="date" value={bookingData.date} onChange={handleBookingChange} className="w-full px-3 py-2 bg-white border rounded dark:bg-gray-800" />
+                <label className="block mb-1 text-gray-700 dark:text-gray-300">Дата и время</label>
+                <input name="date" type="datetime-local" value={bookingData.date} onChange={handleBookingChange} className="w-full px-3 py-2 bg-white border rounded dark:bg-gray-800" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

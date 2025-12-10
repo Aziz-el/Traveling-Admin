@@ -4,116 +4,23 @@ import { useCompaniesStore } from '../entities/Companies/model/useCompanyStore';
 import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 
+import { useBookingStore } from '../entities/Booking/model/useBookingStore';
+import BookingList from '../entities/Booking/ui/BookingList';
+import BookingFormModal from '../entities/Booking/ui/BookingFormModal';
+
 
 export function Bookings() {
-  let tours = useTourStore().tours;
-  const initialBookings: Booking[] = [
-    {
-      id: '1',
-      tourId: '1',
-      customerName: 'Иван Петров',
-      email: 'ivan@example.com',
-      date: '2025-01-15',
-      status: 'Подтверждено',
-      paymentStatus: 'Оплачено',
-      amount: 1500,
-      guests: 2,
-    },
-    {
-      id: '2',
-      tourId: '2',
-      customerName: 'Мария Сидорова',
-      email: 'maria@example.com',
-      date: '2025-01-20',
-      status: 'В ожидании',
-      paymentStatus: 'Ожидает оплаты',
-      amount: 2200,
-      guests: 1,
-    },
-    {
-      id: '3',
-      tourId: '3',
-      customerName: 'Алексей Иванов',
-      email: 'alexey@example.com',
-      date: '2025-02-01',
-      status: 'Подтверждено',
-      paymentStatus: 'Оплачено',
-      amount: 3000,
-      guests: 3,
-    },
-    {
-      id: '4',
-      tourId: '4',
-      customerName: 'Ольга Смирнова',
-      email: 'olga@example.com',
-      date: '2025-02-10',
-      status: 'Отменено',
-      paymentStatus: 'Возврат',
-      amount: 1500,
-      guests: 2,
-    },
-    {
-      id: '5',
-      tourId: '5',
-      customerName: 'Дмитрий Козлов',
-      email: 'dmitry@example.com',
-      date: '2025-02-15',
-      status: 'В ожидании',
-      paymentStatus: 'Ожидает оплаты',
-      amount: 3500,
-      guests: 4,
-    },
-    {
-      id: '6',
-      tourId: '6',
-      customerName: 'Елена Васильева',
-      email: 'elena@example.com',
-      date: '2025-02-20',
-      status: 'Подтверждено',
-      paymentStatus: 'Оплачено',
-      amount: 1800,
-      guests: 2,
-    },
-    {
-      id: '7',
-      tourId: '7',
-      customerName: 'Сергей Николаев',
-      email: 'sergey@example.com',
-      date: '2025-03-01',
-      status: 'Подтверждено',
-      paymentStatus: 'Оплачено',
-      amount: 2500,
-      guests: 2,
-    },
-    {
-      id: '8',
-      tourId: '10',
-      customerName: 'Анна Михайлова',
-      email: 'anna@example.com',
-      date: '2025-03-10',
-      status: 'В ожидании',
-      paymentStatus: 'Ожидает оплаты',
-      amount: 4500,
-      guests: 2,
-    },
-  ];
-
-  const [bookings, setBookings] = useState<Booking[]>(() => {
-    try {
-      const raw = localStorage.getItem('bookings');
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) return parsed as Booking[];
-      }
-    } catch {}
-    return initialBookings;
-  });
-  useEffect(() => {
-    try { localStorage.setItem('bookings', JSON.stringify(bookings)); } catch {}
-  }, [bookings]);
+  const tours = useTourStore().tours;
   const { companies } = useCompaniesStore();
-  const [createOpen, setCreateOpen] = useState(false);
-  const [newBooking, setNewBooking] = useState<Partial<Booking>>({
+  const bookingStore = useBookingStore();
+  const bookingsRaw = bookingStore.bookings; 
+
+  useEffect(() => {
+    bookingStore.fetchBookings();
+  }, []);
+
+  const [createOpen, setCreateOpen] = React.useState(false);
+  const [newBooking, setNewBooking] = React.useState<any>({
     customerName: '',
     email: '',
     tourId: tours[0]?.id ?? '',
@@ -124,31 +31,43 @@ export function Bookings() {
     guests: 1,
   });
 
+  const bookings = bookingsRaw.map(b => ({
+    id: String(b.id),
+    tourId: String((b as any).tour_id ?? (b as any).tourId ?? ''),
+    customerName: (b as any).customer_name ?? ((b as any).user_id ? `User #${(b as any).user_id}` : '—'),
+    email: (b as any).email ?? '',
+    date: b.date,
+    status: (b as any).status ? String((b as any).status) : 'В ожидании',
+    paymentStatus: (b as any).payment_status ?? 'Ожидает оплаты',
+    amount: (b as any).amount ?? 0,
+    guests: (b as any).participants_count ?? (b as any).guests ?? 1,
+  }));
+
+  const toursMap: Record<string, any> = {};
+  tours.forEach(t => { toursMap[String(t.id)] = t; });
+
   const handleCreateChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setNewBooking(prev => ({ ...prev, [name]: name === 'amount' || name === 'guests' ? Number(value) : value }));
+    setNewBooking((prev: any) => ({ ...prev, [name]: name === 'amount' || name === 'guests' ? Number(value) : value }));
   };
 
-  const handleCreateSave = () => {
-    if (!newBooking.customerName || !newBooking.email || !newBooking.tourId || !newBooking.date) {
-      alert('Пожалуйста, заполните все обязательные поля');
+  const handleCreateSave = async () => {
+    if (!newBooking.tourId || !newBooking.date) {
+      alert('Пожалуйста, заполните обязательные поля: тур и дата');
       return;
     }
 
-    const booking: Booking = {
-      id: Date.now().toString(),
-      tourId: newBooking.tourId as string,
-      customerName: newBooking.customerName as string,
-      email: newBooking.email as string,
-      date: newBooking.date as string,
-      status: (newBooking.status as Booking['status']) || 'В ожидании',
-      paymentStatus: (newBooking.paymentStatus as Booking['paymentStatus']) || 'Ожидает оплаты',
-      amount: newBooking.amount || 0,
-      guests: newBooking.guests || 1,
-    };
-
-    setBookings(prev => [booking, ...prev]);
-    setCreateOpen(false);
+    try {
+      await bookingStore.addBooking({
+        tour_id: Number(newBooking.tourId),
+        participants_count: Number(newBooking.guests || 1),
+        date: newBooking.date,
+      });
+      setCreateOpen(false);
+    } catch (err) {
+      console.error('Create booking failed', err);
+      alert('Не удалось создать бронирование');
+    }
   };
 
   const getTourById = (id: string) => {
@@ -224,75 +143,7 @@ export function Bookings() {
               <p className="text-gray-600 dark:text-gray-400">Полный список бронирований</p>
             </div>
 
-            <div className="p-6 space-y-4 max-h-[600px] overflow-y-auto">
-              {bookings.map((booking) => {
-                const tour = getTourById(booking.tourId);
-                
-                return (
-                  <div 
-                    key={booking.id} 
-                    className="flex gap-4 p-4 transition-all border border-gray-200 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-750 hover:shadow-md group dark:border-gray-700"
-                  >
-                    <div className="flex-shrink-0 w-24 h-24 overflow-hidden rounded-lg shadow-md">
-                      <ImageWithFallback
-                        src={tour?.image || ''}
-                        alt={tour?.name || 'Tour'}
-                        className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
-                      />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="text-gray-900 truncate dark:text-white">{tour?.name || 'N/A'}</h3>
-                          <p className="text-gray-600 dark:text-gray-400">{booking.customerName}</p>
-                        </div>
-                        <span className="ml-4 text-gray-900 dark:text-white">${booking.amount}</span>
-                      </div>
-                      
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className="inline-flex items-center px-2 py-1 text-blue-600 rounded-full bg-blue-50 dark:bg-blue-950 dark:text-blue-400">
-                          {tour?.category}
-                        </span>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full ${
-                          booking.status === 'Подтверждено'
-                            ? 'bg-green-50 dark:bg-green-950 text-green-600 dark:text-green-400'
-                            : booking.status === 'В ожидании'
-                            ? 'bg-yellow-50 dark:bg-yellow-950 text-yellow-600 dark:text-yellow-400'
-                            : 'bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400'
-                        }`}>
-                          {booking.status === 'Подтверждено' && <CheckCircle className="w-3 h-3 mr-1" />}
-                          {booking.status === 'В ожидании' && <Clock className="w-3 h-3 mr-1" />}
-                          {booking.status === 'Отменено' && <XCircle className="w-3 h-3 mr-1" />}
-                          {booking.status}
-                        </span>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full ${
-                          booking.paymentStatus === 'Оплачено'
-                            ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400'
-                            : booking.paymentStatus === 'Ожидает оплаты'
-                            ? 'bg-orange-50 dark:bg-orange-950 text-orange-600 dark:text-orange-400'
-                            : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
-                        }`}>
-                          <DollarSign className="w-3 h-3 mr-1" />
-                          {booking.paymentStatus}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-4 text-gray-600 dark:text-gray-400">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>{new Date(booking.date).toLocaleDateString('ru-RU')}</span>
-                        </div>
-                        <span>•</span>
-                        <span>{booking.guests} гост{booking.guests === 1 ? 'ь' : booking.guests < 5 ? 'я' : 'ей'}</span>
-                        <span>•</span>
-                        <span className="truncate">{booking.email}</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <BookingList bookings={bookingsRaw} toursMap={toursMap} />
           </div>
         </div>
 
@@ -365,13 +216,13 @@ export function Bookings() {
                   <div key={tour.id} className="flex items-center gap-3 p-3 transition-colors rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750">
                     <div className="flex-shrink-0 w-12 h-12 overflow-hidden rounded-lg">
                       <ImageWithFallback
-                        src={tour.image}
-                        alt={tour.name}
+                        src={tour.image_url}
+                        alt={tour.title}
                         className="object-cover w-full h-full"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-gray-900 truncate dark:text-white">{tour.name}</p>
+                      <p className="text-gray-900 truncate dark:text-white">{tour.title}</p>
                       <p className="text-gray-600 dark:text-gray-400">{count} бронирований</p>
                     </div>
                   </div>
@@ -380,64 +231,7 @@ export function Bookings() {
           </div>
         </div>
       </div>
-      {createOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="w-full max-w-2xl p-6 bg-white rounded-lg dark:bg-gray-900">
-            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Создать бронирование</h3>
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <label className="block mb-1 text-gray-700 dark:text-gray-300">Тур</label>
-                <select name="tourId" value={newBooking.tourId} onChange={handleCreateChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800">
-                  {tours.map(t => (
-                    <option key={t.id} value={t.id}>{t.name} — {t.company}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block mb-1 text-gray-700 dark:text-gray-300">Имя клиента</label>
-                <input name="customerName" value={newBooking.customerName} onChange={handleCreateChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800" />
-              </div>
-
-              <div>
-                <label className="block mb-1 text-gray-700 dark:text-gray-300">Email</label>
-                <input name="email" value={newBooking.email} onChange={handleCreateChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800" />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Дата</label>
-                  <input name="date" type="date" value={newBooking.date} onChange={handleCreateChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800" />
-                </div>
-                <div>
-                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Гостей</label>
-                  <input name="guests" type="number" min={1} value={newBooking.guests as number} onChange={handleCreateChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Сумма</label>
-                  <input name="amount" type="number" value={newBooking.amount as number} onChange={handleCreateChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800" />
-                </div>
-                <div>
-                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Статус оплаты</label>
-                  <select name="paymentStatus" value={newBooking.paymentStatus} onChange={handleCreateChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800">
-                    <option>Ожидает оплаты</option>
-                    <option>Оплачено</option>
-                    <option>Возврат</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6">
-              <button onClick={() => setCreateOpen(false)} className="px-4 py-2 border rounded-md">Отмена</button>
-              <button onClick={handleCreateSave} className="px-4 py-2 text-white bg-blue-600 rounded-md">Сохранить</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <BookingFormModal open={createOpen} onClose={() => setCreateOpen(false)} tours={tours} />
     </div>
   );
 }

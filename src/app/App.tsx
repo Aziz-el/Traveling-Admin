@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Sidebar } from '../widgets/Sidebar';
 import { Dashboard } from '../pages/Dashboard';
 import { AddTour } from '../pages/AddTour';
 import { ToursList } from '../pages/ToursList';

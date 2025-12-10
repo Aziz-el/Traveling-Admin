@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Tour } from '../app/App';
 import { useCompaniesStore } from '../entities/Companies/model/useCompanyStore';
 import { Building2, MapPin, DollarSign, TrendingUp, Edit2, Trash2, Plus } from 'lucide-react';
 import CompanyModal from '../shared/ui/CompanyModal';

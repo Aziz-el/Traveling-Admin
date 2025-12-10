@@ -1,8 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
-import { Tour } from '../app/App';
-import { Edit, Trash2, MapPin, DollarSign } from 'lucide-react';
-import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 import { TourProps, TourType } from '../entities/Tour/model/type';
 import TourCardFull from '../entities/Tour/UI/TourCards/TourCardFull';
 import FormModal from '../entities/Tour/UI/FormModals/FormModal';
@@ -10,15 +6,13 @@ import { useTourStore } from '../entities/Tour/model/useTourStore';
 
 
 export function ToursList({   categoryImages, onSelectTour, selectedTourId }: TourProps) {
-  let toursStore = useTourStore()
-  let tours = toursStore.tours;
+  const toursStore = useTourStore();
+  const tours = toursStore.tours;
   useEffect(() => {
     toursStore.fetchTours();
-  }, [tours]);
-  console.log(tours);
-  
-  let onUpdateTour = useTourStore().updateTour;
-  let onDeleteTour = useTourStore().deleteTour;
+  }, []);
+
+  const { updateTour: onUpdateTour, deleteTour: onDeleteTour } = useTourStore();
   
   const [editingTour, setEditingTour] = useState<TourType | null>(null);
   const [formData, setFormData] = useState<TourType | null>(null);
