@@ -7,7 +7,7 @@ export default function RegisterPage() {
   const [company, setCompany] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [role, setRole] = useState<'client' | 'admin'>('client');
+  const [role, setRole] = useState<'client' | 'admin' | 'company'>('client');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agree, setAgree] = useState(false);
@@ -113,10 +113,11 @@ export default function RegisterPage() {
                 <div className="flex gap-3">
                   <button type="button" onClick={() => setRole('client')} className={`px-3 py-2 rounded-lg ${role === 'client' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white'}`}>Клиент</button>
                   <button type="button" onClick={() => setRole('admin')} className={`px-3 py-2 rounded-lg ${role === 'admin' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white'}`}>Админ</button>
+                  <button type="button" onClick={() => setRole('company')} className={`px-3 py-2 rounded-lg ${role === 'company' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white'}`}>Компания</button>
                 </div>
               </div>
 
-            {role === 'admin' && (
+            {role === 'company' && (
               <div>
                 <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Компания</label>
                 <input value={company} onChange={(e) => setCompany(e.target.value)} type="text" className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="Название компании" />
@@ -125,7 +126,7 @@ export default function RegisterPage() {
 
             <div className="flex items-center gap-3">
               <input id="agree" type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="w-4 h-4" />
-              <label htmlFor="agree" className="text-sm text-white/90">Я принимаю условия использования</label>
+              <label htmlFor="agree" className="text-sm dark:text-white/90">Я принимаю условия использования</label>
             </div>
 
             <div className="flex items-center gap-3">
@@ -135,7 +136,7 @@ export default function RegisterPage() {
           </form>
 
           <div className="mt-4 text-center">
-            <p className="text-sm text-white/90">Уже есть аккаунт? <a href="/login" className="text-blue-200">Войти</a></p>
+            <p className="text-sm dark:text-white/90">Уже есть аккаунт? <a href="/login" className="text-blue-600 dark:text-blue-200">Войти</a></p>
           </div>
         </div>
       </div>
