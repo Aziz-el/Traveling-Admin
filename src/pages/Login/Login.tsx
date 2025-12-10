@@ -1,15 +1,37 @@
 import React, { useState } from 'react';
-import { Plane,} from 'lucide-react';
-import { Link } from 'react-router';
+import { Plane, } from 'lucide-react';
+import { Link, useNavigate } from 'react-router';
+import instance from '../../shared/lib/axios/axios';
 
 export default function Login() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({ username: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login submitted:', formData);
+    setError(null);
+    setLoading(true);
+    try {
+      const response = await instance.post('/auth/login', {
+        username: formData.username.trim(),
+        password: formData.password,
+      });
+
+      const token = response?.data?.token || response?.data?.access || response?.data?.access_token;
+      if (token) {
+        try { localStorage.setItem('token', token); } catch {}
+        navigate('/');
+      } else {
+        setError('Не удалось получить токен. Проверьте данные.');
+      }
+    } catch (err) {
+      console.error('Login error', err);
+      setError('Ошибка входа: неверный email или пароль, либо сервер недоступен.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +54,7 @@ export default function Login() {
             <Plane className="w-6 h-6 text-white" />
           </div>
           <div className="flex items-center">
-            <h1 className='text-[20px] font-medium'>
+            <h1 className='text-[20px] font-medium dark:text-white/90'>
               Вход
             </h1>
           </div>
@@ -45,9 +67,9 @@ export default function Login() {
             <div className="mt-1">
               <input
                 type="email"
-                name="email"
-                id="email"
-                value={formData.email}
+                name="username"
+                id="username"
+                value={formData.username}
                 onChange={handleChange}
                 required
                 className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
@@ -74,12 +96,15 @@ export default function Login() {
           </div>
           <button
             type="submit"
-            className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={!formData.email || !formData.password}
+            className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
+            disabled={!formData.username || !formData.password || loading}
           >
-            Войти
+            {loading ? 'Вход...' : 'Войти'}
           </button>
-          <div className='flex justify-between text-white/90 text-sm'>
+          {error && (
+            <div className="text-sm text-red-600 mt-2">{error}</div>
+          )}
+          <div className='flex justify-between dark:text-white/90 text-sm'>
             Нет аккаунта? 
             <Link to="/register" className="text-blue-800 hover:underline ">Создать аккаунт</Link>
           </div>

@@ -68,6 +68,7 @@ export function Users() {
                 <th className="px-6 py-3 text-left text-gray-700 dark:text-gray-300">Имя</th>
                 <th className="px-6 py-3 text-left text-gray-700 dark:text-gray-300">Email</th>
                 <th className="px-6 py-3 text-left text-gray-700 dark:text-gray-300">Статус</th>
+                <th className="px-6 py-3 text-left text-gray-700 dark:text-gray-300">Роль</th>
                 <th className="px-6 py-3 text-left text-gray-700 dark:text-gray-300">Бронирования</th>
                 <th className="px-6 py-3 text-left text-gray-700 dark:text-gray-300">Потрачено</th>
               </tr>
@@ -78,6 +79,7 @@ export function Users() {
                   <td className="px-6 py-4 text-gray-900 dark:text-white">#{user.id}</td>
                   <td className="px-6 py-4 text-gray-900 dark:text-white">{user.name}</td>
                   <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{user.email}</td>
+                  <td className="px-6 py-4 text-gray-900 dark:text-white">{user.role}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-3 py-1 rounded-full ${
                       user.status === 'Активный'

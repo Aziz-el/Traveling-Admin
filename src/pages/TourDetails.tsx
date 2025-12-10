@@ -71,10 +71,10 @@ export default function TourDetails({ tours }: TourDetailsProps) {
 
   return (
     <>
-      <div className="p-8 dark:bg-gray-950">
+      <div className="p-8 h-screen dark:bg-gray-950">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
-          <h1 className="text-2xl font-semibold mb-2">{tour.name}</h1>
+          <h1 className="text-2xl font-semibold mb-2 dark:text-white">{tour.name}</h1>
           <p className="text-gray-600 dark:text-gray-400 mb-4">{tour.company} • {tour.category}</p>
           <div className="flex justify-end mb-4">
             <button onClick={() => setCreateOpen(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg">Забронировать</button>
@@ -93,7 +93,7 @@ export default function TourDetails({ tours }: TourDetailsProps) {
         </div>
 
         <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
-          <h3 className="mb-4">Карта</h3>
+          <h3 className="mb-4 dark:text-white">Карта</h3>
           <div className="h-64">
             <InteractiveMap tours={[tour]} />
           </div>
