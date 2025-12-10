@@ -1,4 +1,4 @@
-import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun, Star } from 'lucide-react';
 import { Link } from 'react-router';
 
 interface SidebarProps {
