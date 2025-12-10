@@ -1,4 +1,4 @@
-import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun, Star } from 'lucide-react';
+import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun } from 'lucide-react';
 import { Link } from 'react-router';
 
 interface SidebarProps {
@@ -22,7 +22,7 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
   ];
 
   return (
-    <aside className="fixed top-0 h-screen w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col overflow-y-auto">
+    <aside className="fixed top-0 flex flex-col w-64 h-screen overflow-y-auto bg-white border-r border-gray-200 dark:bg-gray-900 dark:border-gray-800">
       <div className="p-6 border-b border-gray-200 dark:border-gray-800">
         <h1 className="text-blue-600 dark:text-blue-400">TravelAdmin</h1>
       </div>
@@ -45,7 +45,7 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
           }
 
           return (
-            <Link 
+            <Link
               key={item.id}
               to={`/${item.id}`}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${active ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
@@ -60,7 +60,7 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
       <div className="p-4 border-t border-gray-200 dark:border-gray-800">
         <button
           onClick={toggleDarkMode}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          className="flex items-center w-full gap-3 px-4 py-3 text-gray-700 transition-colors rounded-lg dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
         >
           {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           <span>{isDarkMode ? 'Светлая тема' : 'Темная тема'}</span>

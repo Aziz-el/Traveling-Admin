@@ -10,15 +10,15 @@ export interface TourType {
   price: 0,
   location: "string",
   duration: "string",
-  id: 0,
+  id: string,
   company_id: 0,
-  rating: 0
+  rating: 0,
+  is_active: true,
+  capacity: 0
 }
 
 export interface TourProps {
-  tour?: Tour;
-  onUpdateTour: (id: string, tour: Tour) => void;
-  onDeleteTour: (id: string) => void;
+  tour?: TourType;
   categoryImages: Record<string, string>;
   onSelectTour?: (id: string) => void;
   selectedTourId?: string | null;

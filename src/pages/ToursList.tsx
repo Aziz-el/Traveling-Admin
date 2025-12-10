@@ -1,18 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Tour } from '../app/App';
 import { Edit, Trash2, MapPin, DollarSign } from 'lucide-react';
 import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
-import { TourProps } from '../entities/Tour/model/type';
+import { TourProps, TourType } from '../entities/Tour/model/type';
 import TourCardFull from '../entities/Tour/UI/TourCards/TourCardFull';
 import FormModal from '../entities/Tour/UI/FormModals/FormModal';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 
 
-export function ToursList({  onUpdateTour, onDeleteTour, categoryImages, onSelectTour, selectedTourId }: TourProps) {
-  let tours = useTourStore().tours;
-  const [editingTour, setEditingTour] = useState<Tour | null>(null);
-  const [formData, setFormData] = useState<Tour | null>(null);
+export function ToursList({   categoryImages, onSelectTour, selectedTourId }: TourProps) {
+  let toursStore = useTourStore()
+  let tours = toursStore.tours;
+  useEffect(() => {
+    toursStore.fetchTours();
+  }, [tours]);
+  console.log(tours);
+  
+  let onUpdateTour = useTourStore().updateTour;
+  let onDeleteTour = useTourStore().deleteTour;
+  
+  const [editingTour, setEditingTour] = useState<TourType | null>(null);
+  const [formData, setFormData] = useState<TourType | null>(null);
   const handleUpdate = (e: React.FormEvent) => {
           e.preventDefault();
           if (formData && editingTour) {
@@ -41,7 +50,7 @@ export function ToursList({  onUpdateTour, onDeleteTour, categoryImages, onSelec
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {tours.map((tour) => (
-          <TourCardFull tour={tour}  key={tour.id} setFormData={setFormData} setEditingTour={setEditingTour} onUpdateTour={onUpdateTour} onDeleteTour={onDeleteTour} categoryImages={categoryImages} onSelectTour={onSelectTour} selectedTourId={selectedTourId} />
+          <TourCardFull tour={tour}  key={tour.id} setFormData={setFormData} setEditingTour={setEditingTour}  categoryImages={categoryImages} onSelectTour={onSelectTour} selectedTourId={selectedTourId} />
         ))}
       </div>
 
