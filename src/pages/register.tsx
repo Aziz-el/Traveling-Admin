@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import instance from '../shared/lib/axios/axios';
 import {  Plane} from 'lucide-react';
+import { Link } from 'react-router';
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState('');
@@ -136,7 +137,7 @@ export default function RegisterPage() {
           </form>
 
           <div className="mt-4 text-center">
-            <p className="text-sm dark:text-white/90">Уже есть аккаунт? <a href="/login" className="text-blue-600 dark:text-blue-200">Войти</a></p>
+            <p className="text-sm dark:text-white/90">Уже есть аккаунт? <Link to="/login" className="text-blue-600 dark:text-blue-200">Войти</Link></p>
           </div>
         </div>
       </div>

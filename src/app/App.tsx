@@ -12,7 +12,7 @@ import { RoutesPage } from '../pages/RoutesPage';
 import Login from '../pages/Login';
 import Register from '../pages/register';
 import TourDetails from '../pages/TourDetails';
-import ProtectedLayout from '../app/Loyouts/ProtectedLayout';
+import ProtectedLayout from './Layouts/ProtectedLayout';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 export interface Tour {
   id: string;
@@ -43,21 +43,8 @@ const categoryImages: Record<string, string> = {
 export default function App() {
   const [selectedTourId, setSelectedTourId] = useState<string | null>(null);
   const [miniCard, setMiniCard] = useState<{ tourId: string; x: number; y: number } | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved === 'true';
-  });
   let toursData = useTourStore().tours
-  const [tours, setTours] = useState<Tour[]>(toursData as Tour[]);
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    localStorage.setItem('darkMode', String(!isDarkMode));
-  };
-
-  const addTour = (tour: Tour) => {
-    setTours([...tours, tour]);
-  };
 
   const handleSelectTour = (id: string) => {
     setSelectedTourId(id);
@@ -68,13 +55,6 @@ export default function App() {
     setTimeout(() => setMiniCard(null), 4000);
   };
 
-  const updateTour = (id: string, updatedTour: Tour) => {
-    setTours(tours.map(tour => tour.id === id ? updatedTour : tour));
-  };
-
-  const deleteTour = (id: string) => {
-    setTours(tours.filter(tour => tour.id !== id));
-  };
   return (
         <Routes>
           <Route path ="/" element={<Login />} />
@@ -83,11 +63,9 @@ export default function App() {
            <ProtectedLayout>
                 <Routes>
                   <Route path='dashboard' element={<Dashboard onMapItemClick={handleMapItemClick} onSelectTour={handleSelectTour} />} />
-                  <Route path='add-tour' element={<AddTour onAddTour={addTour} categoryImages={categoryImages} />}/>
+                  <Route path='add-tour' element={<AddTour categoryImages={categoryImages} />}/>
                   <Route path='tours' element={<ToursList 
-                      
-                      onUpdateTour={updateTour} 
-                      onDeleteTour={deleteTour}
+  
                       categoryImages={categoryImages}
                       onSelectTour={handleSelectTour}
                       selectedTourId={selectedTourId}

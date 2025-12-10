@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { Plane, } from 'lucide-react';
-import { Link, useNavigate } from 'react-router';
+import { Link, Navigate, useNavigate } from 'react-router';
 import instance from '../shared/lib/axios/axios';
 
 export default function Login() {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
-
+  const [error, setError] = useState<string | null>(null);  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -22,7 +20,6 @@ export default function Login() {
       const token = response?.data?.token || response?.data?.access || response?.data?.access_token;
       if (token) {
         try { localStorage.setItem('token', token); } catch {}
-        navigate('/dashboard');
       } else {
         setError('Не удалось получить токен. Проверьте данные.');
       }
@@ -37,11 +34,10 @@ export default function Login() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-    const token = localStorage.getItem('token')
-    if(token != undefined && token != null){
-      window.location.href = '/dashboard'
-    }
+  const token = localStorage.getItem('token')
+   
   return (
+    !token ?
     <div className='relative flex items-center justify-center min-h-screen p-4'>
       <div className="absolute inset-0 z-0">
         <img
@@ -114,5 +110,6 @@ export default function Login() {
         </form>
       </div>
     </div>
+    :<Navigate to="/dashboard" replace={true} />
   );
 }

@@ -4,13 +4,14 @@ import { useCompaniesStore } from '../entities/Companies/model/useCompanyStore';
 import { useNavigate } from 'react-router';
 import { InteractiveMap } from '../shared/components/InteractiveMap';
 import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
+import { useTourStore } from '../entities/Tour/model/useTourStore';
 
 interface AddTourProps {
-  onAddTour: (tour: Tour) => void;
   categoryImages: Record<string, string>;
 }
 
-export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
+export function AddTour({  categoryImages }: AddTourProps) {
+  let onAddTour = useTourStore().addTour;
   const companies = useCompaniesStore(state => state.companies);
   const navigate = useNavigate();
 
@@ -129,15 +130,15 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
   return (
     <div className="p-8 dark:bg-gray-950">
       <div className="mb-8">
-        <h1 className="text-gray-900 dark:text-white mb-2">Добавить тур</h1>
+        <h1 className="mb-2 text-gray-900 dark:text-white">Добавить тур</h1>
         <p className="text-gray-600 dark:text-gray-400">Создайте новый туристический маршрут</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <div className="p-6 bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block mb-2 text-gray-700 dark:text-gray-300">
                 Название тура *
               </label>
               <input
@@ -145,13 +146,13 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Например: Токио - Киото Экспресс"
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block mb-2 text-gray-700 dark:text-gray-300">
                 Описание
               </label>
               <textarea
@@ -159,21 +160,21 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
                 value={formData.description}
                 onChange={handleInputChange}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none resize-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Краткое описание тура"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block mb-2 text-gray-700 dark:text-gray-300">
                   Категория *
                 </label>
                 <select
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="Азия">Азия</option>
                   <option value="Европа">Европа</option>
@@ -185,14 +186,14 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
               </div>
 
               <div>
-                <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block mb-2 text-gray-700 dark:text-gray-300">
                   Компания *
                 </label>
                 <select
                   name="company"
                   value={formData.company}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                     {companies.map(c => (
                       <option key={c} value={c}>{c}</option>
@@ -203,30 +204,30 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-700 dark:text-gray-300 mb-2">Начало (дата и время) *</label>
+                <label className="block mb-2 text-gray-700 dark:text-gray-300">Начало (дата и время) *</label>
                 <input
                   type="datetime-local"
                   name="startTime"
                   value={formData.startTime}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-gray-700 dark:text-gray-300 mb-2">Окончание (дата и время) *</label>
+                <label className="block mb-2 text-gray-700 dark:text-gray-300">Окончание (дата и время) *</label>
                 <input
                   type="datetime-local"
                   name="endTime"
                   value={formData.endTime}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block mb-2 text-gray-700 dark:text-gray-300">
                   Цена ($) *
                 </label>
                 <input
@@ -234,20 +235,20 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
                   name="price"
                   value={formData.price}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="1500"
                 />
               </div>
 
               <div>
-                <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block mb-2 text-gray-700 dark:text-gray-300">
                   Статус *
                 </label>
                 <select
                   name="status"
                   value={formData.status}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="Активный">Активный</option>
                   <option value="Неактивный">Неактивный</option>
@@ -256,7 +257,7 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
             </div>
 
             <div>
-              <label className="block text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block mb-2 text-gray-700 dark:text-gray-300">
                 URL изображения (опционально)
               </label>
               <input
@@ -264,26 +265,26 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
                 name="image"
                 value={formData.image}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Оставьте пустым для автоматического выбора по категории"
               />
               {(formData.image || categoryImages[formData.category]) && (
-                <div className="mt-3 rounded-lg overflow-hidden">
+                <div className="mt-3 overflow-hidden rounded-lg">
                   <ImageWithFallback
                     src={formData.image || categoryImages[formData.category]}
                     alt="Предпросмотр"
-                    className="w-full h-40 object-cover"
+                    className="object-cover w-full h-40"
                   />
                 </div>
               )}
             </div>
 
-            <div className="border-t border-gray-200 dark:border-gray-800 pt-6">
-              <h3 className="text-gray-900 dark:text-white mb-4">Координаты маршрута</h3>
+            <div className="pt-6 border-t border-gray-200 dark:border-gray-800">
+              <h3 className="mb-4 text-gray-900 dark:text-white">Координаты маршрута</h3>
               
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block mb-2 text-gray-700 dark:text-gray-300">
                     Старт: Широта *
                   </label>
                   <input
@@ -292,12 +293,12 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
                     value={formData.startLat}
                     onChange={handleInputChange}
                     step="0.0001"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="35.6762"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block mb-2 text-gray-700 dark:text-gray-300">
                     Старт: Долгота *
                   </label>
                   <input
@@ -306,7 +307,7 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
                     value={formData.startLng}
                     onChange={handleInputChange}
                     step="0.0001"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="139.6503"
                   />
                 </div>
@@ -314,7 +315,7 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block mb-2 text-gray-700 dark:text-gray-300">
                     Финиш: Широта *
                   </label>
                   <input
@@ -323,12 +324,12 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
                     value={formData.endLat}
                     onChange={handleInputChange}
                     step="0.0001"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="35.0116"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block mb-2 text-gray-700 dark:text-gray-300">
                     Финиш: Долгота *
                   </label>
                   <input
@@ -337,7 +338,7 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
                     value={formData.endLng}
                     onChange={handleInputChange}
                     step="0.0001"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="135.7681"
                   />
                 </div>
@@ -348,13 +349,13 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
               <button
                 type="button"
                 onClick={handlePreview}
-                className="flex-1 px-6 py-3 border border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
+                className="flex-1 px-6 py-3 text-blue-600 transition-colors border border-blue-600 rounded-lg dark:border-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950"
               >
                 Показать на карте
               </button>
               <button
                 type="submit"
-                className="flex-1 px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
+                className="flex-1 px-6 py-3 text-white transition-colors bg-blue-600 rounded-lg dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600"
               >
                 Создать тур
               </button>
@@ -362,7 +363,7 @@ export function AddTour({ onAddTour, categoryImages }: AddTourProps) {
           </form>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div className="overflow-hidden bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
           <div className="p-6 border-b border-gray-200 dark:border-gray-800">
             <h2 className="text-gray-900 dark:text-white">Предпросмотр маршрута</h2>
             <p className="text-gray-600 dark:text-gray-400">
