@@ -1,4 +1,5 @@
-import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun, Star } from 'lucide-react';
+import { Link } from 'react-router';
 
 interface SidebarProps {
   activeSection?: string;
@@ -16,6 +17,7 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
     { id: 'bookings', label: 'Бронирования', icon: CalendarCheck },
     { id: 'users', label: 'Пользователи', icon: Users },
     { id: 'routes', label: 'Маршруты', icon: Route },
+    {id: 'reviews', label: 'Отзывы', icon: Star },
     { id: 'settings', label: 'Настройки', icon: Settings },
   ];
 
@@ -43,14 +45,14 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
           }
 
           return (
-            <a
+            <Link 
               key={item.id}
-              href={`/${item.id}`}
+              to={`/${item.id}`}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${active ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
             >
               <Icon className="w-5 h-5" />
               <span>{item.label}</span>
-            </a>
+            </Link>
           );
         })}
       </nav>

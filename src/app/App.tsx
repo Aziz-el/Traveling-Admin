@@ -10,10 +10,11 @@ import { Routes,Route } from 'react-router';
 import { Settings } from '../pages/Settings';
 import { RoutesPage } from '../pages/RoutesPage';
 import Login from '../pages/Login';
-import Register from '../pages/register';
+import Register from '../pages/Register';
 import TourDetails from '../pages/TourDetails';
 import ProtectedLayout from '../app/Loyouts/ProtectedLayout';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
+// import Reviews  from '../pages/Reviews';
 export interface Tour {
   id: string;
   name: string;
@@ -97,6 +98,7 @@ export default function App() {
                   <Route path='bookings' element={<Bookings />}/>
                   <Route path='users' element={<Users />}/>
                   <Route path='routes' element={<RoutesPage />}/>
+                  {/* <Route path='reviews' element={<Reviews/>}/> */}
                   <Route path='settings' element={<Settings />}/>
                 </Routes>
             

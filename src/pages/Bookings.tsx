@@ -1,22 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Tour } from '../app/App';
 import { Calendar, DollarSign, CheckCircle, Clock, XCircle, TrendingUp } from 'lucide-react';
 import { useCompaniesStore } from '../entities/Companies/model/useCompanyStore';
 import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 
-
-interface Booking {
-  id: string;
-  tourId: string;
-  customerName: string;
-  email: string;
-  date: string;
-  status: 'Подтверждено' | 'В ожидании' | 'Отменено';
-  paymentStatus: 'Оплачено' | 'Ожидает оплаты' | 'Возврат';
-  amount: number;
-  guests: number;
-}
 
 export function Bookings() {
   let tours = useTourStore().tours;
