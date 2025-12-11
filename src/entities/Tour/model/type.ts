@@ -1,4 +1,3 @@
-import { Tour } from "../../../app/App";
 
 export interface TourType {
  title: "string",

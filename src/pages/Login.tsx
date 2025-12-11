@@ -15,6 +15,9 @@ export default function Login() {
       const response = await instance.post('/auth/login', {
         username: formData.username.trim(),
         password: formData.password,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
       });
 
       const token = response?.data?.token || response?.data?.access || response?.data?.access_token;

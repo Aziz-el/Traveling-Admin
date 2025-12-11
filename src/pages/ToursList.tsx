@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
-import { Tour } from '../app/App';
-import { Edit, Trash2, MapPin, DollarSign } from 'lucide-react';
-import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 import { TourProps, TourType } from '../entities/Tour/model/type';
 import TourCardFull from '../entities/Tour/UI/TourCards/TourCardFull';
 import FormModal from '../entities/Tour/UI/FormModals/FormModal';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
+import TourCardSkeleton from '../entities/Tour/UI/TourCards/TourCardSkeleton';
 
 
 export function ToursList({   categoryImages, onSelectTour, selectedTourId }: TourProps) {
   let toursStore = useTourStore()
   let tours = toursStore.tours;
+  let loading = toursStore.loading;
   useEffect(() => {
     toursStore.fetchTours();
-  }, [tours]);
+  }, []);
   console.log(tours);
   
   let onUpdateTour = useTourStore().updateTour;
@@ -22,10 +20,9 @@ export function ToursList({   categoryImages, onSelectTour, selectedTourId }: To
   
   const [editingTour, setEditingTour] = useState<TourType | null>(null);
   const [formData, setFormData] = useState<TourType | null>(null);
-  const handleUpdate = (e: React.FormEvent) => {
-          e.preventDefault();
+  const handleUpdate = () => {
           if (formData && editingTour) {
-            onUpdateTour(editingTour?.id, formData);
+            onUpdateTour(editingTour?.id,formData);
             setEditingTour(null);
             setFormData(null);
           }
@@ -48,11 +45,20 @@ export function ToursList({   categoryImages, onSelectTour, selectedTourId }: To
         <p className="text-gray-600 dark:text-gray-400">Управление всеми турами</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      
+      {
+        loading ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, index) => <TourCardSkeleton />)}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {tours.map((tour) => (
           <TourCardFull tour={tour}  key={tour.id} setFormData={setFormData} setEditingTour={setEditingTour}  categoryImages={categoryImages} onSelectTour={onSelectTour} selectedTourId={selectedTourId} />
         ))}
       </div>
+        )
+      }
 
       {editingTour && formData && (
         <FormModal

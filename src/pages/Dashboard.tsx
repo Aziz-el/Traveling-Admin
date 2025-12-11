@@ -1,4 +1,4 @@
-import { Tour } from '../app/App';
+
 import { StatsCard } from '../shared/components/StatsCard';
 import { InteractiveMap } from '../shared/components/InteractiveMap';
 import { MapPin, Users, DollarSign, TrendingUp } from 'lucide-react';
@@ -14,7 +14,7 @@ interface DashboardProps {
 
 export function Dashboard({  onMapItemClick, onSelectTour }: DashboardProps) {
   let tours = useTourStore().tours;
-  const activeTours = tours.filter(t => t.status === 'Активный');
+  const activeTours = tours.filter(t => t.is_active === true);
   const totalRevenue = tours.reduce((sum, tour) => sum + tour.price, 0);
   const avgPrice = tours.length > 0 ? totalRevenue / tours.length : 0;
 
@@ -82,7 +82,7 @@ export function Dashboard({  onMapItemClick, onSelectTour }: DashboardProps) {
 
       <div className="p-6 bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
         <h2 className="mb-4 text-gray-900 dark:text-white">Последние туры</h2>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {/* <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {tours.slice(0, 8).map((tour) => (
             <div key={tour.id} className="p-4 transition-shadow border border-gray-200 rounded-lg cursor-pointer group dark:border-gray-800 hover:shadow-md">
               <div className="mb-3 overflow-hidden rounded-lg aspect-video">
@@ -104,7 +104,7 @@ export function Dashboard({  onMapItemClick, onSelectTour }: DashboardProps) {
               </div>
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );

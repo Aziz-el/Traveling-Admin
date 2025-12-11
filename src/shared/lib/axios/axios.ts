@@ -16,7 +16,6 @@ const instance = axios.create({
     'Content-Type': 'application/x-www-form-urlencoded',
   },
 });
-
 instance.interceptors.request.use((config => {
     const token = localStorage.getItem('token');
     if (token) {
