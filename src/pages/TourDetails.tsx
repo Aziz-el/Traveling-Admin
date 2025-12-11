@@ -144,8 +144,8 @@ export default function TourDetails() {
       </div>
 
       {createOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="w-full max-w-lg p-6 bg-white rounded-lg dark:bg-gray-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 bg-opacity-40 ">
+          <div className="w-full max-w-lg p-6 bg-white rounded-lg dark:bg-gray-900  max-h-full">
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Создать бронирование</h3>
 
             <div className="grid grid-cols-1 gap-3">
@@ -182,7 +182,7 @@ export default function TourDetails() {
             </div>
 
             <div className="flex justify-end gap-3 mt-4">
-              <button onClick={() => setCreateOpen(false)} className="px-4 py-2 border rounded">Отмена</button>
+              <button onClick={() => setCreateOpen(false)} className="px-4 py-2 border rounded dark:border-gray-700 dark:text-gray-300">Отмена</button>
               <button onClick={handleSaveBooking} className="px-4 py-2 text-white bg-blue-600 rounded">Сохранить</button>
             </div>
           </div>

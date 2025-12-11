@@ -37,6 +37,10 @@ export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours }) => {
     setForm((p: any) => ({ ...p, [name]: name === 'guests' ? Number(value) : value }));
   };
 
+  if(open === true){
+    document.body.style.overflow = 'hidden';
+  }
+
 const save = async () => {
     if (!form.tourId || !form.date) {
         alert('Заполните тур и дату');
@@ -60,8 +64,8 @@ const save = async () => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="w-full max-w-2xl p-6 bg-white rounded-lg dark:bg-gray-900">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60  overflow-auto p-4">
+      <div className="w-full max-w-2xl p-6 bg-white rounded-lg dark:bg-gray-900 max-h-screen overflow-auto">
         <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Создать бронирование</h3>
         <div className="grid grid-cols-1 gap-4">
           <div>
@@ -85,7 +89,7 @@ const save = async () => {
         </div>
 
         <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 border rounded-md">Отмена</button>
+          <button onClick={onClose} className="px-4 py-2 border rounded-md dark:border-gray-700 dark:text-gray-300">Отмена</button>
           <button onClick={save} className="px-4 py-2 text-white bg-blue-600 rounded-md">Сохранить</button>
         </div>
       </div>
