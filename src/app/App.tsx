@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dashboard } from '../pages/Dashboard';
 import { AddTour } from '../pages/AddTour';
 import { ToursList } from '../pages/ToursList';
@@ -44,6 +44,11 @@ export default function App() {
   const [selectedTourId, setSelectedTourId] = useState<string | null>(null);
   const [miniCard, setMiniCard] = useState<{ tourId: string; x: number; y: number } | null>(null);
   let toursData = useTourStore().tours
+  let fetch = useTourStore().fetchTours;
+     useEffect(() => {
+    fetch();
+  }, [fetch]);
+  
 
 
   const handleSelectTour = (id: string) => {

@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { ImageWithFallback } from '../../../shared/ui/ImageWithFallback';
 import { Calendar, DollarSign, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { Booking as BookingType } from '../model/type';
@@ -6,23 +6,35 @@ import { Booking as BookingType } from '../model/type';
 type Props = {
   bookings: BookingType[];
   toursMap: Record<string, any>;
+  onEdit?: (booking: BookingType) => void;
+  onDelete?: (id: string | number) => void;
 };
 
-export const BookingList: React.FC<Props> = ({ bookings, toursMap }) => {
+export const BookingList: React.FC<Props> = ({ bookings, toursMap, onEdit, onDelete }) => {
+  const [menuState, setMenuState] = useState<{ x: number; y: number; booking: BookingType } | null>(null);
+
+  useEffect(() => {
+    const handleClick = () => setMenuState(null);
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, []);
+
   return (
     <div className="p-6 space-y-4 max-h-[600px] overflow-y-auto">
       {bookings.map((booking) => {
-        const tour = toursMap[booking.tour_id ?? booking.tour_id ?? ''] ?? {};
+        const tourId = String((booking as any).tour_id ?? (booking as any).tourId ?? '');
+        const tour = toursMap[tourId] ?? {};
 
         return (
           <div
             key={booking.id}
+            onContextMenu={(e) => { e.preventDefault(); setMenuState({ x: e.clientX, y: e.clientY, booking }); }}
             className="flex gap-4 p-4 transition-all border border-gray-200 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-750 hover:shadow-md group dark:border-gray-700"
           >
             <div className="flex-shrink-0 w-24 h-24 overflow-hidden rounded-lg shadow-md">
               <ImageWithFallback
-                src={tour.image || ''}
-                alt={tour.name || 'Tour'}
+                src={tour.image ?? tour.image_url ?? ''}
+                alt={tour.name ?? tour.title ?? 'Tour'}
                 className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
               />
             </div>
@@ -30,15 +42,14 @@ export const BookingList: React.FC<Props> = ({ bookings, toursMap }) => {
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <h3 className="text-gray-900 truncate dark:text-white">{tour.name || 'N/A'}</h3>
-                  <p className="text-gray-600 dark:text-gray-400">{(booking as any).customer_name ?? (booking as any).email ?? '—'}</p>
+                  <h3 className="text-gray-900 truncate dark:text-white">{tour.name ?? tour.title ?? 'N/A'}</h3>
                 </div>
-                <span className="ml-4 text-gray-900 dark:text-white">${(booking as any).amount ?? 0}</span>
+                <span className="ml-4 text-gray-900 dark:text-white">${(tour?.price ?? (booking as any).amount ?? 0)} </span>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 mb-2">
                 <span className="inline-flex items-center px-2 py-1 text-blue-600 rounded-full bg-blue-50 dark:bg-blue-950 dark:text-blue-400">
-                  {tour.category}
+                  {tour.company_id ?? 'N/A'}
                 </span>
                 <span className={`inline-flex items-center px-2 py-1 rounded-full ${
                   (booking as any).status === 'Подтверждено'
@@ -76,6 +87,19 @@ export const BookingList: React.FC<Props> = ({ bookings, toursMap }) => {
           </div>
         );
       })}
+
+      {menuState && (
+        <div style={{ position: 'fixed', left: menuState.x, top: menuState.y, zIndex: 2000 }} className="bg-white rounded shadow-md dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <button
+            onClick={(e) => { e.stopPropagation(); setMenuState(null); onEdit?.(menuState.booking); }}
+            className="block px-4 py-2 text-left w-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+          >Изменить</button>
+          <button
+            onClick={(e) => { e.stopPropagation(); setMenuState(null); onDelete?.((menuState.booking as any).id); }}
+            className="block px-4 py-2 text-left w-full hover:bg-gray-100 dark:hover:bg-gray-700 text-red-600 dark:text-red-400"
+          >Удалить</button>
+        </div>
+      )}
     </div>
   );
 };

@@ -12,8 +12,6 @@ export const createBooking = async (payload: Partial<BookingApi>): Promise<Booki
     date: payload.date ? new Date(payload.date).toISOString() : undefined,
   } as Partial<BookingApi>;
 
-  console.log('createBooking body:', body);
-
   const response = await instance.post<BookingApi>('/bookings', body, {
     headers: { 'Content-Type': 'application/json' },
   });
@@ -21,12 +19,38 @@ export const createBooking = async (payload: Partial<BookingApi>): Promise<Booki
 };
 
 export const updateBooking = async (id: number | string, payload: Partial<BookingApi>): Promise<BookingApi> => {
-  const response = await instance.put<BookingApi>(`/bookings/${id}`, payload);
-  return response.data;
+  const body = { ...payload, date: payload.date ? new Date(payload.date).toISOString() : undefined } as Partial<BookingApi>;
+  try {
+    const response = await instance.patch<BookingApi>(`/bookings/${id}/status`, body 
+      , { headers: { 'Content-Type': 'application/json' } }
+    );
+    return response.data;
+  } catch (err: any) {
+    if (err?.response?.status === 405) {
+      const response = await instance.put<BookingApi>(`/bookings/${id}`, body, { headers: { 'Content-Type': 'application/json' } });
+      return response.data;
+    }
+    throw err;
+  }
 };
 
 export const deleteBooking = async (id: number | string): Promise<void> => {
-  await instance.delete(`/bookings/${id}`);
+  try {
+    await instance.delete(`/bookings/${id}`);
+    return;
+  } catch (err: any) {
+    if (err?.response?.status === 405) {
+      try {
+        await instance.post(`/bookings/${id}/delete`);
+        return;
+      } catch (_) {}
+      try {
+        await instance.post(`/bookings/${id}`, {}, { headers: { 'X-HTTP-Method-Override': 'DELETE' } });
+        return;
+      } catch (_) {}
+    }
+    throw err;
+  }
 };
 
 export default {

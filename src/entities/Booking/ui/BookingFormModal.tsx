@@ -1,13 +1,18 @@
 import React from 'react';
 import { useBookingStore } from '../model/useBookingStore';
+import { CustomSelect } from '../../../shared/ui/select';
+import CustomInput from '../../../shared/ui/input';
+import CustomCalendar from '../../../shared/ui/calendar';
+import CustomNumberInput from '../../../shared/ui/customNumber';
 
 type Props = {
   open: boolean;
   onClose: () => void;
   tours: any[];
+  editingBooking?: any;
 };
 
-export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours }) => {
+export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editingBooking }) => {
   const bookingStore = useBookingStore();
   const [form, setForm] = React.useState<any>({
     tourId: tours[0]?.id ?? '',
@@ -28,64 +33,128 @@ export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours }) => {
   };
 
   React.useEffect(() => {
+    if (!open) return;
     const nowLocal = toLocalInput(new Date().toISOString());
-    setForm({ tourId: tours[0]?.id ?? '', date: nowLocal, guests: 1 });
-  }, [open, tours]);
+    if (editingBooking) {
+      // Only prefill status for editing — other fields are not editable
+      setForm({
+        status: (editingBooking as any).status ?? 'pending',
+      });
+    } else {
+      setForm({ tourId: String(tours[0]?.id ?? ''), date: nowLocal, guests: 1 });
+    }
+  }, [open, tours, editingBooking]);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm((p: any) => ({ ...p, [name]: name === 'guests' ? Number(value) : value }));
   };
 
-  if(open === true){
-    document.body.style.overflow = 'hidden';
-  }
+  React.useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : 'auto';
+  }, [open]);
 
-const save = async () => {
-    if (!form.tourId || !form.date) {
-        alert('Заполните тур и дату');
-        return;
+  const save = async () => {
+    if (!editingBooking && (!form.tourId || !form.date)) {
+      alert('Заполните тур и дату');
+      return;
     }
     try {
+      if (editingBooking) {
+        await bookingStore.updateBooking(Number(editingBooking.id), {
+          status: form.status,
+        });
+      } else {
         const isoDate = new Date(form.date).toISOString();
         await bookingStore.addBooking({
-            tour_id: Number(form.tourId),
-            participants_count: Number(form.guests),
-            date: isoDate
+          tour_id: Number(form.tourId),
+          participants_count: Number(form.guests),
+          date: isoDate,
         });
-        onClose();
+      }
+      onClose();
     } catch (err) {
-        console.error(err);
-        alert('Ошибка при создании бронирования');
+      console.debug(err);
+      alert('Ошибка при создании бронирования');
     }
-};
-
+  };
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60  overflow-auto p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 overflow-auto p-4">
       <div className="w-full max-w-2xl p-6 bg-white rounded-lg dark:bg-gray-900 max-h-screen overflow-auto">
-        <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Создать бронирование</h3>
+        <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">{editingBooking ? 'Редактировать бронирование' : 'Создать бронирование'}</h3>
         <div className="grid grid-cols-1 gap-4">
-          <div>
-            <label className="block mb-1 text-gray-700 dark:text-gray-300">Тур</label>
-            <select name="tourId" value={form.tourId} onChange={handleChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800">
-              {tours.map(t => (
-                <option key={t.id} value={t.id}>{t.name} — {t.company}</option>
-              ))}
-            </select>
-          </div>
+            {editingBooking ? (
+              <div>
+                <label className="block mb-1 text-gray-700 dark:text-gray-300">Статус</label>
+                <CustomSelect 
+                  name="status" 
+                  value={form.status} 
+                  onChange={(e)=> setForm((p:any)=>({...p, status: e.target.value}))} 
+                  className="w-full px-3 py-2 "
+                  options={[
+                    { value: 'pending', label: 'В ожидании' },
+                    { value: 'confirmed', label: 'Подтверждено' },
+                    { value: 'cancelled', label: 'Отменено' }
+                  ]}
+                />
+              </div>
+            ) : (
+              <>
+                <div>
+                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Имя клиента</label>
+                  <CustomInput
+                    name="customerName"
+                    value={form.customerName}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Email клиента</label>
+                  <CustomInput
+                    name="customerEmail"
+                    value={form.customerEmail}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Тур</label>
+                  <CustomSelect
+                    name="tourId"
+                    value={form.tourId}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2"
+                    options={tours.map(t => ({ value: String(t.id), label: `${t.title ?? t.name ?? 'Тур'} — ${t.company_id ?? t.company ?? ''}` }))}
+                  />
+                </div>
 
-          <div>
-            <label className="block mb-1 text-gray-700 dark:text-gray-300">Дата и время</label>
-            <input name="date" type="datetime-local" value={form.date} onChange={handleChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800" />
-          </div>
+                <div>
+                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Дата и время</label>
+                  <CustomCalendar
+                    name="date"
+                    value={form.date}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2"
+                  />
+                </div>
 
-          <div>
-            <label className="block mb-1 text-gray-700 dark:text-gray-300">Гостей</label>
-            <input name="guests" type="number" min={1} value={form.guests} onChange={handleChange} className="w-full px-3 py-2 bg-white border rounded-md dark:bg-gray-800" />
-          </div>
+                <div>
+                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Гостей</label>
+                  <CustomNumberInput
+                    name="guests"
+                    min={1}
+                    value={form.guests}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 "
+                  />
+                </div>
+              </>
+            )}
         </div>
 
         <div className="flex justify-end gap-3 mt-6">

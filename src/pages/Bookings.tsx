@@ -20,9 +20,8 @@ export function Bookings() {
   }, []);
 
   const [createOpen, setCreateOpen] = React.useState(false);
+  const [editingBooking, setEditingBooking] = React.useState<any>(null);
   const [newBooking, setNewBooking] = React.useState<any>({
-    customerName: '',
-    email: '',
     tourId: tours[0]?.id ?? '',
     date: '',
     status: 'В ожидании',
@@ -34,8 +33,8 @@ export function Bookings() {
   const bookings = bookingsRaw.map(b => ({
     id: String(b.id),
     tourId: String((b as any).tour_id ?? (b as any).tourId ?? ''),
-    customerName: (b as any).customer_name ?? ((b as any).user_id ? `User #${(b as any).user_id}` : '—'),
-    email: (b as any).email ?? '',
+    title: (b as any).title ?? '',
+    image_url: (b as any).image_url ?? '',
     date: b.date,
     status: (b as any).status ? String((b as any).status) : 'В ожидании',
     paymentStatus: (b as any).payment_status ?? 'Ожидает оплаты',
@@ -65,13 +64,13 @@ export function Bookings() {
       });
       setCreateOpen(false);
     } catch (err) {
-      console.error('Create booking failed', err);
+      console.debug('Create booking failed', err);
       alert('Не удалось создать бронирование');
     }
   };
 
   const getTourById = (id: string) => {
-    return tours.find(t => t.id === id);
+    return tours.find(t => String(t.id) === String(id));
   };
 
   const confirmedBookings = bookings.filter(b => b.status === 'Подтверждено').length;
@@ -95,7 +94,7 @@ export function Bookings() {
             <div className="p-3 bg-white shadow-sm dark:bg-gray-800 rounded-xl">
               <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
-            <span className="text-green-600 dark:text-green-400">+5%</span>
+            <span className="text-green-600 dark:text-green-400">{confirmedBookings}%</span>
           </div>
           <h3 className="mb-1 text-green-700 dark:text-green-300">Подтверждено</h3>
           <p className="text-green-900 dark:text-white">{confirmedBookings}</p>
@@ -106,7 +105,7 @@ export function Bookings() {
             <div className="p-3 bg-white shadow-sm dark:bg-gray-800 rounded-xl">
               <Clock className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
             </div>
-            <span className="text-yellow-600 dark:text-yellow-400">+12%</span>
+            <span className="text-yellow-600 dark:text-yellow-400">{pendingBookings}%</span>
           </div>
           <h3 className="mb-1 text-yellow-700 dark:text-yellow-300">В ожидании</h3>
           <p className="text-yellow-900 dark:text-white">{pendingBookings}</p>
@@ -142,8 +141,7 @@ export function Bookings() {
               <h2 className="text-gray-900 dark:text-white">Все бронирования</h2>
               <p className="text-gray-600 dark:text-gray-400">Полный список бронирований</p>
             </div>
-
-            <BookingList bookings={bookingsRaw} toursMap={toursMap} />
+            <BookingList bookings={bookingsRaw} toursMap={toursMap} onEdit={(b)=>{ setEditingBooking(b); setCreateOpen(true); }} onDelete={async (id)=>{ await bookingStore.removeBooking(Number(id)); }} />
           </div>
         </div>
 
@@ -231,7 +229,7 @@ export function Bookings() {
           </div>
         </div>
       </div>
-      <BookingFormModal open={createOpen} onClose={() => setCreateOpen(false)} tours={tours} />
+      <BookingFormModal open={createOpen} onClose={() => { setCreateOpen(false); setEditingBooking(null); }} tours={tours} editingBooking={editingBooking} />
     </div>
   );
 }

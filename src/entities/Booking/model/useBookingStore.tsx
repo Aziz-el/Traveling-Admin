@@ -22,7 +22,7 @@ export const useBookingStore = create<BookingState>((set) => ({
             const data = await fetchBookingsService();
             set({ bookings: data.items || [] });
         } catch (error) {
-            console.error("Failed to fetch bookings:", error);
+            console.debug("Failed to fetch bookings:", error);
         }
     },
     addBooking: async (booking: Partial<Booking>) => {
@@ -30,7 +30,8 @@ export const useBookingStore = create<BookingState>((set) => ({
             const created = await createBooking(booking);
             set((state) => ({ bookings: [...state.bookings, created] }));
         } catch (error) {
-            console.error("Failed to add booking:", error);
+            console.debug("Failed to add booking:", error);
+            alert('Не удалось создать бронирование');
         }
     },
     updateBooking: async (id: number, updatedData: Partial<Booking>) => {
@@ -38,7 +39,8 @@ export const useBookingStore = create<BookingState>((set) => ({
             const updated = await updateBookingService(id, updatedData);
             set((state) => ({ bookings: state.bookings.map(b => (b.id === updated.id ? updated : b)) }));
         } catch (error) {
-            console.error("Failed to update booking:", error);
+            console.debug("Failed to update booking:", error);
+            alert('Не удалось обновить бронирование');
         }
     },
     removeBooking: async (id: number) => {
@@ -46,7 +48,8 @@ export const useBookingStore = create<BookingState>((set) => ({
             await deleteBooking(id);
             set((state) => ({ bookings: state.bookings.filter(b => b.id !== id) }));
         } catch (error) {
-            console.error("Failed to remove booking:", error);
+            console.debug("Failed to remove booking:", error);
+            alert('Не удалось удалить бронирование');
         }
     },
 }));
