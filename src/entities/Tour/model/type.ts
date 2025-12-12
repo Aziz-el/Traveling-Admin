@@ -4,7 +4,10 @@ export interface TourType {
   image_url: "string",
   description: "string",
   schedule: {
-    additionalProp1: {}
+    [key: string]: {
+      title: string,
+      desc: string
+    }
   },
   price: 0,
   location: "string",

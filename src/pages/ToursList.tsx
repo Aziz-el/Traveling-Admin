@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TourProps, TourType } from '../entities/Tour/model/type';
 import TourCardFull from '../entities/Tour/UI/TourCards/TourCardFull';
-import FormModal from '../entities/Tour/UI/FormModals/FormModal';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 import TourCardSkeleton from '../entities/Tour/UI/TourCards/TourCardSkeleton';
 
@@ -59,17 +58,6 @@ export function ToursList({   categoryImages, onSelectTour, selectedTourId }: To
       </div>
         )
       }
-
-      {editingTour && formData && (
-        <FormModal
-          editingTour={editingTour}
-          setEditingTour={setEditingTour}
-          formData={formData}
-          setFormData={setFormData}
-          handleUpdate={handleUpdate}
-          handleInputChange={handleInputChange}
-        />
-      )}
     </div>
   );
 }

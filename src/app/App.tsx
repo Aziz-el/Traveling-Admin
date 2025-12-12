@@ -14,6 +14,7 @@ import Register from '../pages/register';
 import TourDetails from '../pages/TourDetails';
 import ProtectedLayout from './Layouts/ProtectedLayout';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
+import TourEditingPage from '../pages/TourEditingPage';
 
 
 const categoryImages: Record<string, string> = {
@@ -59,6 +60,7 @@ export default function App() {
                       selectedTourId={selectedTourId}
                     />} />
                   <Route path='tours/:id' element={<TourDetails />} />
+                  <Route path='edit-tour/:id' element={<TourEditingPage />} />
                   <Route path='companies' element={<Companies />}/>
                   <Route path='bookings' element={<Bookings />}/>
                   <Route path='users' element={<Users />}/>

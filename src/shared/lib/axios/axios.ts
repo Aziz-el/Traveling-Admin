@@ -13,7 +13,7 @@ declare global {
 const instance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: {
-    'Content-Type': 'application/x-www-form-urlencoded',
+    'Content-Type': 'application/json',
   },
 });
 instance.interceptors.request.use((config => {
