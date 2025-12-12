@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import instance from '../shared/lib/axios/axios';
+import  instance from '../shared/lib/axios/axios';
 import {  Plane} from 'lucide-react';
 import { Link } from 'react-router';
 
@@ -19,6 +19,8 @@ export default function RegisterPage() {
     if (!fullName.trim()) return 'Введите имя';
     if (!email.includes('@')) return 'Введите корректный email';
     if (password.length < 6) return 'Пароль должен быть не менее 6 символов';
+    if(!/[A-Z]/.test(password)) return 'Пароль должен содержать хотя бы одну заглавную букву';
+    if(!/[0-9]/.test(password)) return 'Пароль должен содержать хотя бы одну цифру';
     if (password !== confirmPassword) return 'Пароли не совпадают';
     if (!agree) return 'Примите условия использования';
     return null;
@@ -41,7 +43,7 @@ export default function RegisterPage() {
         role,
         password,
       };
-      if (role === 'admin' && company.trim()) payload.company = company;
+      if (role === 'company' && company.trim()) payload.company = company;
 
       const res = await instance.post('/auth/register', payload);
       const token = res?.data?.token || res?.data?.access || res?.data?.access_token;

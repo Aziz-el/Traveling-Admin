@@ -1,4 +1,4 @@
-import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun, Star } from 'lucide-react';
 import { Link } from 'react-router';
 
 interface SidebarProps {
@@ -17,6 +17,7 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
     { id: 'bookings', label: 'Бронирования', icon: CalendarCheck },
     { id: 'users', label: 'Пользователи', icon: Users },
     { id: 'routes', label: 'Маршруты', icon: Route },
+    {id: 'reviews', label: 'Отзывы', icon: Star },
     { id: 'settings', label: 'Настройки', icon: Settings },
   ];
 

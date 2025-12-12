@@ -8,11 +8,10 @@ import TourCardSkeleton from '../entities/Tour/UI/TourCards/TourCardSkeleton';
 export function ToursList({   categoryImages, onSelectTour, selectedTourId }: TourProps) {
   let toursStore = useTourStore()
   let tours = toursStore.tours;
-  let loading = toursStore.loading;
+  let loading = useTourStore().loading;
   useEffect(() => {
     toursStore.fetchTours();
   }, []);
-  console.log(tours);
   
   let onUpdateTour = useTourStore().updateTour;
   let onDeleteTour = useTourStore().deleteTour;

@@ -5,7 +5,6 @@ import { useNavigate, useParams } from 'react-router';
 
 export default function TourEditingPage() {
     let toursStore = useTourStore()
-    let tours = toursStore.tours;
     let id = useParams().id;
     let navigate = useNavigate();
     const tour = useTourStore(state =>
@@ -31,17 +30,24 @@ export default function TourEditingPage() {
                 navigate(`/tours/`);
               }
             };
-        const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-                  const { name, value } = e.target;
-                  if (formData && setFormData) {
-                    setFormData({
-                      ...formData,
-                      [name]: name === 'price' || name.includes('Lat') || name.includes('Lng') 
-                        ? parseFloat(value) || 0 
-                        : value,
-                    });
-                  }
-                };
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> ) => {
+  const { name, value } = e.target;
+  if (!formData) return;
+
+  let newValue: any = value;
+  if (name === "price" || name === "capacity" || name.includes("Lat") || name.includes("Lng")) {
+    newValue = parseFloat(value) || 0;
+  }
+  if (name === "is_active") {
+    newValue = value === "true";
+  }
+
+  setFormData({
+    ...formData,
+    [name]: newValue
+  });
+};
+
     const handleScheduleChange = (day: string, field: string, value: string) => {
     setFormData((prev: any) => ({
       ...prev,
@@ -54,6 +60,8 @@ export default function TourEditingPage() {
       }
     }))
   }
+  console.log(tour);
+  
   return (
     <div className="max-w-3xl p-6 mx-auto">
 
@@ -181,7 +189,7 @@ export default function TourEditingPage() {
           <label className="block mb-1 dark:text-white">Активен?</label>
           <select
             name="is_active"
-            value={formData?.is_active === true ? "true" : "false"}
+            value={formData?.is_active  ? "true" : "false"}
             onChange={handleInputChange}
             className="w-full px-4 py-2 bg-white border rounded-lg dark:bg-gray-800 dark:text-white"
           >

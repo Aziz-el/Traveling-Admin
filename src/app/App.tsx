@@ -1,21 +1,36 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Sidebar } from '../widgets/Sidebar';
 import { Dashboard } from '../pages/Dashboard';
 import { AddTour } from '../pages/AddTour';
 import { ToursList } from '../pages/ToursList';
 import { Companies } from '../pages/Companies';
 import { Bookings } from '../pages/Bookings';
+import  TourEditingPage from '../pages/TourEditingPage';
 import { Users } from '../pages/Users';
 import { Routes,Route } from 'react-router';
 import { Settings } from '../pages/Settings';
 import { RoutesPage } from '../pages/RoutesPage';
 import Login from '../pages/Login';
-import Register from '../pages/register';
+import Register from '../pages/Register';
 import TourDetails from '../pages/TourDetails';
 import ProtectedLayout from './Layouts/ProtectedLayout';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
-import TourEditingPage from '../pages/TourEditingPage';
-
+export interface Tour {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: 'Азия' | 'Европа' | 'Америка' | 'Африка' | 'Океания' | 'Антарктида';
+  startTime: string;
+  endTime: string;
+  company: string;
+  startLat: number;
+  startLng: number;
+  endLat: number;
+  endLng: number;
+  status: 'Активный' | 'Неактивный';
+  image: string;
+}
 
 const categoryImages: Record<string, string> = {
   'Азия': 'https://images.unsplash.com/photo-1603486038792-2d67824265e0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhc2lhJTIwdHJhdmVsJTIwbGFuZHNjYXBlfGVufDF8fHx8MTc2NDY2ODA1M3ww&ixlib=rb-4.1.0&q=80&w=1080',
@@ -29,10 +44,7 @@ const categoryImages: Record<string, string> = {
 export default function App() {
   const [selectedTourId, setSelectedTourId] = useState<string | null>(null);
   const [miniCard, setMiniCard] = useState<{ tourId: string; x: number; y: number } | null>(null);
-  let toursStore = useTourStore();
-  useEffect(() => {
-    toursStore.fetchTours();
-  }, []);
+  let toursData = useTourStore().tours
 
 
   const handleSelectTour = (id: string) => {
@@ -65,6 +77,7 @@ export default function App() {
                   <Route path='bookings' element={<Bookings />}/>
                   <Route path='users' element={<Users />}/>
                   <Route path='routes' element={<RoutesPage />}/>
+                  {/* <Route path='reviews' element={<Reviews/>}/> */}
                   <Route path='settings' element={<Settings />}/>
                 </Routes>
             
