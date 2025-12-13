@@ -1,5 +1,5 @@
 import React from 'react';
-import { useBookingStore } from '../model/useBookingStore';
+import { useBookingStore } from '../../../entities/Booking/model/useBookingStore';
 import { CustomSelect } from '../../../shared/ui/select';
 import CustomInput from '../../../shared/ui/input';
 import CustomCalendar from '../../../shared/ui/calendar';
@@ -83,8 +83,8 @@ export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editin
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 overflow-auto p-4">
-      <div className="w-full max-w-2xl p-6 bg-white rounded-lg dark:bg-gray-900 max-h-screen overflow-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-auto text-white bg-black/50 ">
+      <div className="w-full max-w-2xl max-h-screen p-6 overflow-auto bg-white rounded-lg dark:bg-gray-900">
         <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">{editingBooking ? 'Редактировать бронирование' : 'Создать бронирование'}</h3>
         <div className="grid grid-cols-1 gap-4">
             {editingBooking ? (

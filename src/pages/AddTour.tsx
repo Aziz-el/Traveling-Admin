@@ -1,77 +1,124 @@
 import React, { useState } from 'react';
-import { Tour } from '../app/App';
 import { useCompaniesStore } from '../entities/Companies/model/useCompanyStore';
 import { useNavigate } from 'react-router';
 import { InteractiveMap } from '../shared/components/InteractiveMap';
-import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 
-interface AddTourProps {
-  categoryImages: Record<string, string>;
+export interface TourType {
+  title: string;
+  image_url: string;
+  description: string;
+  schedule: {
+    [key: string]: {
+      title: string;
+      desc: string;
+    };
+  };
+  price: number;
+  location: string;
+  duration: string;
+  id: string;
+  company_id: number;
+  rating: number;
+  is_active: boolean;
+  capacity: number;
+  lat?: number;
+  lng?: number;
 }
 
-export function AddTour({  categoryImages }: AddTourProps) {
-  let onAddTour = useTourStore().addTour;
+interface ScheduleDay {
+  key: string;
+  title: string;
+  desc: string;
+}
+
+export function AddTour() {
+  const addTour = useTourStore().addTour;
   const companies = useCompaniesStore(state => state.companies);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: '',
+    title: '',
     description: '',
     price: '',
-    category: 'Азия' as Tour['category'],
-    company: companies[0] ?? 'GitLens Travel',
-    startTime: '',
-    endTime: '',
-    startLat: '',
-    startLng: '',
-    endLat: '',
-    endLng: '',
-    status: 'Активный' as Tour['status'],
-    image: '',
+    location: '',
+    duration: '',
+    company_id: '0',
+    capacity: '',
+    image_url: '',
+    is_active: true,
+    lat: '',
+    lng: '',
   });
 
-  const [previewTour, setPreviewTour] = useState<Tour | null>(null);
+  const [scheduleItems, setScheduleItems] = useState<ScheduleDay[]>([
+    { key: 'day_1', title: '', desc: '' }
+  ]);
+
+  const [previewTour, setPreviewTour] = useState<TourType | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => {
-      const updated = { ...prev, [name]: value };
-      
-      if (name === 'category') {
-        updated.image = categoryImages[value] || '';
-      }
-      
+    const { name, value, type } = e.target;
+    
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData(prev => ({ ...prev, [name]: checked }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleScheduleChange = (index: number, field: 'title' | 'desc', value: string) => {
+    setScheduleItems(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
       return updated;
     });
   };
 
+  const addScheduleDay = () => {
+    const newDayNumber = scheduleItems.length + 1;
+    setScheduleItems(prev => [
+      ...prev,
+      { key: `day_${newDayNumber}`, title: '', desc: '' }
+    ]);
+  };
+
+  const removeScheduleDay = (index: number) => {
+    if (scheduleItems.length > 1) {
+      setScheduleItems(prev => prev.filter((_, i) => i !== index));
+    }
+  };
+
   const handlePreview = () => {
-    if (!formData.startLat || !formData.startLng || !formData.endLat || !formData.endLng) {
-      alert('Пожалуйста, заполните все координаты');
+    if (!formData.lat || !formData.lng) {
+      alert('Пожалуйста, заполните координаты для предпросмотра');
       return;
     }
 
-    if (!formData.startTime || !formData.endTime) {
-      alert('Пожалуйста, заполните дату и время начала и окончания');
-      return;
-    }
+    const schedule: TourType['schedule'] = {};
+    scheduleItems.forEach(item => {
+      schedule[item.key] = {
+        title: item.title || 'День',
+        desc: item.desc || 'Описание'
+      };
+    });
 
-    const tour: Tour = {
+    const tour: TourType = {
       id: Date.now().toString(),
-      name: formData.name || 'Предпросмотр',
+      title: formData.title || 'Предпросмотр',
       description: formData.description,
       price: parseFloat(formData.price) || 0,
-      category: formData.category,
-      company: formData.company,
-      startLat: parseFloat(formData.startLat),
-      startLng: parseFloat(formData.startLng),
-      endLat: parseFloat(formData.endLat),
-      endLng: parseFloat(formData.endLng),
-      status: formData.status,
-      image: formData.image || categoryImages[formData.category],
-      startTime: formData.startTime ? formData.startTime.replace('T', ' ') : '',
-      endTime: formData.endTime ? formData.endTime.replace('T', ' ') : ''
+      location: formData.location,
+      duration: formData.duration,
+      company_id: parseInt(formData.company_id),
+      capacity: parseInt(formData.capacity) || 0,
+      image_url: formData.image_url,
+      is_active: formData.is_active,
+      rating: 0,
+      schedule: schedule,
+      lat: parseFloat(formData.lat),
+      lng: parseFloat(formData.lng)
     };
 
     setPreviewTour(tour);
@@ -79,49 +126,60 @@ export function AddTour({  categoryImages }: AddTourProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
- 
-    if (!formData.name || !formData.price || !formData.startLat || !formData.startLng || !formData.endLat || !formData.endLng || !formData.startTime || !formData.endTime) {
+
+    if (!formData.title || !formData.price || !formData.location || !formData.duration) {
       alert('Пожалуйста, заполните все обязательные поля');
       return;
     }
 
-    const tour: Tour = {
+    const hasEmptySchedule = scheduleItems.some(item => !item.title.trim() || !item.desc.trim());
+    if (hasEmptySchedule) {
+      alert('Пожалуйста, заполните все поля расписания');
+      return;
+    }
+
+    const schedule: TourType['schedule'] = {};
+    scheduleItems.forEach(item => {
+      schedule[item.key] = {
+        title: item.title,
+        desc: item.desc
+      };
+    });
+
+    const tour: TourType = {
       id: Date.now().toString(),
-      name: formData.name,
+      title: formData.title,
       description: formData.description,
       price: parseFloat(formData.price),
-      category: formData.category,
-      company: formData.company,
-      startLat: parseFloat(formData.startLat),
-      startLng: parseFloat(formData.startLng),
-      endLat: parseFloat(formData.endLat),
-      endLng: parseFloat(formData.endLng),
-      status: formData.status,
-      image: formData.image || categoryImages[formData.category],
-      startTime: formData.startTime ? formData.startTime.replace('T', ' ') : '',
-      endTime: formData.endTime ? formData.endTime.replace('T', ' ') : ''
+      location: formData.location,
+      duration: formData.duration,
+      company_id: parseInt(formData.company_id),
+      capacity: parseInt(formData.capacity) || 0,
+      image_url: formData.image_url,
+      is_active: formData.is_active,
+      rating: 0,
+      schedule: schedule,
+      lat: formData.lat ? parseFloat(formData.lat) : undefined,
+      lng: formData.lng ? parseFloat(formData.lng) : undefined
     };
 
-    onAddTour(tour);
-    // Перейти на список туров — тур добавлен в состояние в `App`
+    addTour(tour);
     navigate('/tours');
 
-    setFormData(prev => ({
-      ...prev,
-      name: '',
+    setFormData({
+      title: '',
       description: '',
       price: '',
-      category: 'Азия',
-      company: companies[0] ?? 'GitLens Travel',
-      startTime: '',
-      endTime: '',
-      startLat: '',
-      startLng: '',
-      endLat: '',
-      endLng: '',
-      status: 'Активный',
-      image: '',
-    }));
+      location: '',
+      duration: '',
+      company_id: '0',
+      capacity: '',
+      image_url: '',
+      is_active: true,
+      lat: '',
+      lng: '',
+    });
+    setScheduleItems([{ key: 'day_1', title: '', desc: '' }]);
     setPreviewTour(null);
 
     alert('Тур успешно создан!');
@@ -130,167 +188,176 @@ export function AddTour({  categoryImages }: AddTourProps) {
   return (
     <div className="p-8 dark:bg-gray-950">
       <div className="mb-8">
-        <h1 className="mb-2 text-gray-900 dark:text-white">Добавить тур</h1>
+        <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">Добавить тур</h1>
         <p className="text-gray-600 dark:text-gray-400">Создайте новый туристический маршрут</p>
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <div className="p-6 bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block mb-2 text-gray-700 dark:text-gray-300">
-                Название тура *
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Например: Токио - Киото Экспресс"
-              />
-            </div>
-
-            <div>
-              <label className="block mb-2 text-gray-700 dark:text-gray-300">
-                Описание
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                rows={3}
-                className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none resize-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Краткое описание тура"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block mb-2 text-gray-700 dark:text-gray-300">
-                  Категория *
-                </label>
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="Азия">Азия</option>
-                  <option value="Европа">Европа</option>
-                  <option value="Америка">Америка</option>
-                  <option value="Африка">Африка</option>
-                  <option value="Океания">Океания</option>
-                  <option value="Антарктида">Антарктида</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block mb-2 text-gray-700 dark:text-gray-300">
-                  Компания *
-                </label>
-                <select
-                  name="company"
-                  value={formData.company}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                    {companies.map(c => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block mb-2 text-gray-700 dark:text-gray-300">Начало (дата и время) *</label>
-                <input
-                  type="datetime-local"
-                  name="startTime"
-                  value={formData.startTime}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block mb-2 text-gray-700 dark:text-gray-300">Окончание (дата и время) *</label>
-                <input
-                  type="datetime-local"
-                  name="endTime"
-                  value={formData.endTime}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block mb-2 text-gray-700 dark:text-gray-300">
-                  Цена ($) *
-                </label>
-                <input
-                  type="number"
-                  name="price"
-                  value={formData.price}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="1500"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-2 text-gray-700 dark:text-gray-300">
-                  Статус *
-                </label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="Активный">Активный</option>
-                  <option value="Неактивный">Неактивный</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="block mb-2 text-gray-700 dark:text-gray-300">
-                URL изображения (опционально)
-              </label>
-              <input
-                type="text"
-                name="image"
-                value={formData.image}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Оставьте пустым для автоматического выбора по категории"
-              />
-              {(formData.image || categoryImages[formData.category]) && (
-                <div className="mt-3 overflow-hidden rounded-lg">
-                  <ImageWithFallback
-                    src={formData.image || categoryImages[formData.category]}
-                    alt="Предпросмотр"
-                    className="object-cover w-full h-40"
+            {/* Основная информация */}
+            <div className="pb-6 border-b border-gray-200 dark:border-gray-800">
+              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Основная информация</h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Название тура *
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Например: Токио - Киото Экспресс"
                   />
                 </div>
-              )}
+
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Описание
+                  </label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    rows={3}
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none resize-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Подробное описание тура"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Локация *
+                    </label>
+                    <input
+                      type="text"
+                      name="location"
+                      value={formData.location}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Токио, Япония"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Продолжительность *
+                    </label>
+                    <input
+                      type="text"
+                      name="duration"
+                      value={formData.duration}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="7 дней / 6 ночей"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="pt-6 border-t border-gray-200 dark:border-gray-800">
-              <h3 className="mb-4 text-gray-900 dark:text-white">Координаты маршрута</h3>
+            {/* Детали тура */}
+            <div className="pb-6 border-b border-gray-200 dark:border-gray-800">
+              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Детали тура</h2>
               
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Компания *
+                    </label>
+                    <select
+                      name="company_id"
+                      value={formData.company_id}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      {companies.map((c, index) => (
+                        <option key={index} value={index}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Цена ($) *
+                    </label>
+                    <input
+                      type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="1500"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Вместимость (человек)
+                    </label>
+                    <input
+                      type="number"
+                      name="capacity"
+                      value={formData.capacity}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="20"
+                    />
+                  </div>
+
+                  <div className="flex items-center pt-6">
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="is_active"
+                        checked={formData.is_active}
+                        onChange={handleInputChange}
+                        className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+                      />
+                      <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Активный тур
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block mb-2 text-gray-700 dark:text-gray-300">
-                    Старт: Широта *
+                  <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    URL изображения
+                  </label>
+                  <input
+                    type="text"
+                    name="image_url"
+                    value={formData.image_url}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Координаты */}
+            <div className="pb-6 border-b border-gray-200 dark:border-gray-800">
+              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Координаты локации</h2>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Широта
                   </label>
                   <input
                     type="number"
-                    name="startLat"
-                    value={formData.startLat}
+                    name="lat"
+                    value={formData.lat}
                     onChange={handleInputChange}
                     step="0.0001"
                     className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -298,13 +365,13 @@ export function AddTour({  categoryImages }: AddTourProps) {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2 text-gray-700 dark:text-gray-300">
-                    Старт: Долгота *
+                  <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Долгота
                   </label>
                   <input
                     type="number"
-                    name="startLng"
-                    value={formData.startLng}
+                    name="lng"
+                    value={formData.lng}
                     onChange={handleInputChange}
                     step="0.0001"
                     className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -312,39 +379,61 @@ export function AddTour({  categoryImages }: AddTourProps) {
                   />
                 </div>
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block mb-2 text-gray-700 dark:text-gray-300">
-                    Финиш: Широта *
-                  </label>
-                  <input
-                    type="number"
-                    name="endLat"
-                    value={formData.endLat}
-                    onChange={handleInputChange}
-                    step="0.0001"
-                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="35.0116"
-                  />
-                </div>
-                <div>
-                  <label className="block mb-2 text-gray-700 dark:text-gray-300">
-                    Финиш: Долгота *
-                  </label>
-                  <input
-                    type="number"
-                    name="endLng"
-                    value={formData.endLng}
-                    onChange={handleInputChange}
-                    step="0.0001"
-                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="135.7681"
-                  />
-                </div>
+            {/* Расписание */}
+            <div className="pb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Расписание тура</h2>
+                <button
+                  type="button"
+                  onClick={addScheduleDay}
+                  className="px-4 py-2 text-sm text-blue-600 transition-colors border border-blue-600 rounded-lg dark:border-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950"
+                >
+                  + Добавить день
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {scheduleItems.map((item, index) => (
+                  <div key={index} className="p-4 border border-gray-200 rounded-lg dark:border-gray-700 dark:bg-gray-800/50">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        День {index + 1}
+                      </span>
+                      {scheduleItems.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeScheduleDay(index)}
+                          className="text-sm text-red-600 transition-colors dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
+                        >
+                          Удалить
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <input
+                        type="text"
+                        value={item.title}
+                        onChange={(e) => handleScheduleChange(index, 'title', e.target.value)}
+                        className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Заголовок дня"
+                      />
+                      <textarea
+                        value={item.desc}
+                        onChange={(e) => handleScheduleChange(index, 'desc', e.target.value)}
+                        rows={2}
+                        className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg outline-none resize-none dark:border-gray-600 dark:bg-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Описание дня"
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
+            {/* Кнопки действий */}
             <div className="flex gap-4 pt-6 border-t border-gray-200 dark:border-gray-800">
               <button
                 type="button"
@@ -363,11 +452,12 @@ export function AddTour({  categoryImages }: AddTourProps) {
           </form>
         </div>
 
+        {/* Карта предпросмотра */}
         <div className="overflow-hidden bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
           <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-            <h2 className="text-gray-900 dark:text-white">Предпросмотр маршрута</h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              {previewTour ? 'Маршрут отображен на карте' : 'Нажмите "Показать на карте" для предпросмотра'}
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Предпросмотр на карте</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {previewTour ? 'Локация отображена на карте' : 'Нажмите "Показать на карте" для предпросмотра'}
             </p>
           </div>
           <div className="h-[calc(100%-80px)]">

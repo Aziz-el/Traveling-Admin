@@ -1,4 +1,4 @@
-import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun, Star } from 'lucide-react';
+import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun, Star, Menu } from 'lucide-react';
 import { Link } from 'react-router';
 
 interface SidebarProps {
@@ -6,9 +6,12 @@ interface SidebarProps {
   setActiveSection?: (s: string) => void;
   isDarkMode: boolean;
   toggleDarkMode: () => void;
+  mobileOpen?: boolean;
+  onClose?: () => void;
+  onToggle?: () => void;
 }
 
-export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDarkMode }: SidebarProps) {
+export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDarkMode, mobileOpen, onClose, onToggle }: SidebarProps) {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'add-tour', label: 'Добавить тур', icon: Plus },
@@ -22,12 +25,21 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
   ];
 
   return (
-    <aside className="fixed top-0 flex flex-col w-64 h-screen overflow-y-auto bg-white border-r border-gray-200 dark:bg-gray-900 dark:border-gray-800">
-      <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-        <h1 className="text-blue-600 dark:text-blue-400">TravelAdmin</h1>
+    <>
+      {/* Mobile topbar with H1 and burger - shows on mobile only */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-12 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center px-3">
+        <button onClick={() => onToggle && onToggle()} className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+          <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+        </button>
+        <h1 className="text-blue-600 dark:text-blue-400 ml-3">TravelAdmin</h1>
       </div>
-      
-      <nav className="flex-1 p-4 space-y-1 ">
+      {/* Desktop sidebar */}
+      <aside className="hidden md:flex fixed top-0 left-0 flex-col w-64 h-screen overflow-y-auto bg-white border-r border-gray-200 dark:bg-gray-900 dark:border-gray-800">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-800">
+          <h1 className="text-blue-600 dark:text-blue-400">TravelAdmin</h1>
+        </div>
+
+        <nav className="flex-1 p-4 space-y-1 ">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const active = activeSection === item.id;
@@ -55,17 +67,60 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
             </Link>
           );
         })}
-      </nav>
+        </nav>
 
-      <div className="p-4 border-t border-gray-200 dark:border-gray-800">
-        <button
-          onClick={toggleDarkMode}
-          className="flex items-center w-full gap-3 px-4 py-3 text-gray-700 transition-colors rounded-lg dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-        >
-          {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          <span>{isDarkMode ? 'Светлая тема' : 'Темная тема'}</span>
-        </button>
-      </div>
-    </aside>
+        <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+          <button
+            onClick={toggleDarkMode}
+            className="flex items-center w-full gap-3 px-4 py-3 text-gray-700 transition-colors rounded-lg dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+          >
+            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            <span>{isDarkMode ? 'Светлая тема' : 'Темная тема'}</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+          <aside className="absolute left-0 top-12 bottom-0 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4 overflow-y-auto">
+            <div className="flex items-center justify-end p-2 border-b border-gray-200 dark:border-gray-800">
+              <button onClick={onClose} className="text-gray-600 dark:text-gray-300">✕</button>
+            </div>
+
+            <nav className="flex-1 p-2 space-y-1 mt-2">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.id}
+                    to={`/${item.id}`}
+                    onClick={onClose}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <div className="p-2 border-t border-gray-200 dark:border-gray-800">
+              <button
+                onClick={() => {
+                  toggleDarkMode();
+                  onClose && onClose();
+                }}
+                className="flex items-center w-full gap-3 px-4 py-3 text-gray-700 transition-colors rounded-lg dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                <span>{isDarkMode ? 'Светлая тема' : 'Темная тема'}</span>
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
+    </>
   );
 }

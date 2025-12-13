@@ -2,15 +2,19 @@ import { useEffect, useState } from 'react';
 import { ImageWithFallback } from '../../../shared/ui/ImageWithFallback';
 import { Calendar, DollarSign, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { Booking as BookingType } from '../model/type';
+import { optimizeImageUrl } from '../../../shared/utils/imageRenderingOptimizator';
 
 type Props = {
   bookings: BookingType[];
   toursMap: Record<string, any>;
   onEdit?: (booking: BookingType) => void;
   onDelete?: (id: string | number) => void;
+  loading?: boolean;
 };
 
-export const BookingList: React.FC<Props> = ({ bookings, toursMap, onEdit, onDelete }) => {
+import BookingSkeleton from '../../../shared/ui/skeletons/BookingSkeleton';
+
+export const BookingList: React.FC<Props> = ({ bookings, toursMap, onEdit, onDelete, loading }) => {
   const [menuState, setMenuState] = useState<{ x: number; y: number; booking: BookingType } | null>(null);
 
   useEffect(() => {
@@ -18,6 +22,16 @@ export const BookingList: React.FC<Props> = ({ bookings, toursMap, onEdit, onDel
     document.addEventListener('click', handleClick);
     return () => document.removeEventListener('click', handleClick);
   }, []);
+
+  if (loading) {
+    return (
+      <div className="p-6 space-y-4 max-h-[600px] overflow-y-auto">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <BookingSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-4 max-h-[600px] overflow-y-auto">
@@ -33,7 +47,7 @@ export const BookingList: React.FC<Props> = ({ bookings, toursMap, onEdit, onDel
           >
             <div className="flex-shrink-0 w-24 h-24 overflow-hidden rounded-lg shadow-md">
               <ImageWithFallback
-                src={tour.image ?? tour.image_url ?? ''}
+                src={tour.image ?? optimizeImageUrl(tour.image_url, 300, 90) ?? ''}
                 alt={tour.name ?? tour.title ?? 'Tour'}
                 className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
               />

@@ -5,14 +5,13 @@ import { useTourStore } from '../entities/Tour/model/useTourStore';
 import TourCardSkeleton from '../entities/Tour/UI/TourCards/TourCardSkeleton';
 
 
-export function ToursList({   categoryImages, onSelectTour, selectedTourId }: TourProps) {
+export function ToursList({  onSelectTour, selectedTourId }: TourProps) {
   let toursStore = useTourStore()
   let tours = toursStore.tours;
-  let loading = toursStore.loading;
+  let loading = useTourStore().loading;
   useEffect(() => {
     toursStore.fetchTours();
   }, []);
-  console.log(tours);
   
   let onUpdateTour = useTourStore().updateTour;
   let onDeleteTour = useTourStore().deleteTour;
@@ -38,7 +37,7 @@ export function ToursList({   categoryImages, onSelectTour, selectedTourId }: To
           }
         };
   return (
-    <div className="p-8 dark:bg-gray-950">
+    <div className="p-8 h-full dark:bg-gray-950">
       <div className="mb-8">
         <h1 className="mb-2 text-gray-900 dark:text-white">Туры</h1>
         <p className="text-gray-600 dark:text-gray-400">Управление всеми турами</p>
@@ -53,7 +52,7 @@ export function ToursList({   categoryImages, onSelectTour, selectedTourId }: To
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {tours.map((tour) => (
-          <TourCardFull tour={tour}  key={tour.id} setFormData={setFormData} setEditingTour={setEditingTour}  categoryImages={categoryImages} onSelectTour={onSelectTour} selectedTourId={selectedTourId} />
+          <TourCardFull tour={tour}  key={tour.id} setFormData={setFormData} setEditingTour={setEditingTour} onSelectTour={onSelectTour} selectedTourId={selectedTourId} />
         ))}
       </div>
         )

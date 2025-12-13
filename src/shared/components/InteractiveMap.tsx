@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
-import { Tour } from '../../app/App';
+import { useState, useRef, useEffect, use } from 'react';
 import { MapPin, Navigation, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import { Button } from '../../shared/ui/button';
+import { useTourStore } from '../../entities/Tour/model/useTourStore';
 
 interface InteractiveMapProps {
   tours: Tour[];
@@ -10,7 +10,8 @@ interface InteractiveMapProps {
   onSelectTour?: (tourId: string) => void;
 }
 
-export function InteractiveMap({ tours, selectedRoute, onMapItemClick, onSelectTour }: InteractiveMapProps) {
+export function InteractiveMap({ selectedRoute, onMapItemClick, onSelectTour }: InteractiveMapProps) {
+  const tours = useTourStore().tours;
   const [hoveredTour, setHoveredTour] = useState<string | null>(null);
   const [zoom, setZoom] = useState(2);
   const [center, setCenter] = useState({ lat: 40, lng: 20 });
@@ -19,7 +20,6 @@ export function InteractiveMap({ tours, selectedRoute, onMapItemClick, onSelectT
   const [tiles, setTiles] = useState<{ x: number; y: number; z: number }[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Конвертация координат в пиксели
   const latLngToPixel = (lat: number, lng: number, zoom: number) => {
     const scale = 256 * Math.pow(2, zoom);
     const x = (lng + 180) / 360 * scale;
@@ -158,9 +158,7 @@ export function InteractiveMap({ tours, selectedRoute, onMapItemClick, onSelectT
         })}
       </div>
 
-      {/* SVG overlay для маршрутов */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none">
-        {/* Маршруты */}
         {tours.map((tour) => {
           const start = getScreenPosition(tour.startLat, tour.startLng);
           const end = getScreenPosition(tour.endLat, tour.endLng);
@@ -306,7 +304,6 @@ export function InteractiveMap({ tours, selectedRoute, onMapItemClick, onSelectT
           );
         })}
 
-        {/* Предпросмотр маршрута */}
         {selectedRoute && (() => {
           const start = getScreenPosition(selectedRoute.startLat, selectedRoute.startLng);
           const end = getScreenPosition(selectedRoute.endLat, selectedRoute.endLng);
@@ -386,7 +383,7 @@ export function InteractiveMap({ tours, selectedRoute, onMapItemClick, onSelectT
             </div>
             <div className="flex-1">
               <div className="text-slate-900 mb-1">
-                {tours.find((t) => t.id === hoveredTour)?.name}
+                {tours.find((t) => t.id === hoveredTour)?.title}
               </div>
               <div className="text-slate-600 mb-3">
                 {tours.find((t) => t.id === hoveredTour)?.description}

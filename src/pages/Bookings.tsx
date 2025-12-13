@@ -1,22 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, DollarSign, CheckCircle, Clock, XCircle, TrendingUp } from 'lucide-react';
+import {DollarSign, CheckCircle, Clock, XCircle, TrendingUp } from 'lucide-react';
 import { useCompaniesStore } from '../entities/Companies/model/useCompanyStore';
 import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 
 import { useBookingStore } from '../entities/Booking/model/useBookingStore';
 import BookingList from '../entities/Booking/ui/BookingList';
-import BookingFormModal from '../entities/Booking/ui/BookingFormModal';
+import BookingFormModal from '../features/Booking/ui/BookingFormModal';
+import { optimizeImageUrl } from '../shared/utils/imageRenderingOptimizator';
 
 
 export function Bookings() {
   const tours = useTourStore().tours;
   const { companies } = useCompaniesStore();
   const bookingStore = useBookingStore();
+  const [loadingBookings, setLoadingBookings] = useState(true);
   const bookingsRaw = bookingStore.bookings; 
 
   useEffect(() => {
-    bookingStore.fetchBookings();
+    (async () => {
+      setLoadingBookings(true);
+      try {
+        await bookingStore.fetchBookings();
+      } finally {
+        setLoadingBookings(false);
+      }
+    })();
   }, []);
 
   const [createOpen, setCreateOpen] = React.useState(false);
@@ -141,7 +150,7 @@ export function Bookings() {
               <h2 className="text-gray-900 dark:text-white">Все бронирования</h2>
               <p className="text-gray-600 dark:text-gray-400">Полный список бронирований</p>
             </div>
-            <BookingList bookings={bookingsRaw} toursMap={toursMap} onEdit={(b)=>{ setEditingBooking(b); setCreateOpen(true); }} onDelete={async (id)=>{ await bookingStore.removeBooking(Number(id)); }} />
+            <BookingList loading={loadingBookings} bookings={bookingsRaw} toursMap={toursMap} onEdit={(b)=>{ setEditingBooking(b); setCreateOpen(true); }} onDelete={async (id)=>{ await bookingStore.removeBooking(Number(id)); }} />
           </div>
         </div>
 
@@ -214,7 +223,7 @@ export function Bookings() {
                   <div key={tour.id} className="flex items-center gap-3 p-3 transition-colors rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750">
                     <div className="flex-shrink-0 w-12 h-12 overflow-hidden rounded-lg">
                       <ImageWithFallback
-                        src={tour.image_url}
+                        src={optimizeImageUrl(tour.image_url, 300, 90) ?? ''}
                         alt={tour.title}
                         className="object-cover w-full h-full"
                       />

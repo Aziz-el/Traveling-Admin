@@ -1,13 +1,22 @@
 import { Users as UsersIcon, UserCheck, UserX } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useUserStore } from '../entities/Users/model/useUserStore';
+import UsersSkeleton from '../shared/ui/skeletons/UsersSkeleton';
 
 export function Users() {
   const users = useUserStore((s) => s.users);
   const fetchUsers = useUserStore((s) => s.fetchUsers);
 
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    fetchUsers();
+    (async () => {
+      setLoading(true);
+      try {
+        await fetchUsers();
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [fetchUsers]);
 
   const totalUsers = users.length;
@@ -29,7 +38,10 @@ export function Users() {
         <p className="text-gray-600 dark:text-gray-400">Список пользователей из бэкенда</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      {loading ? (
+        <UsersSkeleton />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between mb-4">
             <div className="p-2 bg-blue-50 dark:bg-blue-950 rounded-lg">
@@ -62,14 +74,39 @@ export function Users() {
           <h3 className="text-gray-600 dark:text-gray-400 mb-1">Контакты (телефон)</h3>
           <p className="text-gray-900 dark:text-white">{withPhone}</p>
         </div>
-      </div>
+        </div>
+      )}
 
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
         <div className="p-6 border-b border-gray-200 dark:border-gray-800">
           <h2 className="text-gray-900 dark:text-white">Все пользователи</h2>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile: card list */}
+        <div className="md:hidden">
+          <div className="p-4 space-y-3">
+            {loading ? (
+              Array.from({ length: 4 }).map((_, idx) => (
+                <div key={idx} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg animate-pulse" />
+              ))
+            ) : (
+              users.map((user) => (
+                <div key={user.id} className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">{user.full_name}</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">{user.email}</div>
+                    </div>
+                    <div className="text-right text-xs text-gray-600 dark:text-gray-400">{roleLabel(user.role)}</div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Desktop: table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
               <tr>
@@ -82,25 +119,38 @@ export function Users() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
-              {users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                  <td className="px-6 py-4 text-gray-900 dark:text-white">#{user.id}</td>
-                  <td className="px-6 py-4 text-gray-900 dark:text-white">{user.full_name}</td>
-                  <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{user.email}</td>
-                  <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{user.phone || '-'}</td>
-                  <td className="px-6 py-4 text-gray-900 dark:text-white">{roleLabel(user.role)}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full ${
-                      user.is_active
-                        ? 'bg-green-50 dark:bg-green-950 text-green-600 dark:text-green-400'
-                        : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
-                    }`}>
-                      {user.is_active ? <UserCheck className="w-4 h-4 mr-1" /> : <UserX className="w-4 h-4 mr-1" />}
-                      {user.is_active ? 'Активный' : 'Неактивен'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {loading ? (
+                Array.from({ length: 6 }).map((_, r) => (
+                  <tr key={r} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors animate-pulse">
+                    <td className="px-6 py-4 text-gray-900 dark:text-white">#</td>
+                    <td className="px-6 py-4 text-gray-900 dark:text-white"><div className="w-28 h-4 bg-gray-300 rounded dark:bg-gray-700" /></td>
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400"><div className="w-40 h-4 bg-gray-300 rounded dark:bg-gray-700" /></td>
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400"><div className="w-28 h-4 bg-gray-300 rounded dark:bg-gray-700" /></td>
+                    <td className="px-6 py-4 text-gray-900 dark:text-white"><div className="w-20 h-4 bg-gray-300 rounded dark:bg-gray-700" /></td>
+                    <td className="px-6 py-4"><div className="w-20 h-4 bg-gray-300 rounded dark:bg-gray-700" /></td>
+                  </tr>
+                ))
+              ) : (
+                users.map((user) => (
+                  <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    <td className="px-6 py-4 text-gray-900 dark:text-white">#{user.id}</td>
+                    <td className="px-6 py-4 text-gray-900 dark:text-white">{user.full_name}</td>
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{user.email}</td>
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{user.phone || '-'}</td>
+                    <td className="px-6 py-4 text-gray-900 dark:text-white">{roleLabel(user.role)}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full ${
+                        user.is_active
+                          ? 'bg-green-50 dark:bg-green-950 text-green-600 dark:text-green-400'
+                          : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+                      }`}>
+                        {user.is_active ? <UserCheck className="w-4 h-4 mr-1" /> : <UserX className="w-4 h-4 mr-1" />}
+                        {user.is_active ? 'Активный' : 'Неактивен'}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
