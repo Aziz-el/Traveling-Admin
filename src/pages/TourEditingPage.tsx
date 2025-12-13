@@ -7,9 +7,9 @@ export default function TourEditingPage() {
     let toursStore = useTourStore()
     let id = useParams().id;
     let navigate = useNavigate();
-    const tour = useTourStore(state =>
-  state.tours.find(t => t.id == id)
-)
+    const tour = toursStore.tours.find(t=>t.id == id)
+console.log(tour);
+
     let onUpdateTour = toursStore.updateTour;
     const [editingTour, setEditingTour] = useState<TourType | null | undefined>(null);
     const [formData, setFormData] = useState<TourType | null |undefined>(null);
@@ -26,8 +26,9 @@ export default function TourEditingPage() {
 }, [tour])
     const handleUpdate = () => {
               if (formData && editingTour) {
-                onUpdateTour(editingTour?.id,formData);
+                onUpdateTour(editingTour?.id,formData).then(() => {
                 navigate(`/tours/`);
+                });
               }
             };
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> ) => {

@@ -5,7 +5,7 @@ import { useTourStore } from '../entities/Tour/model/useTourStore';
 import TourCardSkeleton from '../entities/Tour/UI/TourCards/TourCardSkeleton';
 
 
-export function ToursList({   categoryImages, onSelectTour, selectedTourId }: TourProps) {
+export function ToursList({  onSelectTour, selectedTourId }: TourProps) {
   let toursStore = useTourStore()
   let tours = toursStore.tours;
   let loading = useTourStore().loading;
@@ -52,7 +52,7 @@ export function ToursList({   categoryImages, onSelectTour, selectedTourId }: To
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {tours.map((tour) => (
-          <TourCardFull tour={tour}  key={tour.id} setFormData={setFormData} setEditingTour={setEditingTour}  categoryImages={categoryImages} onSelectTour={onSelectTour} selectedTourId={selectedTourId} />
+          <TourCardFull tour={tour}  key={tour.id} setFormData={setFormData} setEditingTour={setEditingTour} onSelectTour={onSelectTour} selectedTourId={selectedTourId} />
         ))}
       </div>
         )
