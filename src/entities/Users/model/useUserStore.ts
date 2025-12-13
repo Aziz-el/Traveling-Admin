@@ -4,6 +4,7 @@ import {
     getUserById,
     updateUser as updateUserService,
     deleteUser as deleteUserService,
+    getCurrentUser,
 } from './services/user';
 import { UserItem } from './types';
 
@@ -21,7 +22,21 @@ export const useUserStore = create<UserStore>((set) => ({
     fetchUsers: async () => {
         try {
             const data = await fetchUsersService();
-            set({ users: data.items || [] });
+            console.debug('fetchUsers response:', data);
+            const items = (data as any)?.items ?? (data as any)?.data ?? (Array.isArray(data) ? data : []);
+            set({ users: items || [] });
+
+            if ((!items || items.length === 0)) {
+                try {
+                    const me = await getCurrentUser();
+                    console.debug('getCurrentUser result:', me);
+                    if (me) {
+                        set((state) => ({ users: [me, ...state.users] }));
+                    }
+                } catch (err) {
+                    console.debug('No current user available', err);
+                }
+            }
         }
         catch (error) {
             console.error("Failed to fetch users:", error);

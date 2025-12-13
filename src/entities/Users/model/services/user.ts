@@ -6,6 +6,19 @@ export const fetchUsers = async (): Promise<UsersResponse> => {
     return response.data;
 };
 
+export const getCurrentUser = async (): Promise<UserItem | null> => {
+    const response = await instance.get<UserItem>("/users/");
+    const endpoints = ['/users/','/auth/me'];
+    for (const ep of endpoints) {
+        try {
+            const res = await instance.get<UserItem>(ep);
+            if (res && res.data) return res.data;
+        } catch (e) {
+        }
+    }
+    return response.data || null;
+}
+
 export const getUserById = async (id: number | string): Promise<UserItem> => {
     const response = await instance.get<UserItem>(`/users/${id}`);
     return response.data;
@@ -23,6 +36,7 @@ export const deleteUser = async (id: number | string): Promise<void> => {
 export default {
     fetchUsers,
     getUserById,
+    getCurrentUser,
     updateUser,
     deleteUser,
 };
