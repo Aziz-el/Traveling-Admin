@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { TourProps, TourType } from '../../model/type'
 import { ImageWithFallback } from '../../../../shared/ui/ImageWithFallback';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { Clock, DollarSign, Edit, MapPin, Star, Trash2, Users } from 'lucide-react';
 import { useTourStore } from '../../model/useTourStore';
 
@@ -91,16 +91,18 @@ export default function TourCardFull({ tour,setFormData,setEditingTour,  onSelec
     </div>
 
     <div className="flex gap-2">
+      <Link to={`/edit-tour/${tour?.id}`} className="flex-1">
       <button
-        onClick={(e) => { e.stopPropagation(); handleEdit(tour); }}
+        onClick={(e) => { e.stopPropagation(); }}
         className="flex items-center justify-center flex-1 gap-2 px-4 py-2 text-gray-700 transition-colors border border-gray-300 rounded-lg dark:border-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
       >
         <Edit className="w-4 h-4" />
         Изменить
       </button>
+      </Link>
 
       <button
-        onClick={(e) => { e.stopPropagation(); handleDelete(tour?.id, tour?.title); }}
+        onClick={(e) => { e.stopPropagation(); handleDelete(tour?.id, tour?.title); setTimeout(() => {tourStore.fetchTours()}, 3000); }}
         className="flex items-center justify-center flex-1 gap-2 px-4 py-2 text-red-600 transition-colors rounded-lg bg-red-50 dark:bg-red-950 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900"
       >
         <Trash2 className="w-4 h-4" />

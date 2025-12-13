@@ -1,11 +1,13 @@
-import { Tour } from "../../../app/App";
 
 export interface TourType {
  title: "string",
   image_url: "string",
   description: "string",
   schedule: {
-    additionalProp1: {}
+    [key: string]: {
+      title: string,
+      desc: string
+    }
   },
   price: 0,
   location: "string",
