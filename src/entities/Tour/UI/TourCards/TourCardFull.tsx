@@ -127,7 +127,7 @@ export default function TourCardFull({ tour, setFormData, setEditingTour, onSele
           </Link>
 
           <button
-            onClick={(e) => { e.stopPropagation(); handleDelete(tour?.id, tour?.title); setTimeout(() => { tourStore.fetchTours() }, 3000); }}
+            onClick={(e) => { e.stopPropagation(); handleDelete(tour?.id, tour?.title); setTimeout(() => { tourStore.fetchTours() }, 1000); }}
             className="flex items-center justify-center flex-1 gap-2 px-4 py-2.5 text-sm font-medium text-red-600 transition-all duration-200 rounded-lg bg-red-50 dark:bg-red-950 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900"
           >
             <Trash2 className="w-4 h-4" />

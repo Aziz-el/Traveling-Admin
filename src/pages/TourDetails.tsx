@@ -4,6 +4,7 @@ import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 import { useBookingStore } from '../entities/Booking/model/useBookingStore';
 import { MapPin, Star, Users, Clock, DollarSign, CheckCircle } from 'lucide-react';
+import ConfirmModal from '../shared/ui/ConfirmModal';
 
 export default function TourDetails() {
   let toursStore = useTourStore();
@@ -20,6 +21,8 @@ export default function TourDetails() {
 
   const bookingStore = useBookingStore();
   const [createOpen, setCreateOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmMsg, setConfirmMsg] = useState('');
   const toLocalInput = (iso?: string) => {
     if (!iso) return '';
     const d = new Date(iso);
@@ -68,8 +71,8 @@ export default function TourDetails() {
       } as any);
 
       setCreateOpen(false);
-      alert('Бронирование создано');
-      navigate('/bookings');
+      setConfirmMsg('Бронирование успешно создано');
+      setConfirmOpen(true);
     } catch (err) {
       console.error('Failed to create booking', err);
       alert('Ошибка при создании бронирования');
@@ -236,6 +239,8 @@ export default function TourDetails() {
           </div>
         </div>
       )}
+
+      <ConfirmModal open={confirmOpen} title="Готово" message={confirmMsg} onClose={() => { setConfirmOpen(false); navigate('/bookings'); }} />
     </>
   );
 }

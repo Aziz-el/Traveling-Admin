@@ -1,17 +1,31 @@
-import { useState, useRef, useEffect, use } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MapPin, Navigation, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import { Button } from '../../shared/ui/button';
 import { useTourStore } from '../../entities/Tour/model/useTourStore';
 
-interface InteractiveMapProps {
-  tours: Tour[];
-  selectedRoute?: { startLat: number; startLng: number; endLat: number; endLng: number };
-  onMapItemClick?: (tourId: string, x: number, y: number) => void;
-  onSelectTour?: (tourId: string) => void;
+interface Tour {
+  id: string;
+  title?: string;
+  description?: string;
+  startLat?: number;
+  startLng?: number;
+  endLat?: number;
+  endLng?: number;
+  lat?: number;
+  lng?: number;
 }
 
-export function InteractiveMap({ selectedRoute, onMapItemClick, onSelectTour }: InteractiveMapProps) {
-  const tours = useTourStore().tours;
+interface InteractiveMapProps {
+  tours?: Tour[];
+  selectedRoute?: { startLat: number; startLng: number; endLat: number; endLng: number };
+  onMapItemClick?: (tourId: string, x: number, y: number) => void;
+  onSelectTour?: (tourIdOrTitle: string) => void; // accepts id or title
+  selectedTour?: string | null; // id or title
+}
+
+export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick, onSelectTour, selectedTour }: InteractiveMapProps) {
+  const storeTours = useTourStore().tours as Tour[];
+  const tours = propTours ?? storeTours;
   const [hoveredTour, setHoveredTour] = useState<string | null>(null);
   const [zoom, setZoom] = useState(2);
   const [center, setCenter] = useState({ lat: 40, lng: 20 });
@@ -27,7 +41,6 @@ export function InteractiveMap({ selectedRoute, onMapItemClick, onSelectTour }: 
     return { x, y };
   };
 
-  // Конвертация пикселей в координаты
   const pixelToLatLng = (x: number, y: number, zoom: number) => {
     const scale = 256 * Math.pow(2, zoom);
     const lng = x / scale * 360 - 180;
@@ -36,7 +49,6 @@ export function InteractiveMap({ selectedRoute, onMapItemClick, onSelectTour }: 
     return { lat, lng };
   };
 
-  // Вычисление необходимых тайлов
   useEffect(() => {
     if (!containerRef.current) return;
     
@@ -106,6 +118,54 @@ export function InteractiveMap({ selectedRoute, onMapItemClick, onSelectTour }: 
     setCenter({ lat: 40, lng: 20 });
   };
 
+  // Search state
+  const [query, setQuery] = useState('');
+  const suggestions = query.trim() === '' ? [] : tours.filter(t => (t.title || '').toLowerCase().includes(query.trim().toLowerCase())).slice(0, 8);
+
+  const getTourCoords = (tour: any) => {
+    // Accept various naming conventions from API: camelCase and snake_case
+    const read = (obj: any, keys: string[]) => {
+      for (const k of keys) {
+        if (obj[k] !== undefined && obj[k] !== null) return Number(obj[k]);
+      }
+      return NaN;
+    };
+    const startLat = read(tour, ['startLat', 'start_lat', 'lat', 'latitude']);
+    const startLng = read(tour, ['startLng', 'start_lng', 'lng', 'longitude']);
+    const endLat = read(tour, ['endLat', 'end_lat', 'lat', 'latitude']);
+    const endLng = read(tour, ['endLng', 'end_lng', 'lng', 'longitude']);
+    const hasStart = !isNaN(startLat) && !isNaN(startLng);
+    const hasEnd = !isNaN(endLat) && !isNaN(endLng);
+    return {
+      startLat: hasStart ? startLat : null,
+      startLng: hasStart ? startLng : null,
+      endLat: hasEnd ? endLat : null,
+      endLng: hasEnd ? endLng : null,
+      singleLat: !hasStart && !hasEnd && !isNaN(startLat) ? startLat : null,
+      singleLng: !hasStart && !hasEnd && !isNaN(startLng) ? startLng : null,
+    };
+  };
+
+  const handleSelectByTitle = (t: Tour) => {
+    const coords = getTourCoords(t);
+    // center to start if available, otherwise to end
+    const lat = coords.startLat ?? coords.endLat;
+    const lng = coords.startLng ?? coords.endLng;
+    if (lat != null && lng != null) setCenter({ lat, lng });
+    setQuery('');
+    onSelectTour && onSelectTour(t.id ?? (t.title ?? ''));
+  };
+
+  useEffect(() => {
+    if (!selectedTour) return;
+    const t = tours.find(t => t.id === selectedTour || (t.title && t.title === selectedTour));
+    if (!t) return;
+    const coords = getTourCoords(t);
+    const lat = coords.startLat ?? coords.endLat;
+    const lng = coords.startLng ?? coords.endLng;
+    if (lat != null && lng != null) setCenter({ lat, lng });
+  }, [selectedTour, tours]);
+
   // Конвертация координат маршрутов в позиции на экране
   const getScreenPosition = (lat: number, lng: number) => {
     if (!containerRef.current) return { x: 0, y: 0 };
@@ -160,9 +220,28 @@ export function InteractiveMap({ selectedRoute, onMapItemClick, onSelectTour }: 
 
       <svg className="absolute inset-0 w-full h-full pointer-events-none">
         {tours.map((tour) => {
-          const start = getScreenPosition(tour.startLat, tour.startLng);
-          const end = getScreenPosition(tour.endLat, tour.endLng);
-          const isHovered = hoveredTour === tour.id;
+          const isHovered = hoveredTour === String(tour.id);
+          const c = getTourCoords(tour as any);
+          const startLat = c.startLat;
+          const startLng = c.startLng;
+          const endLat = c.endLat;
+          const endLng = c.endLng;
+          const singleLat = c.singleLat;
+          const singleLng = c.singleLng;
+          if (startLat == null || startLng == null || endLat == null || endLng == null) {
+            // No route; draw single point if available
+            if (singleLat != null && singleLng != null) {
+              const pos = getScreenPosition(singleLat, singleLng);
+              return (
+                <g key={tour.id} className="pointer-events-auto cursor-pointer" onClick={(e) => { e.stopPropagation(); onMapItemClick?.(tour.id, pos.x, pos.y); onSelectTour?.(String(tour.id)); }} onMouseEnter={() => setHoveredTour(tour.id)} onMouseLeave={() => setHoveredTour(null)}>
+                  <circle cx={pos.x} cy={pos.y} r={isHovered ? 12 : 8} fill="#3b82f6" stroke="white" strokeWidth="3" />
+                </g>
+              );
+            }
+            return null;
+          }
+          const start = getScreenPosition(startLat, startLng);
+          const end = getScreenPosition(endLat, endLng);
           
           const midX = (start.x + end.x) / 2;
           const midY = (start.y + end.y) / 2;
@@ -191,12 +270,12 @@ export function InteractiveMap({ selectedRoute, onMapItemClick, onSelectTour }: 
                 strokeDasharray="8,4"
                 opacity={isHovered ? 1 : 0.8}
                 className="pointer-events-auto cursor-pointer"
-                onMouseEnter={() => setHoveredTour(tour.id)}
+                onMouseEnter={() => setHoveredTour(String(tour.id))}
                 onMouseLeave={() => setHoveredTour(null)}
                 onClick={(e) => {
                   e.stopPropagation();
                   onMapItemClick?.(tour.id, midX, midY - controlOffset);
-                  onSelectTour?.(tour.id);
+                  onSelectTour?.(String(tour.id));
                 }}
               >
                 <animate
@@ -348,6 +427,25 @@ export function InteractiveMap({ selectedRoute, onMapItemClick, onSelectTour }: 
         </Button>
       </div>
 
+      {/* Поиск по названию */}
+      <div className="absolute top-4 left-4 pointer-events-auto w-60">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Найти тур по названию"
+          className="w-full px-3 py-2 text-sm border rounded bg-white"
+        />
+        {suggestions.length > 0 && (
+          <div className="mt-1 max-h-44 overflow-auto bg-white rounded shadow-lg border">
+            {suggestions.map((s) => (
+              <div key={s.id} className="px-3 py-2 hover:bg-gray-50 cursor-pointer" onClick={() => handleSelectByTitle(s)}>
+                {s.title}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Легенда */}
       <div className="absolute bottom-4 left-4 bg-white rounded-lg border border-slate-200 p-3 shadow-lg pointer-events-auto">
         <div className="space-y-2">
@@ -386,21 +484,27 @@ export function InteractiveMap({ selectedRoute, onMapItemClick, onSelectTour }: 
                 {tours.find((t) => t.id === hoveredTour)?.title}
               </div>
               <div className="text-slate-600 mb-3">
-                {tours.find((t) => t.id === hoveredTour)?.description}
+            {tours.find((t) => t.id === hoveredTour)?.description}
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-slate-600">
                   <div className="w-2 h-2 rounded-full bg-green-500"></div>
                   <span>
-                    Старт: {tours.find((t) => t.id === hoveredTour)?.startLat.toFixed(4)}°,{' '}
-                    {tours.find((t) => t.id === hoveredTour)?.startLng.toFixed(4)}°
+                    Старт: {(() => {
+                      const t = tours.find((tt) => tt.id === hoveredTour);
+                      const c = t ? getTourCoords(t) : null;
+                      return c && c.startLat != null ? `${c.startLat.toFixed(4)}°, ${c.startLng?.toFixed(4)}°` : '—';
+                    })()}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-600">
                   <div className="w-2 h-2 rounded-full bg-red-500"></div>
                   <span>
-                    Финиш: {tours.find((t) => t.id === hoveredTour)?.endLat.toFixed(4)}°,{' '}
-                    {tours.find((t) => t.id === hoveredTour)?.endLng.toFixed(4)}°
+                    Финиш: {(() => {
+                      const t = tours.find((tt) => tt.id === hoveredTour);
+                      const c = t ? getTourCoords(t) : null;
+                      return c && c.endLat != null ? `${c.endLat.toFixed(4)}°, ${c.endLng?.toFixed(4)}°` : '—';
+                    })()}
                   </span>
                 </div>
               </div>

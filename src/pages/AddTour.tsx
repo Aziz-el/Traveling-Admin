@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useCompaniesStore } from '../entities/Companies/model/useCompanyStore';
 import { useNavigate } from 'react-router';
+import ConfirmModal from '../shared/ui/ConfirmModal';
 import { InteractiveMap } from '../shared/components/InteractiveMap';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 
@@ -34,9 +35,12 @@ interface ScheduleDay {
 
 export function AddTour() {
   const addTour = useTourStore().addTour;
-  const companies = useCompaniesStore(state => state.companies);
+    let companyStore = useCompaniesStore()
+  const companies = companyStore.companies
+  useEffect(()=>{
+   companyStore.fetchCompanies()
+  },[])
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -56,6 +60,8 @@ export function AddTour() {
   ]);
 
   const [previewTour, setPreviewTour] = useState<TourType | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmMsg, setConfirmMsg] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -164,7 +170,8 @@ export function AddTour() {
     };
 
     addTour(tour);
-    navigate('/tours');
+    setConfirmMsg('Тур успешно создан');
+    setConfirmOpen(true);
 
     setFormData({
       title: '',
@@ -181,8 +188,7 @@ export function AddTour() {
     });
     setScheduleItems([{ key: 'day_1', title: '', desc: '' }]);
     setPreviewTour(null);
-
-    alert('Тур успешно создан!');
+  
   };
 
   return (
@@ -272,12 +278,12 @@ export function AddTour() {
                     </label>
                     <select
                       name="company_id"
-                      value={formData.company_id}
+                      value={formData.company_id == "0" ? 0 : formData.company_id}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       {companies.map((c, index) => (
-                        <option key={index} value={index}>{c}</option>
+                        <option key={index} value={c.id}>{c.name}</option>
                       ))}
                     </select>
                   </div>
@@ -345,8 +351,7 @@ export function AddTour() {
               </div>
             </div>
 
-            {/* Координаты */}
-            <div className="pb-6 border-b border-gray-200 dark:border-gray-800">
+            {/* <div className="pb-6 border-b border-gray-200 dark:border-gray-800">
               <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Координаты локации</h2>
               
               <div className="grid grid-cols-2 gap-4">
@@ -379,9 +384,7 @@ export function AddTour() {
                   />
                 </div>
               </div>
-            </div>
-
-            {/* Расписание */}
+            </div> */}
             <div className="pb-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Расписание тура</h2>
@@ -465,6 +468,7 @@ export function AddTour() {
           </div>
         </div>
       </div>
+      <ConfirmModal open={confirmOpen} title="Готово" message={confirmMsg} onClose={() => { setConfirmOpen(false); navigate('/tours'); }} />
     </div>
   );
 }

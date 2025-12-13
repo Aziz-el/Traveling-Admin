@@ -6,6 +6,7 @@ import { useReviewStore } from '../entities/Reviews/model/useReviewStore';
 import { ReviewItem } from '../entities/Reviews/model/types';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 import { getCurrentUser } from '../entities/Users/model/services/user';
+import ConfirmModal from '../shared/ui/ConfirmModal';
 
 
 export default function Reviews() {
@@ -27,6 +28,8 @@ export default function Reviews() {
   const [currentUserId, setCurrentUserId] = useState<string | null>('');
 
   const [loadingReviews, setLoadingReviews] = useState(true);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmMsg, setConfirmMsg] = useState('');
   useEffect(() => {
     (async () => {
       setLoadingReviews(true);
@@ -67,6 +70,8 @@ export default function Reviews() {
       } as any);
       setFormValues({ tourId: '', userName: '', rating: 5, comment: '' });
       setShowAddForm(false);
+      setConfirmMsg('Отзыв успешно добавлен');
+      setConfirmOpen(true);
     }
   };
 
@@ -74,11 +79,15 @@ export default function Reviews() {
     if (editingReview) {
       await updateReview(editingReview.id, editingReview as any);
       setEditingReview(null);
+      setConfirmMsg('Отзыв успешно обновлён');
+      setConfirmOpen(true);
     }
   };
 
   const handleDeleteReview = async (id: string) => {
     await deleteReview(id);
+    setConfirmMsg('Отзыв удалён');
+    setConfirmOpen(true);
   };
 
   const handleLike = async (id: string) => {
@@ -118,6 +127,7 @@ export default function Reviews() {
         onChangeStatus={handleStatusChange}
         loading={loadingReviews}
       />
+      <ConfirmModal open={confirmOpen} title="Готово" message={confirmMsg} onClose={() => setConfirmOpen(false)} />
     </div>
   );
 }

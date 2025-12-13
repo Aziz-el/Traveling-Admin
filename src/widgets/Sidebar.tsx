@@ -19,9 +19,9 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
     { id: 'companies', label: 'Компании', icon: Building2 },
     { id: 'bookings', label: 'Бронирования', icon: CalendarCheck },
     { id: 'users', label: 'Пользователи', icon: Users },
-    { id: 'routes', label: 'Маршруты', icon: Route },
+    // { id: 'routes', label: 'Маршруты', icon: Route },
     {id: 'reviews', label: 'Отзывы', icon: Star },
-    { id: 'settings', label: 'Настройки', icon: Settings },
+    // { id: 'settings', label: 'Настройки', icon: Settings },
   ];
 
   return (

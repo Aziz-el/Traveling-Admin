@@ -202,7 +202,7 @@ console.log(tour);
         <div className="flex gap-4 pt-6 border-t dark:border-gray-800">
           <button
             type="button"
-            onClick={(e) => {e.preventDefault(); setFormData(editingTour);}}
+            onClick={(e) => {e.preventDefault(); setFormData(editingTour);navigate("/tours/")}}
             className="flex-1 px-6 py-3 border rounded-lg dark:text-white"
           >
             Отмена

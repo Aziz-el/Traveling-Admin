@@ -7,6 +7,7 @@ import { useTourStore } from '../entities/Tour/model/useTourStore';
 import { useBookingStore } from '../entities/Booking/model/useBookingStore';
 import BookingList from '../entities/Booking/ui/BookingList';
 import BookingFormModal from '../features/Booking/ui/BookingFormModal';
+import ConfirmModal from '../shared/ui/ConfirmModal';
 import { optimizeImageUrl } from '../shared/utils/imageRenderingOptimizator';
 
 
@@ -30,6 +31,8 @@ export function Bookings() {
 
   const [createOpen, setCreateOpen] = React.useState(false);
   const [editingBooking, setEditingBooking] = React.useState<any>(null);
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [confirmMsg, setConfirmMsg] = React.useState('');
   const [newBooking, setNewBooking] = React.useState<any>({
     tourId: tours[0]?.id ?? '',
     date: '',
@@ -72,6 +75,8 @@ export function Bookings() {
         date: newBooking.date,
       });
       setCreateOpen(false);
+      setConfirmMsg('Бронирование успешно создано');
+      setConfirmOpen(true);
     } catch (err) {
       console.debug('Create booking failed', err);
       alert('Не удалось создать бронирование');
@@ -238,7 +243,8 @@ export function Bookings() {
           </div>
         </div>
       </div>
-      <BookingFormModal open={createOpen} onClose={() => { setCreateOpen(false); setEditingBooking(null); }} tours={tours} editingBooking={editingBooking} />
+      <BookingFormModal open={createOpen} onClose={() => { setCreateOpen(false); setEditingBooking(null); }} tours={tours} editingBooking={editingBooking} onSuccess={(m) => { setConfirmMsg(m ?? 'Бронирование успешно создано'); setConfirmOpen(true); }} />
+      <ConfirmModal open={confirmOpen} title="Готово" message={confirmMsg} onClose={() => setConfirmOpen(false)} />
     </div>
   );
 }

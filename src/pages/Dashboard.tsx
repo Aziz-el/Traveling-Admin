@@ -11,9 +11,10 @@ import TourCardMid from '../entities/Tour/UI/TourCards/TourCardMid';
 interface DashboardProps {
   onMapItemClick?: (tourId: string, x: number, y: number) => void;
   onSelectTour?: (tourId: string) => void;
+  selectedTourId?: string | null;
 }
 
-export function Dashboard({  onMapItemClick, onSelectTour }: DashboardProps) {
+export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: DashboardProps) {
   let tours = useTourStore().tours;
   const activeTours = tours.filter(t => t.is_active === true);
   const totalRevenue = tours.reduce((sum, tour) => sum + tour.price, 0);
@@ -64,7 +65,7 @@ export function Dashboard({  onMapItemClick, onSelectTour }: DashboardProps) {
             <p className="text-gray-600 dark:text-gray-400">Все активные туры на карте</p>
           </div>
           <div className="h-[600px]">
-            <InteractiveMap tours={activeTours} onMapItemClick={onMapItemClick} onSelectTour={onSelectTour} />
+            <InteractiveMap tours={activeTours} onMapItemClick={onMapItemClick} onSelectTour={onSelectTour} selectedTour={selectedTourId} />
           </div>
         </div>
 
