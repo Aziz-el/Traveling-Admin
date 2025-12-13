@@ -15,8 +15,6 @@ import Register from '../pages/Register';
 import TourDetails from '../pages/TourDetails';
 import ProtectedLayout from './Layouts/ProtectedLayout';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
-import TourEditingPage from '../pages/TourEditingPage';
-
 const categoryImages: Record<string, string> = {
   'Азия': 'https://images.unsplash.com/photo-1603486038792-2d67824265e0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhc2lhJTIwdHJhdmVsJTIwbGFuZHNjYXBlfGVufDF8fHx8MTc2NDY2ODA1M3ww&ixlib=rb-4.1.0&q=80&w=1080',
   'Европа': 'https://images.unsplash.com/photo-1602828958507-e1b7b2f79b99?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxldXJvcGUlMjB0cmF2ZWwlMjBjaXRpZXN8ZW58MXx8fHwxNzY0NjY4MDU0fDA&ixlib=rb-4.1.0&q=80&w=1080',
@@ -34,8 +32,6 @@ export default function App() {
   useEffect(() => {
     toursStore.fetchTours();
   }, []);
->>>>>>>>> Temporary merge branch 2
-
 
   const handleSelectTour = (id: string) => {
     setSelectedTourId(id);
