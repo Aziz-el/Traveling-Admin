@@ -56,7 +56,25 @@ export function RoutesPage() {
           <h2 className="text-gray-900 dark:text-white">Все маршруты</h2>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile: cards */}
+        <div className="md:hidden p-4 space-y-3">
+          {routes.map(route => (
+            <div key={route.id} className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-800 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium text-gray-900 dark:text-white">{route.name}</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">{route.distance} • {route.points} точек</div>
+                </div>
+                <div className="text-sm">
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${{ 'Активный': 'bg-green-50 dark:bg-green-950 text-green-600 dark:text-green-400' }[route.status] || 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>{route.status}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
               <tr>

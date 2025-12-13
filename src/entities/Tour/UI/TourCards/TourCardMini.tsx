@@ -15,7 +15,7 @@ export default function TourCardMini({ tour }: { tour: TourType }) {
         </div>
       )}
 
-      <div className="relative flex-shrink-0 w-40 overflow-hidden bg-gray-100 rounded-lg h-28 dark:bg-gray-800">
+      <div className="relative flex-shrink-0 w-28 sm:w-40 overflow-hidden bg-gray-100 rounded-lg h-20 sm:h-28 dark:bg-gray-800">
         <ImageWithFallback
           src={optimizedImageUrl}
           alt={tour.title}
@@ -34,7 +34,7 @@ export default function TourCardMini({ tour }: { tour: TourType }) {
 
       <div className="flex flex-col justify-between flex-1 min-w-0">
         <div>
-          <h3 className="mb-1 text-base font-semibold text-gray-900 transition-colors line-clamp-1 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+          <h3 className="mb-1 text-sm sm:text-base font-semibold text-gray-900 transition-colors line-clamp-1 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
             {tour.title}
           </h3>
 

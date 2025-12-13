@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Sidebar } from '../widgets/Sidebar';
 import { Dashboard } from '../pages/Dashboard';
 import { AddTour } from '../pages/AddTour';
 import { ToursList } from '../pages/ToursList';
@@ -13,7 +12,9 @@ import { RoutesPage } from '../pages/RoutesPage';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import TourDetails from '../pages/TourDetails';
+import Reviews from '../pages/Reviews';
 import ProtectedLayout from './Layouts/ProtectedLayout';
+import { ToastProvider } from '../shared/ui/Toast';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 const categoryImages: Record<string, string> = {
   'Азия': 'https://images.unsplash.com/photo-1603486038792-2d67824265e0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhc2lhJTIwdHJhdmVsJTIwbGFuZHNjYXBlfGVufDF8fHx8MTc2NDY2ODA1M3ww&ixlib=rb-4.1.0&q=80&w=1080',
@@ -32,7 +33,7 @@ export default function App() {
   useEffect(() => {
     toursStore.fetchTours();
   }, []);
-
+    
   const handleSelectTour = (id: string) => {
     setSelectedTourId(id);
   };
@@ -42,8 +43,9 @@ export default function App() {
     setTimeout(() => setMiniCard(null), 4000);
   };
 
-  return (
-        <Routes>
+    return (
+      <ToastProvider>
+      <Routes>
           <Route path ="/" element={<Login />} />
           <Route path ="register" element={<Register />} />
           <Route path="*" element={
@@ -62,12 +64,13 @@ export default function App() {
                   <Route path='bookings' element={<Bookings />}/>
                   <Route path='users' element={<Users />}/>
                   <Route path='routes' element={<RoutesPage />}/>
-                  {/* <Route path='reviews' element={<Reviews/>}/> */}
+                  <Route path='reviews' element={<Reviews/>}/>
                   <Route path='settings' element={<Settings />}/>
                 </Routes>
             
             </ProtectedLayout>
           } />
         </Routes>
+        </ToastProvider>
   );
 }

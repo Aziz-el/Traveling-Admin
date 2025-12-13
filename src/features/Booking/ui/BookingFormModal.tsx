@@ -1,5 +1,5 @@
 import React from 'react';
-import { useBookingStore } from '../model/useBookingStore';
+import { useBookingStore } from '../../../entities/Booking/model/useBookingStore';
 import { CustomSelect } from '../../../shared/ui/select';
 import CustomInput from '../../../shared/ui/input';
 import CustomCalendar from '../../../shared/ui/calendar';

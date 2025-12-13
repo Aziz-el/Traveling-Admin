@@ -1,6 +1,37 @@
 import { User, Lock, Bell, Globe } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { getCurrentUser, updateUser} from '../entities/Users/model/services/user';
+import { useToast } from '../shared/ui/Toast';
 
 export function Settings() {
+  const { showToast } = useToast();
+  const [userId, setUserId] = useState<number | null>(null);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [company, setCompany] = useState('');
+  const [phone, setPhone] = useState('');
+  const [emailNotify, setEmailNotify] = useState(true);
+  const [pushNotify, setPushNotify] = useState(false);
+  const [smsNotify, setSmsNotify] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const me = await getCurrentUser();
+        if (me) {
+          setUserId(me.id);
+          setName(me.full_name || '');
+          setEmail(me.email || '');
+          setPhone(me.phone || '');
+        }
+      } catch (e) {
+        // ignore
+      }
+    })();
+  }, []);
   return (
     <div className="p-8 dark:bg-gray-950">
       <div className="mb-8">
@@ -23,7 +54,8 @@ export function Settings() {
               <label className="block text-gray-700 dark:text-gray-300 mb-2">Имя</label>
               <input
                 type="text"
-                defaultValue="Admin User"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
               />
             </div>
@@ -31,18 +63,28 @@ export function Settings() {
               <label className="block text-gray-700 dark:text-gray-300 mb-2">Email</label>
               <input
                 type="email"
-                defaultValue="admin@traveladmin.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
               />
             </div>
             <div>
               <label className="block text-gray-700 dark:text-gray-300 mb-2">Компания</label>
-              <select className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
-                <option>GitLens Travel</option>
-                <option>Aviasales Tours</option>
-              </select>
+              <input value={company} onChange={(e) => setCompany(e.target.value)} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" />
             </div>
-            <button className="w-full px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
+            <div>
+              <label className="block text-gray-700 dark:text-gray-300 mb-2">Телефон</label>
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" />
+            </div>
+            <button onClick={async () => {
+              try {
+                if (!userId) throw new Error('User not loaded');
+                await updateUser(userId, { full_name: name, email, phone, settings: { notifications: { email: emailNotify, push: pushNotify, sms: smsNotify } } } as any);
+                showToast('Профиль успешно обновлён', 'success');
+              } catch (e:any) {
+                showToast(e?.message || 'Ошибка обновления профиля', 'error');
+              }
+            }} className="w-full px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
               Сохранить изменения
             </button>
           </div>
@@ -61,6 +103,8 @@ export function Settings() {
             <div>
               <label className="block text-gray-700 dark:text-gray-300 mb-2">Текущий пароль</label>
               <input
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
                 type="password"
                 placeholder="••••••••"
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
@@ -69,6 +113,8 @@ export function Settings() {
             <div>
               <label className="block text-gray-700 dark:text-gray-300 mb-2">Новый пароль</label>
               <input
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
                 type="password"
                 placeholder="••••••••"
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
@@ -77,14 +123,19 @@ export function Settings() {
             <div>
               <label className="block text-gray-700 dark:text-gray-300 mb-2">Подтвердите пароль</label>
               <input
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 type="password"
                 placeholder="••••••••"
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
               />
             </div>
-            <button className="w-full px-6 py-3 bg-red-600 dark:bg-red-500 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-600 transition-colors">
-              Изменить пароль
-            </button>
+            <div className="space-y-2">
+              <button  className="w-full px-6 py-3 bg-red-600 dark:bg-red-500 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-600 transition-colors">
+                Изменить пароль
+              </button>
+              <button onClick={() => { (function(){ if (typeof Notification !== 'undefined') { if (Notification.permission === 'granted') { new Notification('Тест уведомления', { body: 'Уведомления включены' }); showToast('Тестовое уведомление отправлено', 'info'); } else { Notification.requestPermission().then(p => { if (p === 'granted') { new Notification('Тест уведомления', { body: 'Уведомления включены' }); showToast('Тестовое уведомление отправлено', 'info'); } else { showToast('Разрешение на уведомления отклонено', 'error'); } }).catch(() => showToast('Запрос на уведомления не поддерживается', 'error')); } } else { showToast('Уведомления не поддерживаются в этом браузере', 'error'); } })() }} className="w-full px-6 py-2 border rounded">Отправить тестовое уведомление</button>
+            </div>
           </div>
         </div>
 
@@ -104,7 +155,7 @@ export function Settings() {
                 <p className="text-gray-600 dark:text-gray-400">Получать письма о новых бронированиях</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" defaultChecked className="sr-only peer" />
+                <input type="checkbox" checked={emailNotify} onChange={(e)=>setEmailNotify(e.target.checked)} className="sr-only peer" />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
               </label>
             </div>
@@ -115,7 +166,7 @@ export function Settings() {
                 <p className="text-gray-600 dark:text-gray-400">Мгновенные уведомления в браузере</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" className="sr-only peer" />
+                <input type="checkbox" checked={pushNotify} onChange={(e)=>setPushNotify(e.target.checked)} className="sr-only peer" />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
               </label>
             </div>
@@ -126,7 +177,7 @@ export function Settings() {
                 <p className="text-gray-600 dark:text-gray-400">Получать СМС о важных событиях</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" defaultChecked className="sr-only peer" />
+                <input type="checkbox" checked={smsNotify} onChange={(e)=>setSmsNotify(e.target.checked)} className="sr-only peer" />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
               </label>
             </div>
