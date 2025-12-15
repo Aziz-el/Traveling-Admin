@@ -57,7 +57,7 @@ export default function App() {
                   <Route path='users' element={<Users />}/>
                   {/* <Route path='routes' element={<RoutesPage />}/> */}
                   <Route path='reviews' element={<Reviews/>}/>
-                  <Route path='settings' element={<Settings />}/>
+                  {/* <Route path='settings' element={<Settings />}/> */}
                   <Route path='*' element={<NotFound />} />
                 </Routes>
             

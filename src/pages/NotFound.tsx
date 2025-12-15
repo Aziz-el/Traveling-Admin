@@ -19,12 +19,12 @@ export default function NotFound() {
             На главную
           </button>
 
-          <button onClick={() => navigate('/tours')} className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
+          <button onClick={() => navigate('/tours')} className="inline-flex items-center gap-2 px-4 py-2 border text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
             <MapPin className="w-4 h-4 text-gray-600 dark:text-gray-300" />
             К турам
           </button>
 
-          <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
+          <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 px-4 py-2 border text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
             <ArrowLeft className="w-4 h-4 text-gray-600 dark:text-gray-300" />
             Назад
           </button>
