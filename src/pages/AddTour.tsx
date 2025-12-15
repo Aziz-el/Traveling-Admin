@@ -46,7 +46,7 @@ export function AddTour() {
     price: '',
     location: '',
     duration: '',
-    company_id: '0',
+    company_id: '1',
     capacity: '',
     image_url: '',
     is_active: true,
@@ -175,7 +175,7 @@ export function AddTour() {
       price: '',
       location: '',
       duration: '',
-      company_id: '0',
+      company_id: "1",
       capacity: '',
       image_url: '',
       is_active: true,
@@ -274,7 +274,7 @@ export function AddTour() {
                     </label>
                     <select
                       name="company_id"
-                      value={formData.company_id == "0" ? 0 : formData.company_id}
+                      value={formData.company_id}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >

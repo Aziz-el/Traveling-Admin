@@ -63,9 +63,9 @@ export default function App() {
                   <Route path='companies' element={<Companies />}/>
                   <Route path='bookings' element={<Bookings />}/>
                   <Route path='users' element={<Users />}/>
-                  <Route path='routes' element={<RoutesPage />}/>
-                  <Route path='reviews' element={<Reviews/>}/>
-                  <Route path='settings' element={<Settings />}/>
+                  {/* <Route path='routes' element={<RoutesPage />}/> */}
+                  <Route path='reviews' element={<Reviews/>}/> 
+                  {/* <Route path='settings' element={<Settings />}/> */}
                 </Routes>
             
             </ProtectedLayout>
