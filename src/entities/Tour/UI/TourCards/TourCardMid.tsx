@@ -3,12 +3,14 @@ import { TourType } from '../../model/type'
 import { ImageWithFallback } from '../../../../shared/ui/ImageWithFallback'
 import { MapPin, Clock, Star, Users } from 'lucide-react'
 import { optimizeImageUrl } from '../../../../shared/utils/imageRenderingOptimizator'
+import { useNavigate } from 'react-router'
 
-export default function TourCardMid({tour}: {tour: TourType}) {
+export default function TourCardMid({tour,onSelectTour}: {tour: TourType, onSelectTour?: (id: string) => void }) {
   const optimizedImageUrl = optimizeImageUrl(tour.image_url, 600, 90);
-  
+  let navigate = useNavigate();
   return (
-    <div className="relative overflow-hidden transition-all duration-300 bg-white border border-gray-200 cursor-pointer rounded-xl group hover:shadow-2xl hover:border-blue-300 dark:bg-gray-900 dark:border-gray-800 dark:hover:border-blue-700">
+    <div className="relative overflow-hidden transition-all duration-300 bg-white border border-gray-200 cursor-pointer rounded-xl group hover:shadow-2xl hover:border-blue-300 dark:bg-gray-900 dark:border-gray-800 dark:hover:border-blue-700"
+    onClick={() => { onSelectTour?.(tour?.id); navigate(`/tours/${tour?.id}`); }}>
       {tour.is_active && (
         <div className="absolute z-10 px-3 py-1 text-xs font-semibold text-white bg-green-500 rounded-full top-3 right-3">
           Активен

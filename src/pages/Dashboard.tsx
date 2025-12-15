@@ -7,6 +7,7 @@ import { formatDateRange } from '../shared/utils/formatDate';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 import TourCardMini from '../entities/Tour/UI/TourCards/TourCardMini';
 import TourCardMid from '../entities/Tour/UI/TourCards/TourCardMid';
+import { useBookingStore } from '../entities/Booking/model/useBookingStore';
 
 interface DashboardProps {
   onMapItemClick?: (tourId: string, x: number, y: number) => void;
@@ -18,7 +19,8 @@ export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: Das
   let tours = useTourStore().tours;
   const activeTours = tours.filter(t => t.is_active === true);
   const totalRevenue = tours.reduce((sum, tour) => sum + tour.price, 0);
-  const avgPrice = tours.length > 0 ? totalRevenue / tours.length : 0;
+  const avgPrice = tours.length > 0 ? totalRevenue / tours.length : 0; 
+  const bookings =useBookingStore().bookings;
 
   return (
     <div className="p-8 dark:bg-gray-950">
@@ -37,7 +39,7 @@ export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: Das
         />
         <StatsCard
           title="Новые бронирования"
-          value={23}
+          value={bookings.length}
           icon={Users}
           trend="+8%"
           trendUp={true}
@@ -75,9 +77,9 @@ export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: Das
             <p className="text-gray-600 dark:text-gray-400">Топ направлений</p>
           </div>
           <div className="p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-1">
               {activeTours.slice(0, 5).map((tour) => (
-                <TourCardMini key={tour.id} tour={tour} />
+                <TourCardMini key={tour.id} tour={tour} onSelectTour={onSelectTour}/>
               ))}
             </div>
           </div>
@@ -88,7 +90,7 @@ export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: Das
         <h2 className="mb-4 text-gray-900 dark:text-white">Последние туры</h2>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {tours.slice(0, 8).map((tour) => (
-            <TourCardMid key={tour.id} tour={tour} />
+            <TourCardMid key={tour.id} tour={tour} onSelectTour={onSelectTour} />
           ))}
         </div>
       </div>

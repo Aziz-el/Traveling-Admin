@@ -27,14 +27,14 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
   return (
     <>
       {/* Mobile topbar with H1 and burger - shows on mobile only */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-12 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center px-3">
+      <div className="fixed top-0 left-0 right-0 z-40 flex items-center h-12 px-3 bg-white border-b border-gray-200 md:hidden dark:bg-gray-900 dark:border-gray-800">
         <button onClick={() => onToggle && onToggle()} className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
           <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
         </button>
-        <h1 className="text-blue-600 dark:text-blue-400 ml-3">TravelAdmin</h1>
+        <h1 className="ml-3 text-blue-600 dark:text-blue-400">TravelAdmin</h1>
       </div>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex fixed top-0 left-0 flex-col w-64 h-screen overflow-y-auto bg-white border-r border-gray-200 dark:bg-gray-900 dark:border-gray-800">
+      <aside className="fixed top-0 left-0 flex-col hidden w-64 h-screen overflow-y-auto bg-white border-r border-gray-200 md:flex dark:bg-gray-900 dark:border-gray-800">
         <div className="p-6 border-b border-gray-200 dark:border-gray-800">
           <h1 className="text-blue-600 dark:text-blue-400">TravelAdmin</h1>
         </div>
@@ -84,12 +84,12 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-          <aside className="absolute left-0 top-12 bottom-0 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4 overflow-y-auto">
+          <aside className="absolute bottom-0 left-0 w-64 p-4 overflow-y-auto bg-white border-r border-gray-200 top-12 dark:bg-gray-900 dark:border-gray-800">
             <div className="flex items-center justify-end p-2 border-b border-gray-200 dark:border-gray-800">
               <button onClick={onClose} className="text-gray-600 dark:text-gray-300">✕</button>
             </div>
 
-            <nav className="flex-1 p-2 space-y-1 mt-2">
+            <nav className="flex-1 p-2 mt-2 space-y-1">
               {menuItems.map((item) => {
                 const Icon = item.icon;
                 return (

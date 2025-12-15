@@ -8,6 +8,8 @@ import { useBookingStore } from '../entities/Booking/model/useBookingStore';
 import BookingList from '../entities/Booking/ui/BookingList';
 import BookingFormModal from '../features/Booking/ui/BookingFormModal';
 import ConfirmModal from '../shared/ui/ConfirmModal';
+import ConfirmDialog from '../shared/ui/ConfirmDialog';
+import { useToast } from '../shared/ui/Toast';
 import { optimizeImageUrl } from '../shared/utils/imageRenderingOptimizator';
 
 
@@ -33,6 +35,9 @@ export function Bookings() {
   const [editingBooking, setEditingBooking] = React.useState<any>(null);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [confirmMsg, setConfirmMsg] = React.useState('');
+  const { showToast } = useToast();
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [pendingDelete, setPendingDelete] = React.useState<number | null>(null);
   const [newBooking, setNewBooking] = React.useState<any>({
     tourId: tours[0]?.id ?? '',
     date: '',
@@ -64,7 +69,7 @@ export function Bookings() {
 
   const handleCreateSave = async () => {
     if (!newBooking.tourId || !newBooking.date) {
-      alert('Пожалуйста, заполните обязательные поля: тур и дата');
+      showToast('Пожалуйста, заполните обязательные поля: тур и дата', 'error');
       return;
     }
 
@@ -79,7 +84,7 @@ export function Bookings() {
       setConfirmOpen(true);
     } catch (err) {
       console.debug('Create booking failed', err);
-      alert('Не удалось создать бронирование');
+      showToast('Не удалось создать бронирование', 'error');
     }
   };
 
@@ -155,7 +160,7 @@ export function Bookings() {
               <h2 className="text-gray-900 dark:text-white">Все бронирования</h2>
               <p className="text-gray-600 dark:text-gray-400">Полный список бронирований</p>
             </div>
-            <BookingList loading={loadingBookings} bookings={bookingsRaw} toursMap={toursMap} onEdit={(b)=>{ setEditingBooking(b); setCreateOpen(true); }} onDelete={async (id)=>{ await bookingStore.removeBooking(Number(id)); }} />
+            <BookingList loading={loadingBookings} bookings={bookingsRaw} toursMap={toursMap} onEdit={(b: any)=>{ setEditingBooking(b); setCreateOpen(true); }} onDelete={(id: any)=>{ setPendingDelete(Number(id)); setDialogOpen(true); }} />
           </div>
         </div>
 
@@ -244,6 +249,20 @@ export function Bookings() {
         </div>
       </div>
       <BookingFormModal open={createOpen} onClose={() => { setCreateOpen(false); setEditingBooking(null); }} tours={tours} editingBooking={editingBooking} onSuccess={(m) => { setConfirmMsg(m ?? 'Бронирование успешно создано'); setConfirmOpen(true); }} />
+      <ConfirmDialog open={dialogOpen} title="Подтвердите удаление" message={pendingDelete ? 'Вы действительно хотите удалить это бронирование? Это действие нельзя отменить.' : ''} onConfirm={async () => {
+        if (!pendingDelete) return;
+        try {
+          await bookingStore.removeBooking(Number(pendingDelete));
+          setConfirmMsg('Бронирование удалено');
+          setConfirmOpen(true);
+        } catch (err) {
+          console.debug('Remove failed', err);
+          showToast('Не удалось удалить бронирование', 'error');
+        } finally {
+          setDialogOpen(false);
+          setPendingDelete(null);
+        }
+      }} onCancel={() => { setDialogOpen(false); setPendingDelete(null); }} />
       <ConfirmModal open={confirmOpen} title="Готово" message={confirmMsg} onClose={() => setConfirmOpen(false)} />
     </div>
   );

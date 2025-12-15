@@ -117,6 +117,7 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
     setZoom(2);
     setCenter({ lat: 40, lng: 20 });
   };
+  
 
   // Search state
   const [query, setQuery] = useState('');
@@ -183,7 +184,7 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full bg-slate-200 overflow-hidden"
+      className="relative w-full h-full overflow-hidden bg-slate-200"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -217,6 +218,7 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
           );
         })}
       </div>
+      
 
       <svg className="absolute inset-0 w-full h-full pointer-events-none">
         {tours.map((tour) => {
@@ -233,7 +235,7 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
             if (singleLat != null && singleLng != null) {
               const pos = getScreenPosition(singleLat, singleLng);
               return (
-                <g key={tour.id} className="pointer-events-auto cursor-pointer" onClick={(e) => { e.stopPropagation(); onMapItemClick?.(tour.id, pos.x, pos.y); onSelectTour?.(String(tour.id)); }} onMouseEnter={() => setHoveredTour(tour.id)} onMouseLeave={() => setHoveredTour(null)}>
+                <g key={tour.id} className="cursor-pointer pointer-events-auto" onClick={(e) => { e.stopPropagation(); onMapItemClick?.(tour.id, pos.x, pos.y); onSelectTour?.(String(tour.id)); }} onMouseEnter={() => setHoveredTour(tour.id)} onMouseLeave={() => setHoveredTour(null)}>
                   <circle cx={pos.x} cy={pos.y} r={isHovered ? 12 : 8} fill="#3b82f6" stroke="white" strokeWidth="3" />
                 </g>
               );
@@ -269,7 +271,7 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
                 strokeWidth={isHovered ? 4 : 3}
                 strokeDasharray="8,4"
                 opacity={isHovered ? 1 : 0.8}
-                className="pointer-events-auto cursor-pointer"
+                className="cursor-pointer pointer-events-auto"
                 onMouseEnter={() => setHoveredTour(String(tour.id))}
                 onMouseLeave={() => setHoveredTour(null)}
                 onClick={(e) => {
@@ -309,10 +311,11 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
                 strokeWidth="3"
                 markerEnd={`url(#arrow-${tour.id})`}
               />
+              
 
               {/* Точка старта */}
               <g
-                className="pointer-events-auto cursor-pointer"
+                className="cursor-pointer pointer-events-auto"
                 onMouseEnter={() => setHoveredTour(tour.id)}
                 onMouseLeave={() => setHoveredTour(null)}
                 onClick={(e) => {
@@ -347,7 +350,7 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
 
               {/* Точка финиша */}
               <g
-                className="pointer-events-auto cursor-pointer"
+                className="cursor-pointer pointer-events-auto"
                 onMouseEnter={() => setHoveredTour(tour.id)}
                 onMouseLeave={() => setHoveredTour(null)}
                 onClick={(e) => {
@@ -413,9 +416,10 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
           );
         })()}
       </svg>
+      
 
       {/* Контролы */}
-      <div className="absolute top-4 right-4 flex flex-col gap-2 pointer-events-auto">
+      <div className="absolute flex flex-col gap-2 pointer-events-auto top-4 right-4">
         <Button size="sm" variant="outline" className="bg-white shadow-lg" onClick={handleZoomIn}>
           <ZoomIn className="w-4 h-4" />
         </Button>
@@ -428,17 +432,17 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
       </div>
 
       {/* Поиск по названию */}
-      <div className="absolute top-4 left-4 pointer-events-auto w-60">
+      <div className="absolute pointer-events-auto top-4 left-4 w-60">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Найти тур по названию"
-          className="w-full px-3 py-2 text-sm border rounded bg-white"
+          className="w-full px-3 py-2 text-sm bg-white border rounded"
         />
         {suggestions.length > 0 && (
-          <div className="mt-1 max-h-44 overflow-auto bg-white rounded shadow-lg border">
+          <div className="mt-1 overflow-auto bg-white border rounded shadow-lg max-h-44">
             {suggestions.map((s) => (
-              <div key={s.id} className="px-3 py-2 hover:bg-gray-50 cursor-pointer" onClick={() => handleSelectByTitle(s)}>
+              <div key={s.id} className="px-3 py-2 cursor-pointer hover:bg-gray-50" onClick={() => handleSelectByTitle(s)}>
                 {s.title}
               </div>
             ))}
@@ -447,14 +451,14 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
       </div>
 
       {/* Легенда */}
-      <div className="absolute bottom-4 left-4 bg-white rounded-lg border border-slate-200 p-3 shadow-lg pointer-events-auto">
+      <div className="absolute p-3 bg-white border rounded-lg shadow-lg pointer-events-auto bottom-4 left-4 border-slate-200">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-green-500 border-2 border-white shadow-sm"></div>
+            <div className="w-3 h-3 bg-green-500 border-2 border-white rounded-full shadow-sm"></div>
             <span className="text-slate-700">Точка старта</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500 border-2 border-white shadow-sm"></div>
+            <div className="w-3 h-3 bg-red-500 border-2 border-white rounded-full shadow-sm"></div>
             <span className="text-slate-700">Точка финиша</span>
           </div>
           <div className="flex items-center gap-2">
@@ -465,30 +469,31 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
           </div>
           {selectedRoute && (
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-purple-500 border-2 border-white shadow-sm"></div>
+              <div className="w-3 h-3 bg-purple-500 border-2 border-white rounded-full shadow-sm"></div>
               <span className="text-slate-700">Предпросмотр</span>
             </div>
           )}
         </div>
       </div>
+      
 
       {/* Информация о туре */}
       {hoveredTour && tours.find((t) => t.id === hoveredTour) && (
-        <div className="absolute top-4 left-4 bg-white rounded-lg border border-slate-200 p-4 shadow-xl max-w-sm pointer-events-auto">
+        <div className="absolute max-w-sm p-4 bg-white border rounded-lg shadow-xl pointer-events-auto top-4 left-4 border-slate-200">
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0">
+            <div className="flex-shrink-0 p-2 rounded-lg bg-blue-50">
               <Navigation className="w-5 h-5 text-blue-600" />
             </div>
             <div className="flex-1">
-              <div className="text-slate-900 mb-1">
+              <div className="mb-1 text-slate-900">
                 {tours.find((t) => t.id === hoveredTour)?.title}
               </div>
-              <div className="text-slate-600 mb-3">
+              <div className="mb-3 text-slate-600">
             {tours.find((t) => t.id === hoveredTour)?.description}
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-slate-600">
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span>
                     Старт: {(() => {
                       const t = tours.find((tt) => tt.id === hoveredTour);
@@ -498,7 +503,7 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-600">
-                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                   <span>
                     Финиш: {(() => {
                       const t = tours.find((tt) => tt.id === hoveredTour);
@@ -514,7 +519,7 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
       )}
 
       {/* Подсказка */}
-      <div className="absolute bottom-4 right-4 bg-white/95 rounded-lg border border-slate-200 px-3 py-2 text-slate-600 shadow-sm pointer-events-auto">
+      <div className="absolute px-3 py-2 border rounded-lg shadow-sm pointer-events-auto bottom-4 right-4 bg-white/95 border-slate-200 text-slate-600">
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4" />
           <span>Перетаскивайте карту • Zoom: {zoom}</span>

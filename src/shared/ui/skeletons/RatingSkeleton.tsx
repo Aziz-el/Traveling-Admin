@@ -1,5 +1,3 @@
-import React from 'react';
-import { Star } from 'lucide-react';
 
 export default function RatingSkeleton({ count = 5 }: { count?: number }) {
   return (

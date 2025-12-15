@@ -52,7 +52,7 @@ export const CustomCalendar: React.FC<CustomDateTimePickerProps> = ({ name, valu
             type="datetime-local"
             value={value}
             onChange={e => handleChange(e.target.value)}
-            className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800 dark:text-white"
+            className="w-full px-3 py-2 border text-gray-900  rounded-md bg-white dark:bg-gray-800 dark:text-white"
           />
         </div>
       )}

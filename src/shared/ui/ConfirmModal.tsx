@@ -12,10 +12,15 @@ interface ConfirmModalProps {
 export default function ConfirmModal({ open, title, message, onClose, autoCloseMs = 3000 }: ConfirmModalProps) {
   useEffect(() => {
     if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const t = setTimeout(() => {
       onClose && onClose();
     }, autoCloseMs);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      document.body.style.overflow = prev;
+    };
   }, [open, autoCloseMs, onClose]);
 
   if (!open) return null;

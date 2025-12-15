@@ -5,6 +5,10 @@ import { Link, useNavigate } from 'react-router';
 import { Clock, DollarSign, Edit, MapPin, Star, Trash2, Users } from 'lucide-react';
 import { useTourStore } from '../../model/useTourStore';
 import { optimizeImageUrl } from '../../../../shared/utils/imageRenderingOptimizator';
+import ConfirmDialog from '../../../../shared/ui/ConfirmDialog';
+import ConfirmModal from '../../../../shared/ui/ConfirmModal';
+import { useToast } from '../../../../shared/ui/Toast';
+import { useState } from 'react';
 
 export default function TourCardFull({ tour, setFormData, setEditingTour, onSelectTour, selectedTourId }: TourProps & {
   setFormData?: React.Dispatch<React.SetStateAction<TourType | null>>,
@@ -14,6 +18,11 @@ export default function TourCardFull({ tour, setFormData, setEditingTour, onSele
   const navigate = useNavigate();
   const tourStore = useTourStore();
   const onDeleteTour = tourStore.deleteTour;
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmMsg, setConfirmMsg] = useState('');
+  const { showToast } = useToast();
 
   const handleEdit = (tour: TourType) => {
     setEditingTour?.(tour);
@@ -21,9 +30,8 @@ export default function TourCardFull({ tour, setFormData, setEditingTour, onSele
   };
 
   const handleDelete = (id: string, name: string) => {
-    if (window.confirm(`Вы уверены, что хотите удалить тур "${name}"?`)) {
-      onDeleteTour(id);
-    }
+    setDialogOpen(true);
+    setPendingId(id);
   };
 
   if (tour === undefined) {
@@ -31,6 +39,7 @@ export default function TourCardFull({ tour, setFormData, setEditingTour, onSele
   }
 
   return (
+    <>
     <div
       key={tour?.id}
       onClick={() => { onSelectTour?.(tour?.id); navigate(`/tours/${tour?.id}`); }}
@@ -61,7 +70,7 @@ export default function TourCardFull({ tour, setFormData, setEditingTour, onSele
         </div>
 
         {tour?.rating > 0 && (
-          <div className="absolute flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-white rounded-lg shadow-lg bottom-3 left-3 bg-black/70 backdrop-blur-md">
+          <div className="absolute flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-white rounded-lg shadow-lg bottom-3 left-3 bg-white/10 border border-white/10 backdrop-blur-sm">
             <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
             {tour?.rating.toFixed(1)}
           </div>
@@ -136,5 +145,21 @@ export default function TourCardFull({ tour, setFormData, setEditingTour, onSele
         </div>
       </div>
     </div>
+    <ConfirmDialog open={dialogOpen} title="Подтвердите удаление" message={pendingId ? `Вы уверены, что хотите удалить тур?` : ''} onCancel={() => setDialogOpen(false)} onConfirm={async () => {
+      if (!pendingId) return;
+      try {
+        await onDeleteTour(pendingId);
+        setConfirmMsg('Тур удалён');
+        setConfirmOpen(true);
+      } catch (err) {
+        console.debug('Delete tour failed', err);
+        showToast('Не удалось удалить тур', 'error');
+      } finally {
+        setDialogOpen(false);
+        setPendingId(null);
+      }
+    }} />
+    <ConfirmModal open={confirmOpen} title="Готово" message={confirmMsg} onClose={() => setConfirmOpen(false)} />
+    </>
   )
 }

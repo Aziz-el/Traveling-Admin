@@ -10,7 +10,7 @@ import { Routes,Route } from 'react-router';
 // import { Settings } from '../pages/Settings';
 // import { RoutesPage } from '../pages/RoutesPage';
 import Login from '../pages/Login';
-import Register from '../pages/Register';
+import Register from '../pages/register';
 import TourDetails from '../pages/TourDetails';
 import ProtectedLayout from './Layouts/ProtectedLayout';
 import { ToastProvider } from '../shared/ui/Toast';
