@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useCompaniesStore } from '../entities/Companies/model/useCompanyStore';
 import { useNavigate } from 'react-router';
+import ConfirmModal from '../shared/ui/ConfirmModal';
 import { InteractiveMap } from '../shared/components/InteractiveMap';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 
@@ -59,6 +60,8 @@ export function AddTour() {
   ]);
 
   const [previewTour, setPreviewTour] = useState<TourType | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmMsg, setConfirmMsg] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -167,7 +170,8 @@ export function AddTour() {
     };
 
     addTour(tour);
-    navigate('/tours');
+    setConfirmMsg('Тур успешно создан');
+    setConfirmOpen(true);
 
     setFormData({
       title: '',
@@ -189,7 +193,7 @@ export function AddTour() {
 
   return (
     <div className="p-8 dark:bg-gray-950">
-      <div className="mb-8">
+      <div className="mb-8 max-md:mt-5">
         <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">Добавить тур</h1>
         <p className="text-gray-600 dark:text-gray-400">Создайте новый туристический маршрут</p>
       </div>
@@ -464,6 +468,7 @@ export function AddTour() {
           </div>
         </div>
       </div>
+      <ConfirmModal open={confirmOpen} title="Готово" message={confirmMsg} onClose={() => { setConfirmOpen(false); navigate('/tours'); }} />
     </div>
   );
 }

@@ -117,7 +117,6 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
     setZoom(2);
     setCenter({ lat: 40, lng: 20 });
   };
-  
 
   // Search state
   const [query, setQuery] = useState('');

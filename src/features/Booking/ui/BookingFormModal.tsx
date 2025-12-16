@@ -10,9 +10,10 @@ type Props = {
   onClose: () => void;
   tours: any[];
   editingBooking?: any;
+  onSuccess?: (message?: string) => void;
 };
 
-export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editingBooking }) => {
+export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editingBooking, onSuccess }) => {
   const bookingStore = useBookingStore();
   const [form, setForm] = React.useState<any>({
     tourId: tours[0]?.id ?? '',
@@ -72,6 +73,7 @@ export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editin
           participants_count: Number(form.guests),
           date: isoDate,
         });
+        onSuccess && onSuccess('Бронирование создано');
       }
       onClose();
     } catch (err) {

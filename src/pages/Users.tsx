@@ -32,52 +32,58 @@ export function Users() {
   }
 
   return (
-    <div className="p-8 h-screen dark:bg-gray-950">
-      <div className="mb-8">
-        <h1 className="text-gray-900 dark:text-white mb-2">Пользователи</h1>
-        <p className="text-gray-600 dark:text-gray-400">Список пользователей из бэкенда</p>
-      </div>
+    <div className="h-full p-8 dark:bg-gray-950">
+      <div className="flex flex-col gap-3 mb-8 sm:flex-row sm:items-center sm:justify-between max-md:mt-5">
+  <div>
+    <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
+      Пользователи
+    </h1>
+    <p className="mt-1 text-sm text-gray-600 sm:text-base dark:text-gray-400">
+     Список пользователей из бэкенда
+    </p>
+  </div>
+</div>
 
       {loading ? (
         <UsersSkeleton />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-800">
+        <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-3">
+        <div className="p-6 bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-blue-50 dark:bg-blue-950 rounded-lg">
+            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950">
               <UsersIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <span className="text-green-600 dark:text-green-400">{totalUsers > 0 ? `+${Math.round((activeUsers/totalUsers)*100)}%` : '-'} </span>
           </div>
-          <h3 className="text-gray-600 dark:text-gray-400 mb-1">Всего пользователей</h3>
+          <h3 className="mb-1 text-gray-600 dark:text-gray-400">Всего пользователей</h3>
           <p className="text-gray-900 dark:text-white">{totalUsers}</p>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-800">
+        <div className="p-6 bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-green-50 dark:bg-green-950 rounded-lg">
+            <div className="p-2 rounded-lg bg-green-50 dark:bg-green-950">
               <UserCheck className="w-5 h-5 text-green-600 dark:text-green-400" />
             </div>
             <span className="text-green-600 dark:text-green-400">{activeUsers}</span>
           </div>
-          <h3 className="text-gray-600 dark:text-gray-400 mb-1">Активные</h3>
+          <h3 className="mb-1 text-gray-600 dark:text-gray-400">Активные</h3>
           <p className="text-gray-900 dark:text-white">{activeUsers}</p>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-800">
+        <div className="p-6 bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-purple-50 dark:bg-purple-950 rounded-lg">
+            <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-950">
               <UserX className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
             <span className="text-green-600 dark:text-green-400">{withPhone}</span>
           </div>
-          <h3 className="text-gray-600 dark:text-gray-400 mb-1">Контакты (телефон)</h3>
+          <h3 className="mb-1 text-gray-600 dark:text-gray-400">Контакты (телефон)</h3>
           <p className="text-gray-900 dark:text-white">{withPhone}</p>
         </div>
         </div>
       )}
 
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+      <div className="overflow-hidden bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
         <div className="p-6 border-b border-gray-200 dark:border-gray-800">
           <h2 className="text-gray-900 dark:text-white">Все пользователи</h2>
         </div>
@@ -87,17 +93,17 @@ export function Users() {
           <div className="p-4 space-y-3">
             {loading ? (
               Array.from({ length: 4 }).map((_, idx) => (
-                <div key={idx} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg animate-pulse" />
+                <div key={idx} className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 animate-pulse" />
               ))
             ) : (
               users.map((user) => (
-                <div key={user.id} className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+                <div key={user.id} className="p-4 bg-white border border-gray-200 rounded-lg dark:bg-gray-900 dark:border-gray-800">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-sm font-medium text-gray-900 dark:text-white">{user.full_name}</div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{user.email}</div>
                     </div>
-                    <div className="text-right text-xs text-gray-600 dark:text-gray-400">{roleLabel(user.role)}</div>
+                    <div className="text-xs text-right text-gray-600 dark:text-gray-400">{roleLabel(user.role)}</div>
                   </div>
                 </div>
               ))
@@ -106,9 +112,9 @@ export function Users() {
         </div>
 
         {/* Desktop: table */}
-        <div className="hidden md:block overflow-x-auto">
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+            <thead className="border-b border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-gray-700 dark:text-gray-300">ID</th>
                 <th className="px-6 py-3 text-left text-gray-700 dark:text-gray-300">Имя</th>
@@ -121,18 +127,18 @@ export function Users() {
             <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
               {loading ? (
                 Array.from({ length: 6 }).map((_, r) => (
-                  <tr key={r} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors animate-pulse">
+                  <tr key={r} className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 animate-pulse">
                     <td className="px-6 py-4 text-gray-900 dark:text-white">#</td>
-                    <td className="px-6 py-4 text-gray-900 dark:text-white"><div className="w-28 h-4 bg-gray-300 rounded dark:bg-gray-700" /></td>
+                    <td className="px-6 py-4 text-gray-900 dark:text-white"><div className="h-4 bg-gray-300 rounded w-28 dark:bg-gray-700" /></td>
                     <td className="px-6 py-4 text-gray-600 dark:text-gray-400"><div className="w-40 h-4 bg-gray-300 rounded dark:bg-gray-700" /></td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400"><div className="w-28 h-4 bg-gray-300 rounded dark:bg-gray-700" /></td>
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400"><div className="h-4 bg-gray-300 rounded w-28 dark:bg-gray-700" /></td>
                     <td className="px-6 py-4 text-gray-900 dark:text-white"><div className="w-20 h-4 bg-gray-300 rounded dark:bg-gray-700" /></td>
                     <td className="px-6 py-4"><div className="w-20 h-4 bg-gray-300 rounded dark:bg-gray-700" /></td>
                   </tr>
                 ))
               ) : (
                 users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                  <tr key={user.id} className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800">
                     <td className="px-6 py-4 text-gray-900 dark:text-white">#{user.id}</td>
                     <td className="px-6 py-4 text-gray-900 dark:text-white">{user.full_name}</td>
                     <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{user.email}</td>

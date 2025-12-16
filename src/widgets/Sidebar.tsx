@@ -81,10 +81,16 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
       </aside>
 
       {/* Mobile drawer */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-          <aside className="absolute bottom-0 left-0 w-64 p-4 overflow-y-auto bg-white border-r border-gray-200 top-12 dark:bg-gray-900 dark:border-gray-800">
+      { (
+        <>
+        
+<div
+  className={`fixed inset-0 z-30 transform transition-transform duration-300 ease-in-out ${
+    mobileOpen ? 'translate-x-0' : '-translate-x-full'
+  }`}
+>
+            <div className="absolute inset-0 bg-black/30" onClick={onClose} ></div>
+          <aside className="absolute bottom-0 left-0 w-full p-4 overflow-y-auto bg-white border-r border-gray-200 top-12 dark:bg-gray-900 dark:border-gray-800">
             <div className="flex items-center justify-end p-2 border-b border-gray-200 dark:border-gray-800">
               <button onClick={onClose} className="text-gray-600 dark:text-gray-300">✕</button>
             </div>
@@ -97,10 +103,12 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
                     key={item.id}
                     to={`/${item.id}`}
                     onClick={onClose}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 `}
                   >
-                    <Icon className="w-5 h-5" />
-                    <span>{item.label}</span>
+                    <div className="flex items-center gap-3 div w-[200px] ">
+                      <Icon className="w-5 h-5" />
+                      <span>{item.label}</span>
+                    </div>
                   </Link>
                 );
               })}
@@ -120,6 +128,7 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
             </div>
           </aside>
         </div>
+        </>
       )}
     </>
   );

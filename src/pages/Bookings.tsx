@@ -7,6 +7,7 @@ import { useTourStore } from '../entities/Tour/model/useTourStore';
 import { useBookingStore } from '../entities/Booking/model/useBookingStore';
 import BookingList from '../entities/Booking/ui/BookingList';
 import BookingFormModal from '../features/Booking/ui/BookingFormModal';
+import ConfirmModal from '../shared/ui/ConfirmModal';
 import { optimizeImageUrl } from '../shared/utils/imageRenderingOptimizator';
 
 
@@ -30,6 +31,8 @@ export function Bookings() {
 
   const [createOpen, setCreateOpen] = React.useState(false);
   const [editingBooking, setEditingBooking] = React.useState<any>(null);
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [confirmMsg, setConfirmMsg] = React.useState('');
   const [newBooking, setNewBooking] = React.useState<any>({
     tourId: tours[0]?.id ?? '',
     date: '',
@@ -72,6 +75,8 @@ export function Bookings() {
         date: newBooking.date,
       });
       setCreateOpen(false);
+      setConfirmMsg('Бронирование успешно создано');
+      setConfirmOpen(true);
     } catch (err) {
       console.debug('Create booking failed', err);
       alert('Не удалось создать бронирование');
@@ -92,10 +97,16 @@ export function Bookings() {
 
   return (
     <div className="min-h-screen p-8 dark:bg-gray-950">
-      <div className="mb-8">
-        <h1 className="mb-2 text-gray-900 dark:text-white">Бронирования</h1>
-        <p className="text-gray-600 dark:text-gray-400">Управление бронированиями туров</p>
-      </div>
+       <div className="flex flex-col gap-3 mb-8 sm:flex-row sm:items-center sm:justify-between max-md:mt-5">
+  <div>
+    <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
+      Бронирования
+    </h1>
+    <p className="mt-1 text-sm text-gray-600 sm:text-base dark:text-gray-400">
+     Управление бронированиями туров
+    </p>
+  </div>
+</div>
 
       <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4">
         <div className="p-6 transition-all border border-green-200 shadow-sm bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 rounded-xl dark:border-green-800 hover:shadow-lg hover:scale-105">
@@ -238,7 +249,8 @@ export function Bookings() {
           </div>
         </div>
       </div>
-      <BookingFormModal open={createOpen} onClose={() => { setCreateOpen(false); setEditingBooking(null); }} tours={tours} editingBooking={editingBooking} />
+      <BookingFormModal open={createOpen} onClose={() => { setCreateOpen(false); setEditingBooking(null); }} tours={tours} editingBooking={editingBooking} onSuccess={(m) => { setConfirmMsg(m ?? 'Бронирование успешно создано'); setConfirmOpen(true); }} />
+      <ConfirmModal open={confirmOpen} title="Готово" message={confirmMsg} onClose={() => setConfirmOpen(false)} />
     </div>
   );
 }
