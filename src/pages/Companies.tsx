@@ -62,13 +62,13 @@ export function Companies() {
   const [confirmMsg, setConfirmMsg] = useState('')
 
   return (
-    <div className="min-h-screen p-8 dark:bg-gray-950">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-gray-900 dark:text-white">Компании</h1>
-          <p className="text-gray-600 dark:text-gray-400">Туроператоры и их статистика</p>
+    <div className="min-h-screen p-6 sm:p-8 dark:bg-gray-950">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
+        <div className="w-full sm:w-auto">
+          <h1 className="mb-1 text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white">Компании</h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Туроператоры и их статистика</p>
         </div>
-        <button onClick={handleAdd} className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg  ">
+        <button onClick={handleAdd} className="w-full sm:w-auto mt-4 sm:mt-0 inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base text-white bg-blue-600 rounded-md sm:rounded-lg justify-center">
           <Plus className="w-4 h-4" />
           Добавить компанию
         </button>

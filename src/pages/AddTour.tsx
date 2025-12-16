@@ -196,8 +196,8 @@ export function AddTour() {
   return (
     <div className="p-8 dark:bg-gray-950">
       <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">Добавить тур</h1>
-        <p className="text-gray-600 dark:text-gray-400">Создайте новый туристический маршрут</p>
+        <h1 className="mb-2 text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Добавить тур</h1>
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Создайте новый туристический маршрут</p>
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -393,7 +393,7 @@ export function AddTour() {
                 <button
                   type="button"
                   onClick={addScheduleDay}
-                  className="px-4 py-2 text-sm text-blue-600 transition-colors border border-blue-600 rounded-lg dark:border-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950"
+                  className="w-full sm:w-auto mt-2 sm:mt-0 inline-flex items-center justify-center gap-2 px-3 py-2 text-sm text-blue-600 transition-colors border border-blue-600 rounded-md sm:rounded-lg dark:border-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950"
                 >
                   + Добавить день
                 </button>
@@ -410,7 +410,9 @@ export function AddTour() {
                         <button
                           type="button"
                           onClick={() => removeScheduleDay(index)}
-                          className="text-sm text-red-600 transition-colors dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
+                          className="inline-flex items-center gap-1 text-sm px-2 py-1 text-red-600 transition-colors rounded-md dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900"
+                          title="Удалить день расписания"
+                          aria-label={`Удалить день ${index + 1}`}
                         >
                           Удалить
                         </button>
@@ -439,17 +441,17 @@ export function AddTour() {
             </div>
 
             {/* Кнопки действий */}
-            <div className="flex gap-4 pt-6 border-t border-gray-200 dark:border-gray-800">
+            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 dark:border-gray-800">
               <button
                 type="button"
                 onClick={handlePreview}
-                className="flex-1 px-6 py-3 text-blue-600 transition-colors border border-blue-600 rounded-lg dark:border-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950"
+                className="w-full sm:flex-1 px-4 py-3 text-blue-600 transition-colors border border-blue-600 rounded-lg dark:border-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 text-sm sm:text-base"
               >
                 Показать на карте
               </button>
               <button
                 type="submit"
-                className="flex-1 px-6 py-3 text-white transition-colors bg-blue-600 rounded-lg dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600"
+                className="w-full sm:flex-1 px-4 py-3 text-white transition-colors bg-blue-600 rounded-lg dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-sm sm:text-base"
               >
                 Создать тур
               </button>
