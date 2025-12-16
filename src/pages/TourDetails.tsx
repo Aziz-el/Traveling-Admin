@@ -5,6 +5,7 @@ import { useTourStore } from '../entities/Tour/model/useTourStore';
 import { useBookingStore } from '../entities/Booking/model/useBookingStore';
 import { MapPin, Star, Users, Clock, DollarSign, CheckCircle } from 'lucide-react';
 import ConfirmModal from '../shared/ui/ConfirmModal';
+import { useToast } from '../shared/ui/Toast';
 
 export default function TourDetails() {
   let toursStore = useTourStore();
@@ -23,6 +24,7 @@ export default function TourDetails() {
   const [createOpen, setCreateOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmMsg, setConfirmMsg] = useState('');
+  const { showToast } = useToast();
   const toLocalInput = (iso?: string) => {
     if (!iso) return '';
     const d = new Date(iso);
@@ -55,7 +57,7 @@ export default function TourDetails() {
 
   const handleSaveBooking = async () => {
     if (!bookingData.customerName || !bookingData.email || !bookingData.date) {
-      alert('Пожалуйста, заполните имя клиента, email и дату');
+      showToast('Пожалуйста, заполните имя клиента, email и дату', 'error');
       return;
     }
 
@@ -75,7 +77,7 @@ export default function TourDetails() {
       setConfirmOpen(true);
     } catch (err) {
       console.error('Failed to create booking', err);
-      alert('Ошибка при создании бронирования');
+      showToast('Ошибка при создании бронирования', 'error');
     }
   };
 

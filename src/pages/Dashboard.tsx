@@ -7,6 +7,7 @@ import { formatDateRange } from '../shared/utils/formatDate';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 import TourCardMini from '../entities/Tour/UI/TourCards/TourCardMini';
 import TourCardMid from '../entities/Tour/UI/TourCards/TourCardMid';
+import { useBookingStore } from '../entities/Booking/model/useBookingStore';
 
 interface DashboardProps {
   onMapItemClick?: (tourId: string, x: number, y: number) => void;
@@ -18,7 +19,8 @@ export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: Das
   let tours = useTourStore().tours;
   const activeTours = tours.filter(t => t.is_active === true);
   const totalRevenue = tours.reduce((sum, tour) => sum + tour.price, 0);
-  const avgPrice = tours.length > 0 ? totalRevenue / tours.length : 0;
+  const avgPrice = tours.length > 0 ? totalRevenue / tours.length : 0; 
+  const bookings =useBookingStore().bookings;
 
   return (
     <div className="p-8 dark:bg-gray-950">
@@ -44,7 +46,7 @@ export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: Das
         />
         <StatsCard
           title="Новые бронирования"
-          value={23}
+          value={bookings.length}
           icon={Users}
           trend="+8%"
           trendUp={true}

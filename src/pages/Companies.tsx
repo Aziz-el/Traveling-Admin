@@ -4,6 +4,7 @@ import { useCompaniesStore } from '../entities/Companies/model/useCompanyStore'
 import { useTourStore } from '../entities/Tour/model/useTourStore'
 import { Plus } from 'lucide-react'
 import CompanyModal from '../entities/Companies/ui/CompanyModalForms/CompanyModal'
+import ConfirmModal from '../shared/ui/ConfirmModal';
 import CompanyCard from '../entities/Companies/ui/CompanyCards/CompanyCard'
 import { CompanyCardSkeleton } from '../entities/Companies/ui/CompanyCards/CompanySkeletonCard'
 import { CompanyForm } from '../entities/Companies/model/types'
@@ -53,7 +54,12 @@ export function Companies() {
       await addCompany(data)
     }
     setModalOpen(false)
+    setConfirmMsg(editingId !== null ? 'Компания обновлена' : 'Компания создана')
+    setConfirmOpen(true)
   }
+
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [confirmMsg, setConfirmMsg] = useState('')
 
   return (
     <div className="min-h-screen p-8 dark:bg-gray-950">
@@ -62,7 +68,7 @@ export function Companies() {
           <h1 className="text-gray-900 dark:text-white">Компании</h1>
           <p className="text-gray-600 dark:text-gray-400">Туроператоры и их статистика</p>
         </div>
-        <button onClick={handleAdd} className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg">
+        <button onClick={handleAdd} className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg  ">
           <Plus className="w-4 h-4" />
           Добавить компанию
         </button>
@@ -90,6 +96,7 @@ export function Companies() {
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
       />
+      <ConfirmModal open={confirmOpen} title="Готово" message={confirmMsg} onClose={() => setConfirmOpen(false)} />
     </div>
   )
 }

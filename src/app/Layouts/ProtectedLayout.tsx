@@ -27,8 +27,6 @@ export default function ProtectedLayout({children}: {children: React.ReactNode})
   return (
     token ?
     <div className={isDarkMode ? 'dark' : ''}>
-      {/* Mobile burger and h1 are rendered by Sidebar (no duplication) */}
-
       <div className="flex w-full h-full bg-gray-50 dark:bg-gray-950">
         <Sidebar mobileOpen={mobileOpen} onClose={() => onCloseMobileMenu()} onToggle={() => onOpenMobileMenu()} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
         <main className="flex-1 p-4 md:ml-64">{children}</main>

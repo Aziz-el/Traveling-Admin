@@ -1,10 +1,14 @@
 import React from 'react'
 import { TourProps, TourType } from '../../model/type'
-import { ImageWithFallback } from '../../../../shared/ui/ImageWithFallback'
-import { Link, useNavigate } from 'react-router'
-import { Clock, DollarSign, Edit, MapPin, Star, Trash2, Users } from 'lucide-react'
-import { useTourStore } from '../../model/useTourStore'
-import { optimizeImageUrl } from '../../../../shared/utils/imageRenderingOptimizator'
+import { ImageWithFallback } from '../../../../shared/ui/ImageWithFallback';
+import { Link, useNavigate } from 'react-router';
+import { Clock, DollarSign, Edit, MapPin, Star, Trash2, Users } from 'lucide-react';
+import { useTourStore } from '../../model/useTourStore';
+import { optimizeImageUrl } from '../../../../shared/utils/imageRenderingOptimizator';
+import ConfirmDialog from '../../../../shared/ui/ConfirmDialog';
+import ConfirmModal from '../../../../shared/ui/ConfirmModal';
+import { useToast } from '../../../../shared/ui/Toast';
+import { useState } from 'react';
 
 export default function TourCardFull({
   tour,
@@ -16,21 +20,37 @@ export default function TourCardFull({
   setFormData?: React.Dispatch<React.SetStateAction<TourType | null>>
   setEditingTour?: React.Dispatch<React.SetStateAction<TourType | null>>
 }) {
-  const optimizedImageUrl = optimizeImageUrl(tour?.image_url, 800, 90)
-  const navigate = useNavigate()
-  const tourStore = useTourStore()
-  const onDeleteTour = tourStore.deleteTour
+  const optimizedImageUrl = optimizeImageUrl(tour?.image_url, 800, 90);
+  const navigate = useNavigate();
+  const tourStore = useTourStore();
+  const onDeleteTour = tourStore.deleteTour;
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmMsg, setConfirmMsg] = useState('');
+  const { showToast } = useToast();
 
-  if (!tour) return null
+  const handleEdit = (tour: TourType) => {
+    setEditingTour?.(tour);
+    setFormData?.(tour);
+  };
+
+  const handleDelete = (id: string, name: string) => {
+    setDialogOpen(true);
+    setPendingId(id);
+  };
+
+  if (tour === undefined) {
+    return <div>Tour not found</div>
+  }
 
   return (
+    <>
     <div
-      onClick={() => {
-        onSelectTour?.(tour.id)
-        navigate(`/tours/${tour.id}`)
-      }}
-      className={`@container relative bg-white dark:bg-gray-900 rounded-xl border overflow-hidden transition-all duration-300 cursor-pointer
-        ${selectedTourId === tour.id
+      key={tour?.id}
+      onClick={() => { onSelectTour?.(tour?.id); navigate(`/tours/${tour?.id}`); }}
+      className={`relative bg-white dark:bg-gray-900 rounded-xl shadow-md border overflow-hidden hover:shadow-2xl transition-all duration-300 group cursor-pointer 
+        ${selectedTourId === tour?.id
           ? 'border-blue-500 dark:border-blue-400 ring-2 ring-blue-100 dark:ring-blue-900'
           : 'border-gray-200 dark:border-gray-800 hover:border-blue-300 dark:hover:border-blue-700'
         }`}
@@ -52,10 +72,10 @@ export default function TourCardFull({
           </span>
         </div>
 
-        {tour.rating > 0 && (
-          <div className="absolute bottom-2 left-2 flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-white rounded-lg bg-black/70">
-            <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-            {tour.rating.toFixed(1)}
+        {tour?.rating > 0 && (
+          <div className="absolute flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-white rounded-lg shadow-lg bottom-3 left-3 bg-white/10 border border-white/10 backdrop-blur-sm">
+            <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+            {tour?.rating.toFixed(1)}
           </div>
         )}
       </div>
@@ -122,5 +142,21 @@ export default function TourCardFull({
         </div>
       </div>
     </div>
+    <ConfirmDialog open={dialogOpen} title="Подтвердите удаление" message={pendingId ? `Вы уверены, что хотите удалить тур?` : ''} onCancel={() => setDialogOpen(false)} onConfirm={async () => {
+      if (!pendingId) return;
+      try {
+        await onDeleteTour(pendingId);
+        setConfirmMsg('Тур удалён');
+        setConfirmOpen(true);
+      } catch (err) {
+        console.debug('Delete tour failed', err);
+        showToast('Не удалось удалить тур', 'error');
+      } finally {
+        setDialogOpen(false);
+        setPendingId(null);
+      }
+    }} />
+    <ConfirmModal open={confirmOpen} title="Готово" message={confirmMsg} onClose={() => setConfirmOpen(false)} />
+    </>
   )
 }

@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { MapPin, Navigation, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import { Button } from '../../shared/ui/button';
@@ -117,6 +118,7 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
     setZoom(2);
     setCenter({ lat: 40, lng: 20 });
   };
+  
 
   // Search state
   const [query, setQuery] = useState('');

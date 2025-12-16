@@ -24,6 +24,13 @@ export function CompanyModal({ open, initialData, onClose, onSave }: CompanyModa
     }
   }, [initialData])
 
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [open]);
+
   if (!open) return null
 
   return (

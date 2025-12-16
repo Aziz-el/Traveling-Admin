@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 import ConfirmModal from '../shared/ui/ConfirmModal';
 import { InteractiveMap } from '../shared/components/InteractiveMap';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
+import { useToast } from '../shared/ui/Toast';
 
 export interface TourType {
   title: string;
@@ -62,6 +63,7 @@ export function AddTour() {
   const [previewTour, setPreviewTour] = useState<TourType | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmMsg, setConfirmMsg] = useState('');
+  const { showToast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -98,7 +100,7 @@ export function AddTour() {
 
   const handlePreview = () => {
     if (!formData.lat || !formData.lng) {
-      alert('Пожалуйста, заполните координаты для предпросмотра');
+      showToast('Пожалуйста, заполните координаты для предпросмотра', 'error');
       return;
     }
 
@@ -134,13 +136,13 @@ export function AddTour() {
     e.preventDefault();
 
     if (!formData.title || !formData.price || !formData.location || !formData.duration) {
-      alert('Пожалуйста, заполните все обязательные поля');
+      showToast('Пожалуйста, заполните все обязательные поля', 'error');
       return;
     }
 
     const hasEmptySchedule = scheduleItems.some(item => !item.title.trim() || !item.desc.trim());
     if (hasEmptySchedule) {
-      alert('Пожалуйста, заполните все поля расписания');
+      showToast('Пожалуйста, заполните все поля расписания', 'error');
       return;
     }
 

@@ -12,7 +12,7 @@ export const createReview = async (payload: Partial<ApiReview>): Promise<ApiRevi
 };
 
 export const updateReview = async (id: string, payload: Partial<ApiReview>): Promise<ApiReview> => {
-  const res = await instance.patch<ApiReview>(`/reviews/${id}`, payload);
+  const res = await instance.patch<ApiReview>(`/reviews/${id}/moderate`, payload);
   return res.data;
 };
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 import { TourType } from '../entities/Tour/model/type';
 import { useNavigate, useParams } from 'react-router';
+import ConfirmModal from '../shared/ui/ConfirmModal';
 
 export default function TourEditingPage() {
     let toursStore = useTourStore()
@@ -11,6 +12,8 @@ export default function TourEditingPage() {
 console.log(tour);
 
     let onUpdateTour = toursStore.updateTour;
+    const [confirmOpen, setConfirmOpen] = React.useState(false);
+    const [confirmMsg, setConfirmMsg] = React.useState('');
     const [editingTour, setEditingTour] = useState<TourType | null | undefined>(null);
     const [formData, setFormData] = useState<TourType | null |undefined>(null);
     useEffect(() => {
@@ -27,6 +30,8 @@ console.log(tour);
     const handleUpdate = () => {
               if (formData && editingTour) {
                 onUpdateTour(editingTour?.id,formData).then(() => {
+                setConfirmMsg('Тур обновлён');
+                setConfirmOpen(true);
                 navigate(`/tours/`);
                 });
               }
@@ -217,6 +222,7 @@ console.log(tour);
         </div>
 
       </form>
+      <ConfirmModal open={confirmOpen} title="Готово" message={confirmMsg} onClose={() => setConfirmOpen(false)} />
     </div>
   )
 }

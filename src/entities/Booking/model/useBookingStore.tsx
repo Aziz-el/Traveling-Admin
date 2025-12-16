@@ -5,6 +5,7 @@ import {
     updateBooking as updateBookingService,
     deleteBooking,
 } from "./services/bookings";
+
 import { Booking } from "./type";
 
 interface BookingState {
@@ -31,7 +32,8 @@ export const useBookingStore = create<BookingState>((set) => ({
             set((state) => ({ bookings: [...state.bookings, created] }));
         } catch (error) {
             console.debug("Failed to add booking:", error);
-            alert('Не удалось создать бронирование');
+            // notify in UI layer
+            // toast.error('Не удалось создать бронирование');
         }
     },
     updateBooking: async (id: number, updatedData: Partial<Booking>) => {
@@ -40,7 +42,8 @@ export const useBookingStore = create<BookingState>((set) => ({
             set((state) => ({ bookings: state.bookings.map(b => (b.id === updated.id ? updated : b)) }));
         } catch (error) {
             console.debug("Failed to update booking:", error);
-            alert('Не удалось обновить бронирование');
+            // notify in UI layer
+            // toast.error('Не удалось обновить бронирование');
         }
     },
     removeBooking: async (id: number) => {
@@ -49,7 +52,8 @@ export const useBookingStore = create<BookingState>((set) => ({
             set((state) => ({ bookings: state.bookings.filter(b => b.id !== id) }));
         } catch (error) {
             console.debug("Failed to remove booking:", error);
-            alert('Не удалось удалить бронирование');
+            // notify in UI layer
+            // toast.error('Не удалось удалить бронирование');
         }
     },
 }));

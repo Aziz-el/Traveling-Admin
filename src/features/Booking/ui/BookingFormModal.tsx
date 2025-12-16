@@ -1,5 +1,6 @@
 import React from 'react';
 import { useBookingStore } from '../../../entities/Booking/model/useBookingStore';
+import { useToast } from '../../../shared/ui/Toast';
 import { CustomSelect } from '../../../shared/ui/select';
 import CustomInput from '../../../shared/ui/input';
 import CustomCalendar from '../../../shared/ui/calendar';
@@ -15,6 +16,7 @@ type Props = {
 
 export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editingBooking, onSuccess }) => {
   const bookingStore = useBookingStore();
+  const { showToast } = useToast();
   const [form, setForm] = React.useState<any>({
     tourId: tours[0]?.id ?? '',
     date: '',
@@ -37,7 +39,6 @@ export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editin
     if (!open) return;
     const nowLocal = toLocalInput(new Date().toISOString());
     if (editingBooking) {
-      // Only prefill status for editing — other fields are not editable
       setForm({
         status: (editingBooking as any).status ?? 'pending',
       });
@@ -53,12 +54,15 @@ export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editin
   };
 
   React.useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : 'auto';
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
   }, [open]);
 
   const save = async () => {
     if (!editingBooking && (!form.tourId || !form.date)) {
-      alert('Заполните тур и дату');
+      showToast('Заполните тур и дату', 'error');
       return;
     }
     try {
@@ -66,6 +70,7 @@ export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editin
         await bookingStore.updateBooking(Number(editingBooking.id), {
           status: form.status,
         });
+        onSuccess && onSuccess('Бронирование обновлено');
       } else {
         const isoDate = new Date(form.date).toISOString();
         await bookingStore.addBooking({
@@ -76,9 +81,9 @@ export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editin
         onSuccess && onSuccess('Бронирование создано');
       }
       onClose();
-    } catch (err) {
+      } catch (err) {
       console.debug(err);
-      alert('Ошибка при создании бронирования');
+      showToast('Ошибка при создании бронирования', 'error');
     }
   };
 
@@ -160,7 +165,7 @@ export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editin
         </div>
 
         <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 border rounded-md dark:border-gray-700 dark:text-gray-300">Отмена</button>
+          <button onClick={onClose} className="px-4 py-2 border rounded-md text-gray-700 dark:border-gray-700 dark:text-gray-300">Отмена</button>
           <button onClick={save} className="px-4 py-2 text-white bg-blue-600 rounded-md">Сохранить</button>
         </div>
       </div>
