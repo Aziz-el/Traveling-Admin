@@ -18,6 +18,7 @@ import { useTourStore } from '../entities/Tour/model/useTourStore';
 import Reviews from '../pages/Reviews';
 import NotFound from '../pages/NotFound';
 import CompanyTours from '../pages/CompanyTours';
+import Applications from '../pages/Applications';
 export default function App() {
   const [selectedTourId, setSelectedTourId] = useState<string | null>(null);
   const [miniCard, setMiniCard] = useState<{ tourId: string; x: number; y: number } | null>(null);
@@ -61,6 +62,7 @@ export default function App() {
                   <Route path='reviews' element={<Reviews/>}/>
                   {/* <Route path='settings' element={<Settings />}/> */}
                   <Route path='*' element={<NotFound />} />
+                  <Route path="applications" element={<Applications />} />
                 </Routes>
             
             </ProtectedLayout>

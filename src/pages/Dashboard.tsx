@@ -84,7 +84,7 @@ export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: Das
             <p className="text-gray-600 dark:text-gray-400">Топ направлений</p>
           </div>
           <div className="p-6">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-1">
+            <div className="grid grid-cols-1 gap-3 2xl:grid-cols-1">
               {activeTours.slice(0, 5).map((tour) => (
                 <TourCardMini key={tour.id} tour={tour} onSelectTour={onSelectTour}/>
               ))}

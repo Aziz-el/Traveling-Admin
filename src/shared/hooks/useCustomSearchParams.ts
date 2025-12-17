@@ -7,16 +7,15 @@ export function useCustomSearchParams() {
     return searchParams.get(name)
   }
 
-  const add = (name: string, value: string) => {
-    const params = new URLSearchParams(searchParams)
-    params.append(name, value)
-    setSearchParams(params)
-  }
 
   const update = (name: string, value: string) => {
+    if(value.length > 0){
     const params = new URLSearchParams(searchParams)
     params.set(name, value)
     setSearchParams(params)
+    }else{
+      remove("search")
+    }
   }
 
   const remove = (name: string) => {
@@ -27,7 +26,6 @@ export function useCustomSearchParams() {
 
   return {
     get,
-    add,
     update,
     remove,
     searchParams

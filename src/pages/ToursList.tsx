@@ -3,39 +3,27 @@ import { TourProps, TourType } from '../entities/Tour/model/type';
 import TourCardFull from '../entities/Tour/UI/TourCards/TourCardFull';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 import TourCardSkeleton from '../entities/Tour/UI/TourCards/TourCardSkeleton';
-
-
+import { useDebounce } from '../shared/hooks/useDebounce';
+import CustomInput from '../shared/ui/input';
+import { useCustomSearchParams } from '../shared/hooks/useCustomSearchParams';
 export function ToursList({  onSelectTour, selectedTourId }: TourProps) {
   let toursStore = useTourStore()
   let tours = toursStore.tours;
   let loading = useTourStore().loading;
+  let {update} = useCustomSearchParams()
+   let [search,setSerch] = useState("")
+  const debouncedQuery = useDebounce(search, 300); 
   useEffect(() => {
-    toursStore.fetchTours();
-  }, []);
-  
-  let onUpdateTour = useTourStore().updateTour;
-  let onDeleteTour = useTourStore().deleteTour;
+    update("search",debouncedQuery)
+
+    toursStore.fetchTours({search:debouncedQuery});
+  }, [debouncedQuery]);
   
   const [editingTour, setEditingTour] = useState<TourType | null>(null);
   const [formData, setFormData] = useState<TourType | null>(null);
-  const handleUpdate = () => {
-          if (formData && editingTour) {
-            onUpdateTour(editingTour?.id,formData);
-            setEditingTour(null);
-            setFormData(null);
-          }
-        };
-   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-          const { name, value } = e.target;
-          if (formData && setFormData) {
-            setFormData({
-              ...formData,
-              [name]: name === 'price' || name.includes('Lat') || name.includes('Lng') 
-                ? parseFloat(value) || 0 
-                : value,
-            });
-          }
-        };
+
+
+
   return (
     <div className="h-full p-8 dark:bg-gray-950">
       <div className="flex flex-col gap-3 mb-8 sm:flex-row sm:items-center sm:justify-between max-md:mt-5">
@@ -46,6 +34,10 @@ export function ToursList({  onSelectTour, selectedTourId }: TourProps) {
     <p className="mt-1 text-sm text-gray-600 sm:text-base dark:text-gray-400">
       Управление всеми турами
     </p>
+  </div>
+
+  <div>
+     <CustomInput value={search} name='search' onChange={(e)=> setSerch(e.target.value)} placeholder='Поиск' />
   </div>
 </div>
 

@@ -1,28 +1,32 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { useTourStore } from '../entities/Tour/model/useTourStore'
 import TourCardFull from '../entities/Tour/UI/TourCards/TourCardFull'
 import { useCompaniesStore } from '../entities/Companies/model/useCompanyStore'
 import TourCardSkeleton from '../entities/Tour/UI/TourCards/TourCardSkeleton'
 import { Building2, Clock, Globe, MapPin } from 'lucide-react'
+import CustomInput from '../shared/ui/input'
+import { useDebounce } from '../shared/hooks/useDebounce'
+import { useCustomSearchParams } from '../shared/hooks/useCustomSearchParams'
 
 export default function CompanyTours() {
   const { id } = useParams()
   const { tours, fetchTours, loading } = useTourStore()
   const { fetchCompanies, companies } = useCompaniesStore()
-
+  let {update}= useCustomSearchParams()
+  let [search,setSerch] = useState("")
+  const debouncedQuery = useDebounce(search, 300); 
   useEffect(() => {
     if (!id) return
+    update("search",debouncedQuery)
     fetchCompanies()
-    fetchTours({ company_id: id })
-  }, [id])
+    fetchTours({ company_id: id ,search :debouncedQuery})
+  }, [id,debouncedQuery])
 
   const company = companies.find(el => el.id == (id ?? -1))
 
   return (
     <div className="min-h-screen p-4 space-y-8 md:p-8 dark:bg-gray-950">
-      
-      {/* Шапка компании */}
       <div className="relative overflow-hidden shadow-md rounded-xl max-md:mt-14">
         <div className="h-56 sm:h-72 bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
@@ -50,14 +54,10 @@ export default function CompanyTours() {
           </div>
         </div>
       </div>
-
-      {/* Заголовок туров */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
         <h2 className="mb-2 text-xl font-semibold dark:text-white sm:mb-0">Туры компании</h2>
-        <span className="text-sm text-gray-500">{tours.length} туров</span>
+         <CustomInput value={search} name='search' onChange={(e)=> setSerch(e.target.value)} placeholder='Поиск' className='sm:max-w-[200px]' />
       </div>
-
-      {/* Сетка туров */}
       {loading ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 8 }).map((_, i) => (
