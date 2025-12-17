@@ -17,6 +17,7 @@ import { ToastProvider } from '../shared/ui/Toast';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 import Reviews from '../pages/Reviews';
 import NotFound from '../pages/NotFound';
+import CompanyTours from '../pages/CompanyTours';
 export default function App() {
   const [selectedTourId, setSelectedTourId] = useState<string | null>(null);
   const [miniCard, setMiniCard] = useState<{ tourId: string; x: number; y: number } | null>(null);
@@ -52,6 +53,7 @@ export default function App() {
                     />} />
                   <Route path='tours/:id' element={<TourDetails />} />
                   <Route path='edit-tour/:id' element={<TourEditingPage />} />
+                  <Route path="companies/:id/tours" element={<CompanyTours />}/>
                   <Route path='companies' element={<Companies />}/>
                   <Route path='bookings' element={<Bookings />}/>
                   <Route path='users' element={<Users />}/>

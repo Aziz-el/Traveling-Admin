@@ -21,21 +21,9 @@ export function CompanyCardSkeleton() {
 
       <div className="p-6 space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          {[1, 2, 3, 4].map(i => (
+          {[1, 2, ].map(i => (
             <div key={i} className="p-4 bg-gray-100 rounded-lg dark:bg-gray-800">
               <div className="w-20 h-3 mb-2 bg-gray-200 rounded dark:bg-gray-700" />
-              <div className="w-12 h-4 bg-gray-200 rounded dark:bg-gray-700" />
-            </div>
-          ))}
-        </div>
-
-        <div className="space-y-2">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="flex justify-between p-3 bg-gray-100 rounded-lg dark:bg-gray-800">
-              <div className="space-y-2">
-                <div className="w-40 h-4 bg-gray-200 rounded dark:bg-gray-700" />
-                <div className="w-20 h-3 bg-gray-200 rounded dark:bg-gray-700" />
-              </div>
               <div className="w-12 h-4 bg-gray-200 rounded dark:bg-gray-700" />
             </div>
           ))}

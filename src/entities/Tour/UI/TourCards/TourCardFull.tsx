@@ -127,14 +127,8 @@ export default function TourCardFull({
           </Link>
 
           <button
-            onClick={(e) => {
-              e.stopPropagation()
-              if (window.confirm(`Удалить "${tour.title}"?`)) {
-                onDeleteTour(tour.id)
-                setTimeout(() => tourStore.fetchTours(), 800)
-              }
-            }}
-            className="flex items-center justify-center flex-1 w-full gap-2 px-3 py-2 text-sm text-red-600 rounded-lg bg-red-50 dark:bg-red-950 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900"
+            onClick={(e) => { e.stopPropagation(); handleDelete(tour?.id, tour?.title); }}
+            className="flex items-center justify-center flex-1 gap-2 px-4 py-2.5 text-sm font-medium text-red-600 transition-all duration-200 rounded-lg bg-red-50 dark:bg-red-950 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900"
           >
             <Trash2 className="w-4 h-4" />
             Удалить
@@ -148,6 +142,8 @@ export default function TourCardFull({
         await onDeleteTour(pendingId);
         setConfirmMsg('Тур удалён');
         setConfirmOpen(true);
+        // refresh tours after successful delete
+        tourStore.fetchTours();
       } catch (err) {
         console.debug('Delete tour failed', err);
         showToast('Не удалось удалить тур', 'error');

@@ -31,7 +31,7 @@ export default function TourCardMid({tour,onSelectTour}: {tour: TourType, onSele
         <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-t from-black/40 via-transparent to-transparent group-hover:opacity-100"></div>
         
         {tour.rating > 0 && (
-          <div className="absolute flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-white rounded-lg bottom-3 left-3 bg-black/70 backdrop-blur-sm">
+          <div className="absolute flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-white rounded-lg bottom-3 left-3 bg-white/10 backdrop-blur-sm">
             <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
             {tour.rating.toFixed(1)}
           </div>

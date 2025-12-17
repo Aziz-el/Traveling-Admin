@@ -67,7 +67,7 @@ export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: Das
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-1 2xl:grid-cols-3">
         <div className="overflow-hidden bg-white border border-gray-200 shadow-sm lg:col-span-2 dark:bg-gray-900 rounded-xl dark:border-gray-800">
           <div className="p-6 border-b border-gray-200 dark:border-gray-800">
             <h2 className="text-gray-900 dark:text-white">Карта маршрутов</h2>

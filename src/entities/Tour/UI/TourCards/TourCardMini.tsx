@@ -21,7 +21,7 @@ export default function TourCardMini({ tour,onSelectTour }: { tour: TourType, on
         <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-t from-black/30 to-transparent group-hover:opacity-100" />
 
         {tour.rating > 0 && (
-          <div className="absolute flex items-center gap-1 px-2 py-1 text-xs font-semibold text-white rounded-full bottom-2 left-2 bg-black/60 backdrop-blur-sm">
+          <div className="absolute flex items-center gap-1 px-2 py-1 text-xs font-semibold text-white rounded-full bottom-2 left-2 bg-white/10 backdrop-blur-sm">
             <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
             {tour.rating.toFixed(1)}
           </div>
