@@ -100,17 +100,30 @@ export default function Reviews() {
   };
 
   return (
-    <div className="p-8 dark:bg-[#0a0a0f] min-h-screen">
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-gray-900 dark:text-white">Отзывы</h1>
-          <button onClick={() => setShowAddForm(!showAddForm)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-            <Plus className="w-5 h-5" />
-            Добавить отзыв
-          </button>
-        </div>
-        <p className="text-gray-600 dark:text-gray-400">Управление отзывами клиентов</p>
-      </div>
+    <div className="p-8 dark:bg-[#0a0a0f] min-h-[697px] overflow-x-hidden">
+     <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between max-md:mt-5">
+  <div>
+    <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
+      Отзывы
+    </h1>
+    <p className="mt-1 text-sm text-gray-600 sm:text-base dark:text-gray-400">
+      Управление отзывами клиентов
+    </p>
+  </div>
+
+  <button
+    onClick={() => setShowAddForm(!showAddForm)}
+    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
+               bg-blue-600 text-white font-medium transition-colors
+               hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+               dark:focus:ring-offset-gray-900 "
+  >
+    <Plus className="w-5 h-5" />
+    <span className="hidden sm:inline">Добавить отзыв</span>
+    <span className="sm:hidden">Добавить</span>
+  </button>
+</div>
+
 
       {showAddForm && (
         <ReviewForm tours={tours.map(t => ({ id: t.id, name: t.title }))} values={formValues} onChange={updateFormValues} onCancel={() => setShowAddForm(false)} onSubmit={handleAddReview} />

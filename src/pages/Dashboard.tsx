@@ -24,10 +24,17 @@ export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: Das
 
   return (
     <div className="p-8 dark:bg-gray-950">
-      <div className="mb-8">
-        <h1 className="mb-2 text-gray-900 dark:text-white">Dashboard</h1>
-        <p className="text-gray-600 dark:text-gray-400">Обзор активности туристического сервиса</p>
-      </div>
+      <div className="flex flex-col gap-3 mb-8 sm:flex-row sm:items-center sm:justify-between max-md:mt-5">
+  <div>
+    <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
+      Dashboard
+    </h1>
+    <p className="mt-1 text-sm text-gray-600 sm:text-base dark:text-gray-400">
+      Обзор активности туристического сервиса
+    </p>
+  </div>
+</div>
+
 
       <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard

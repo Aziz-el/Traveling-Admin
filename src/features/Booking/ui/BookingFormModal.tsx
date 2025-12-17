@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { useBookingStore } from '../../../entities/Booking/model/useBookingStore';
 import { useToast } from '../../../shared/ui/Toast';
 import { CustomSelect } from '../../../shared/ui/select';
@@ -8,16 +8,17 @@ import CustomNumberInput from '../../../shared/ui/customNumber';
 
 type Props = {
   open: boolean;
-  onClose: () => void;
+  onClose?: (e?: React.MouseEvent) => void;
   tours: any[];
-  editingBooking?: any;
   onSuccess?: (message?: string) => void;
 };
 
-export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editingBooking, onSuccess }) => {
+export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, onSuccess }) => {
   const bookingStore = useBookingStore();
   const { showToast } = useToast();
-  const [form, setForm] = React.useState<any>({
+  const [form, setForm] = useState<any>({
+    name: '',
+    email: '',
     tourId: tours[0]?.id ?? '',
     date: '',
     guests: 1,
@@ -35,17 +36,11 @@ export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editin
     return `${YYYY}-${MM}-${DD}T${hh}:${mm}`;
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) return;
     const nowLocal = toLocalInput(new Date().toISOString());
-    if (editingBooking) {
-      setForm({
-        status: (editingBooking as any).status ?? 'pending',
-      });
-    } else {
-      setForm({ tourId: String(tours[0]?.id ?? ''), date: nowLocal, guests: 1 });
-    }
-  }, [open, tours, editingBooking]);
+    setForm({ tourId: String(tours[0]?.id ?? ''), date: nowLocal, guests: 1 });
+  }, [open, tours]);
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -53,35 +48,29 @@ export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editin
     setForm((p: any) => ({ ...p, [name]: name === 'guests' ? Number(value) : value }));
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = prev; };
   }, [open]);
 
-  const save = async () => {
-    if (!editingBooking && (!form.tourId || !form.date)) {
+  const save = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.stopPropagation();
+    if (!form.tourId || !form.date) {
       showToast('Заполните тур и дату', 'error');
       return;
     }
     try {
-      if (editingBooking) {
-        await bookingStore.updateBooking(Number(editingBooking.id), {
-          status: form.status,
-        });
-        onSuccess && onSuccess('Бронирование обновлено');
-      } else {
-        const isoDate = new Date(form.date).toISOString();
-        await bookingStore.addBooking({
-          tour_id: Number(form.tourId),
-          participants_count: Number(form.guests),
-          date: isoDate,
-        });
-        onSuccess && onSuccess('Бронирование создано');
-      }
-      onClose();
-      } catch (err) {
+      const isoDate = new Date(form.date).toISOString();
+      await bookingStore.addBooking({
+        tour_id: Number(form.tourId),
+        participants_count: Number(form.guests),
+        date: isoDate,
+      });
+      onSuccess && onSuccess('Бронирование создано');
+      onClose?.(e);
+    } catch (err) {
       console.debug(err);
       showToast('Ошибка при создании бронирования', 'error');
     }
@@ -90,78 +79,62 @@ export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, editin
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-auto text-white bg-black/50 ">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-auto text-white bg-black/50 " 
+      onMouseDown={(e) => { if (e.target === e.currentTarget) { onClose && onClose(e as any); } }}>
       <div className="w-full max-w-2xl max-h-screen p-6 overflow-auto bg-white rounded-lg dark:bg-gray-900">
-        <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">{editingBooking ? 'Редактировать бронирование' : 'Создать бронирование'}</h3>
+        <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Создать бронирование</h3>
         <div className="grid grid-cols-1 gap-4">
-            {editingBooking ? (
-              <div>
-                <label className="block mb-1 text-gray-700 dark:text-gray-300">Статус</label>
-                <CustomSelect 
-                  name="status" 
-                  value={form.status} 
-                  onChange={(e)=> setForm((p:any)=>({...p, status: e.target.value}))} 
-                  className="w-full px-3 py-2 "
-                  options={[
-                    { value: 'pending', label: 'В ожидании' },
-                    { value: 'confirmed', label: 'Подтверждено' },
-                    { value: 'cancelled', label: 'Отменено' }
-                  ]}
-                />
-              </div>
-            ) : (
-              <>
-                <div>
-                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Имя клиента</label>
-                  <CustomInput
-                    name="customerName"
-                    value={form.customerName}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Email клиента</label>
-                  <CustomInput
-                    name="customerEmail"
-                    value={form.customerEmail}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Тур</label>
-                  <CustomSelect
-                    name="tourId"
-                    value={form.tourId}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2"
-                    options={tours.map(t => ({ value: String(t.id), label: `${t.title ?? t.name ?? 'Тур'} — ${t.company_id ?? t.company ?? ''}` }))}
-                  />
-                </div>
+            <>
+                        <div>
+                          <label className="block mb-1 text-gray-700 dark:text-gray-300">Имя клиента</label>
+                          <CustomInput
+                            name="customerName"
+                            value={form.customerName ?? ''} 
+                            onChange={handleChange}
+                            className="w-full px-3 py-2"
+                          />
+                        </div>
+                        <div>
+                          <label className="block mb-1 text-gray-700 dark:text-gray-300">Email клиента</label>
+                          <CustomInput
+                            name="customerEmail"
+                            value={form.customerEmail ?? ''} 
+                            onChange={handleChange}
+                            className="w-full px-3 py-2"
+                          />
+                        </div>
+                        <div>
+                          <label className="block mb-1 text-gray-700 dark:text-gray-300">Тур</label>
+                          <CustomSelect
+                            name="tourId"
+                            value={form.tourId ?? String(tours[0]?.id ?? '')} 
+                            onChange={handleChange}
+                            className="w-full px-3 py-2"
+                            options={tours.map(t => ({ value: String(t.id), label: t.title ?? t.name ?? 'Тур' }))}
+                          />
+                        </div>
 
-                <div>
-                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Дата и время</label>
-                  <CustomCalendar
-                    name="date"
-                    value={form.date}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2"
-                  />
-                </div>
+                        <div>
+                          <label className="block mb-1 text-gray-700 dark:text-gray-300">Дата и время</label>
+                          <CustomCalendar
+                            name="date"
+                            value={form.date ?? ''} 
+                            onChange={handleChange}
+                            className="w-full px-3 py-2"
+                          />
+                        </div>
 
-                <div>
-                  <label className="block mb-1 text-gray-700 dark:text-gray-300">Гостей</label>
-                  <CustomNumberInput
-                    name="guests"
-                    min={1}
-                    value={form.guests}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 "
-                  />
-                </div>
-              </>
-            )}
+                        <div>
+                          <label className="block mb-1 text-gray-700 dark:text-gray-300">Гостей</label>
+                          <CustomNumberInput
+                            name="guests"
+                            min={1}
+                            value={form.guests ?? 1} 
+                            onChange={handleChange}
+                            className="w-full px-3 py-2"
+                          />
+                        </div>
+                      </>
         </div>
 
         <div className="flex justify-end gap-3 mt-6">

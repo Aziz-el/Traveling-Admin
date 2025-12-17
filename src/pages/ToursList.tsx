@@ -37,11 +37,17 @@ export function ToursList({  onSelectTour, selectedTourId }: TourProps) {
           }
         };
   return (
-    <div className="p-8 h-full dark:bg-gray-950">
-      <div className="mb-8">
-        <h1 className="mb-2 text-gray-900 dark:text-white">Туры</h1>
-        <p className="text-gray-600 dark:text-gray-400">Управление всеми турами</p>
-      </div>
+    <div className="h-full p-8 dark:bg-gray-950">
+      <div className="flex flex-col gap-3 mb-8 sm:flex-row sm:items-center sm:justify-between max-md:mt-5">
+  <div>
+    <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
+      Туры
+    </h1>
+    <p className="mt-1 text-sm text-gray-600 sm:text-base dark:text-gray-400">
+      Управление всеми турами
+    </p>
+  </div>
+</div>
 
       
       {

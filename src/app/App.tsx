@@ -16,6 +16,7 @@ import ProtectedLayout from './Layouts/ProtectedLayout';
 import { ToastProvider } from '../shared/ui/Toast';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 import Reviews from '../pages/Reviews';
+import BookingDetails from '../pages/BookingDetails';
 import NotFound from '../pages/NotFound';
 export default function App() {
   const [selectedTourId, setSelectedTourId] = useState<string | null>(null);
@@ -54,6 +55,7 @@ export default function App() {
                   <Route path='edit-tour/:id' element={<TourEditingPage />} />
                   <Route path='companies' element={<Companies />}/>
                   <Route path='bookings' element={<Bookings />}/>
+                  <Route path='bookings/:id' element={<BookingDetails />} />
                   <Route path='users' element={<Users />}/>
                   {/* <Route path='routes' element={<RoutesPage />}/> */}
                   <Route path='reviews' element={<Reviews/>}/>

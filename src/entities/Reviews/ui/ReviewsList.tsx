@@ -47,7 +47,7 @@ export default function ReviewsList({ reviews, userId, editingReview, setEditing
                     ))}</div>
                     <span className="text-gray-500 dark:text-gray-400">{review.date}</span>
                   </div>
-                  <p className="text-gray-700 dark:text-gray-300 mb-4">{review.comment}</p>
+                  <p className="text-gray-700 dark:text-gray-300 mb-4 break-words">{review.comment}</p>
                   <div className="flex items-center gap-4">
                     <button onClick={() => onLike(review.id)} className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                       <ThumbsUp className="w-4 h-4" />
@@ -77,7 +77,7 @@ export default function ReviewsList({ reviews, userId, editingReview, setEditing
         </div>
       )));
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       {items}
       {!loading && reviews.length === 0 && (
         <div className="bg-white dark:bg-[#13131a] rounded-xl p-12 border border-gray-200 dark:border-gray-800/50 text-center">

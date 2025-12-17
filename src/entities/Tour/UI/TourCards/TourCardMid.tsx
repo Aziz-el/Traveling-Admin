@@ -11,9 +11,13 @@ export default function TourCardMid({tour,onSelectTour}: {tour: TourType, onSele
   return (
     <div className="relative overflow-hidden transition-all duration-300 bg-white border border-gray-200 cursor-pointer rounded-xl group hover:shadow-2xl hover:border-blue-300 dark:bg-gray-900 dark:border-gray-800 dark:hover:border-blue-700"
     onClick={() => { onSelectTour?.(tour?.id); navigate(`/tours/${tour?.id}`); }}>
-      {tour.is_active && (
+      {tour.is_active ? (
         <div className="absolute z-10 px-3 py-1 text-xs font-semibold text-white bg-green-500 rounded-full top-3 right-3">
           Активен
+        </div>
+      ) : (
+      <div className="absolute z-10 px-3 py-1 text-xs font-semibold text-white bg-red-500 rounded-full top-3 right-3 ">
+          Неактивен
         </div>
       )}
 

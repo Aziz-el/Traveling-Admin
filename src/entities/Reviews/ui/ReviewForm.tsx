@@ -6,11 +6,12 @@ interface Props {
   tours: { id: string; name: string }[];
   values: { tourId: string; userName: string; rating: number; comment: string };
   onChange: (next: Partial<Props['values']>) => void;
-  onCancel: () => void;
+  onCancel: (e: React.MouseEvent) => void;
   onSubmit: () => void;
+  onClose?: (e: React.MouseEvent) => void;
 }
 
-export default function ReviewForm({ values, onChange, onCancel, onSubmit }: Props) {
+export default function ReviewForm({ values, onChange, onCancel, onSubmit, onClose }: Props) {
     const tours = useTourStore((s) => s.tours);
 
   const tourOptions = [{ value: '', label: 'Выберите тур' }, ...tours.map((t) => ({ value: t.id, label: t.title }))];
@@ -35,7 +36,12 @@ export default function ReviewForm({ values, onChange, onCancel, onSubmit }: Pro
 
 
   return (
-    <div className="bg-white dark:bg-[#13131a] rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 mb-8">
+    <div className="bg-white dark:bg-[#13131a] rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 mb-8" 
+          onMouseDown={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose?.(e as any);
+        }
+      }}>
       <h2 className="text-gray-900 dark:text-white mb-6">Новый отзыв</h2>
       <div className="space-y-4">
         <div>

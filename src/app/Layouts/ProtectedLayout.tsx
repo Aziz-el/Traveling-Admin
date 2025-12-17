@@ -15,13 +15,21 @@ export default function ProtectedLayout({children}: {children: React.ReactNode})
 
    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const [mobileOpen, setMobileOpen] = useState(false);
-
+  function onOpenMobileMenu() {
+    setMobileOpen(true);
+    document.body.style.overflow = 'hidden';
+    
+  }
+  function onCloseMobileMenu() {
+    setMobileOpen(false);
+    document.body.style.overflow = 'auto';
+  }
   return (
     token ?
     <div className={isDarkMode ? 'dark' : ''}>
       <div className="flex w-full h-full bg-gray-50 dark:bg-gray-950">
-        <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} onToggle={() => setMobileOpen(true)} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-        <main className="flex-1 md:ml-64 pt-12 p-4">{children}</main>
+        <Sidebar mobileOpen={mobileOpen} onClose={() => onCloseMobileMenu()} onToggle={() => onOpenMobileMenu()} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+        <main className="flex-1 p-4 md:ml-64">{children}</main>
       </div>
     </div>
     :<Navigate to="/" replace={true} />

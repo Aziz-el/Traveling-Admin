@@ -64,7 +64,7 @@ export function Companies() {
   return (
     <div className="min-h-screen p-6 sm:p-8 dark:bg-gray-950">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
-        <div className="w-full sm:w-auto">
+        <div className="w-full sm:w-auto mt-6 sm:mb-0">
           <h1 className="mb-1 text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white">Компании</h1>
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Туроператоры и их статистика</p>
         </div>

@@ -4,6 +4,7 @@ import {
     createBooking,
     updateBooking as updateBookingService,
     deleteBooking,
+    fetchBookingById,
 } from "./services/bookings";
 
 import { Booking } from "./type";
@@ -11,12 +12,13 @@ import { Booking } from "./type";
 interface BookingState {
     bookings: Booking[];
     fetchBookings: () => Promise<void>;
+    fetchBooking: (id: number) => Promise<Booking | undefined>;
     addBooking: (booking: Partial<Booking>) => Promise<void>;
     updateBooking: (id: number, updatedData: Partial<Booking>) => Promise<void>;
     removeBooking: (id: number) => Promise<void>;
 }
 
-export const useBookingStore = create<BookingState>((set) => ({
+export const useBookingStore = create<BookingState>((set, get) => ({
     bookings: [],
     fetchBookings: async () => {
         try {
@@ -54,6 +56,18 @@ export const useBookingStore = create<BookingState>((set) => ({
             console.debug("Failed to remove booking:", error);
             // notify in UI layer
             // toast.error('Не удалось удалить бронирование');
+        }
+    },
+    fetchBooking: async (id: number) => {
+        try {
+            const existing = (get as any)().bookings.find((b: Booking) => b.id === Number(id));
+            if (existing) return existing;
+            const fetched = await fetchBookingById(id);
+            set((state) => ({ bookings: [...state.bookings, fetched as Booking] }));
+            return fetched as Booking;
+        } catch (error) {
+            console.debug('Failed to fetch booking by id', error);
+            return undefined;
         }
     },
 }));

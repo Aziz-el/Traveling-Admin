@@ -53,6 +53,11 @@ export const deleteBooking = async (id: number | string): Promise<void> => {
   }
 };
 
+export const fetchBookingById = async (id: number | string): Promise<BookingApi> => {
+  const response = await instance.get<BookingApi>(`/bookings/${id}`);
+  return response.data;
+};
+
 export default {
   fetchBookings,
   createBooking,
