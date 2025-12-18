@@ -1,4 +1,4 @@
-import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun, Star, Menu } from 'lucide-react';
+import { LayoutDashboard, Plus, MapPin, Building2, Users, Route, Settings, CalendarCheck, Moon, Sun, Star, Menu,Dock} from 'lucide-react';
 import { Link } from 'react-router';
 
 interface SidebarProps {
@@ -13,7 +13,7 @@ interface SidebarProps {
 
 export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDarkMode, mobileOpen, onClose, onToggle }: SidebarProps) {
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: '', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'add-tour', label: 'Добавить тур', icon: Plus },
     { id: 'tours', label: 'Туры', icon: MapPin },
     { id: 'companies', label: 'Компании', icon: Building2 },
@@ -22,6 +22,7 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
     // { id: 'routes', label: 'Маршруты', icon: Route },
     {id: 'reviews', label: 'Отзывы', icon: Star },
     // { id: 'settings', label: 'Настройки', icon: Settings },
+    {id:'applications',label:"Заявки",icon :Dock}
   ];
 
   return (
@@ -34,7 +35,7 @@ export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDar
         <h1 className="ml-3 text-blue-600 dark:text-blue-400">TravelAdmin</h1>
       </div>
       {/* Desktop sidebar */}
-      <aside className="fixed top-0 left-0 flex-col hidden w-64 h-screen overflow-y-auto bg-white border-r border-gray-200 md:flex dark:bg-gray-900 dark:border-gray-800">
+      <aside className="sticky top-0 left-0 flex-col hidden w-64 h-screen overflow-y-auto bg-white border-r border-gray-200 md:flex dark:bg-gray-900 dark:border-gray-800">
         <div className="p-6 border-b border-gray-200 dark:border-gray-800">
           <h1 className="text-blue-600 dark:text-blue-400">TravelAdmin</h1>
         </div>

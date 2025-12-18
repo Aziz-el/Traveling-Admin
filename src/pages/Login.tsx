@@ -29,6 +29,7 @@
         const token = response?.data?.token || response?.data?.access || response?.data?.access_token;
         if (token) {
           try { localStorage.setItem('token', token); } catch {}
+          navigate('/dashboard');
         } else {
           setError('Не удалось получить токен. Проверьте данные.');
         }
@@ -44,10 +45,16 @@
       setFormData({ ...formData, [e.target.name]: e.target.value });
     };
     const token = localStorage.getItem('token')
+    const navigate = useNavigate();
     
-    return (
-      !token ?
-      <div className='relative flex items-center justify-center min-h-screen p-4'>
+      const handleLogout = () => {
+        try { localStorage.removeItem('token'); } catch {}
+        // refresh to update layout/state
+        window.location.reload();
+      };
+
+      return (
+        <div className='relative flex items-center justify-center min-h-screen p-4'>
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1613356522023-e95206f99214?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWFjaCUyMHN1bnNldCUyMHRyYXZlbHxlbnwxfHx8fDE3NjUxODE4MzN8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
@@ -67,6 +74,16 @@
               </h1>
             </div>
           </div>
+          {token && (
+            <div className="mb-4 p-3 rounded-md bg-yellow-50 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200">
+              Вы уже вошли в систему. Можно продолжить к панели или выйти и войти под другим аккаунтом.
+              <div className="mt-2 flex gap-2">
+                <button type="button" onClick={() => navigate('/')} className="px-3 py-1 bg-green-600 text-white rounded">Перейти в панель</button>
+                <button type="button" onClick={handleLogout} className="px-3 py-1 bg-gray-200 dark:bg-gray-800 rounded">Выйти</button>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -112,13 +129,12 @@
             {error && (
               <div className="mt-2 text-sm text-red-600">{error}</div>
             )}
-            <div className='flex justify-between text-sm dark:text-white/90'>
+            <div className='flex gap-5 text-sm dark:text-white/90'>
               Нет аккаунта? 
               <Link to="/register" className="text-blue-800 hover:underline ">Создать аккаунт</Link>
             </div>
           </form>
+          </div>
         </div>
-      </div>
-      :<Navigate to="/dashboard" replace={true} />
-    );
+      );
   }

@@ -1,10 +1,12 @@
 import {create} from 'zustand';
 import instance from '../../../shared/lib/axios/axios';
 import { TourType } from './type';
+import { useSearchParams } from 'react-router';
+
 export const useTourStore = create<{
     tours: TourType[],
     loading: boolean,
-    fetchTours: () => void,
+    fetchTours: (params?:Record<string, string | number | undefined> | undefined) => void,
     addTour: (tour: TourType
     ) => Promise<void>,
     updateTour: (id: string, updatedTour: any) => Promise<void>,
@@ -13,9 +15,10 @@ export const useTourStore = create<{
 }>((set) => ({
     tours: [] as TourType[],
     loading: false,
-    fetchTours: async () => {
+    fetchTours: async (params?:Record<string, string | number | undefined|undefined> | undefined) => {
+        
         set({loading:true});
-        let res = instance.get('/tours')
+        let res = instance.get('/tours',{params: params?params:[]})
         res.then(response => set({ tours: response.data.items ,loading:false})).catch(error => {
             console.error("Failed to fetch tours:", error);
             set({loading:false});

@@ -68,7 +68,7 @@ export function Companies() {
           <h1 className="mb-1 text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white">Компании</h1>
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Туроператоры и их статистика</p>
         </div>
-        <button onClick={handleAdd} className="w-full sm:w-auto mt-4 sm:mt-0 inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base text-white bg-blue-600 rounded-md sm:rounded-lg justify-center">
+        <button onClick={handleAdd} className="inline-flex items-center justify-center w-full gap-2 px-3 py-2 mt-4 text-sm text-white bg-blue-600 rounded-md sm:w-auto sm:mt-0 sm:px-4 sm:py-2 sm:text-base sm:rounded-lg">
           <Plus className="w-4 h-4" />
           Добавить компанию
         </button>
@@ -76,7 +76,7 @@ export function Companies() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {isLoading
-          ? Array.from({ length: 4 }).map((_, i) => <CompanyCardSkeleton key={i} />)
+          ? Array.from({ length: 8 }).map((_, i) => <CompanyCardSkeleton key={i} />)
           : companies.map(company => (
               <CompanyCard
                 key={company.id}

@@ -27,11 +27,11 @@ export default function ProtectedLayout({children}: {children: React.ReactNode})
   return (
     token ?
     <div className={isDarkMode ? 'dark' : ''}>
-      <div className="flex w-full h-full bg-gray-50 dark:bg-gray-950">
+      <div className="container relative flex w-full h-full mx-auto bg-gray-50 dark:bg-gray-950 min-h-au">
         <Sidebar mobileOpen={mobileOpen} onClose={() => onCloseMobileMenu()} onToggle={() => onOpenMobileMenu()} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-        <main className="flex-1 p-4 md:ml-64">{children}</main>
+        <main className="flex-1 p-4 ">{children}</main>
       </div>
     </div>
-    :<Navigate to="/" replace={true} />
+    :<Navigate to="/login" replace={true} />
   )
 }
