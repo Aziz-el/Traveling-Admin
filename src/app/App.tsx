@@ -16,6 +16,7 @@ import ProtectedLayout from './Layouts/ProtectedLayout';
 import { ToastProvider } from '../shared/ui/Toast';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 import Reviews from '../pages/Reviews';
+import BookingDetails from '../pages/BookingDetails';
 import NotFound from '../pages/NotFound';
 import CompanyTours from '../pages/CompanyTours';
 import Applications from '../pages/Applications';
@@ -57,6 +58,7 @@ export default function App() {
                   <Route path="companies/:id/tours" element={<CompanyTours />}/>
                   <Route path='companies' element={<Companies />}/>
                   <Route path='bookings' element={<Bookings />}/>
+                  <Route path='bookings/:id' element={<BookingDetails />} />
                   <Route path='users' element={<Users />}/>
                   {/* <Route path='routes' element={<RoutesPage />}/> */}
                   <Route path='reviews' element={<Reviews/>}/>

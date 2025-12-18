@@ -8,6 +8,8 @@ import { useTourStore } from '../entities/Tour/model/useTourStore';
 import TourCardMini from '../entities/Tour/UI/TourCards/TourCardMini';
 import TourCardMid from '../entities/Tour/UI/TourCards/TourCardMid';
 import { useBookingStore } from '../entities/Booking/model/useBookingStore';
+import TourCardMiniSkeleton from '../entities/Tour/UI/TourSkeletons/TourCardMiniSkeleton';
+import TourCardMidSkeleton from '../entities/Tour/UI/TourSkeletons/TourCardMidSkeleton';
 
 interface DashboardProps {
   onMapItemClick?: (tourId: string, x: number, y: number) => void;
@@ -85,9 +87,10 @@ export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: Das
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 gap-3 2xl:grid-cols-1">
-              {activeTours.slice(0, 5).map((tour) => (
+              {activeTours.length == 0 ? <> {Array.from({ length: 4 }).map((_, index) => <TourCardMiniSkeleton  key={index}/>)}
+              </> : <>{activeTours.slice(0, 5).map((tour) => (
                 <TourCardMini key={tour.id} tour={tour} onSelectTour={onSelectTour}/>
-              ))}
+              ))}</>}
             </div>
           </div>
         </div>
@@ -96,9 +99,11 @@ export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: Das
       <div className="p-6 bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
         <h2 className="mb-4 text-gray-900 dark:text-white">Последние туры</h2>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {tours.slice(0, 8).map((tour) => (
+          {tours.length == 0 ? <>{Array.from({ length: 8 }).map((_, index) => <TourCardMidSkeleton  key={index}/>)}</> : <>{
+            tours.slice(0, 8).map((tour) => (
             <TourCardMid key={tour.id} tour={tour} onSelectTour={onSelectTour} />
           ))}
+          </>}
         </div>
       </div>
     </div>

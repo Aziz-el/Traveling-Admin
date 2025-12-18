@@ -5,6 +5,8 @@ import ConfirmModal from '../shared/ui/ConfirmModal';
 import { InteractiveMap } from '../shared/components/InteractiveMap';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 import { useToast } from '../shared/ui/Toast';
+import CustomInput from '../shared/ui/input';
+import { CustomSelect } from '../shared/ui/select';
 
 export interface TourType {
   title: string;
@@ -203,7 +205,6 @@ export function AddTour() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <div className="p-6 bg-white border border-gray-200 shadow-sm dark:bg-gray-900 rounded-xl dark:border-gray-800">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Основная информация */}
             <div className="pb-6 border-b border-gray-200 dark:border-gray-800">
               <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Основная информация</h2>
               
@@ -212,7 +213,7 @@ export function AddTour() {
                   <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     Название тура *
                   </label>
-                  <input
+                  <CustomInput
                     type="text"
                     name="title"
                     value={formData.title}
@@ -236,12 +237,12 @@ export function AddTour() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="sm:grid grid-cols-2 gap-4 grid-cols-2">
                   <div>
                     <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                       Локация *
                     </label>
-                    <input
+                    <CustomInput
                       type="text"
                       name="location"
                       value={formData.location}
@@ -255,7 +256,7 @@ export function AddTour() {
                     <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                       Продолжительность *
                     </label>
-                    <input
+                    <CustomInput
                       type="text"
                       name="duration"
                       value={formData.duration}
@@ -268,7 +269,6 @@ export function AddTour() {
               </div>
             </div>
 
-            {/* Детали тура */}
             <div className="pb-6 border-b border-gray-200 dark:border-gray-800">
               <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Детали тура</h2>
               
@@ -278,30 +278,26 @@ export function AddTour() {
                     <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                       Компания *
                     </label>
-                    <select
+                    <CustomSelect
                       name="company_id"
                       value={formData.company_id}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      {companies.map((c, index) => (
-                        <option key={index} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
+                      options={companies.map(c => ({ value: String(c.id), label: c.name }))}
+                      className=""
+                    />
                   </div>
 
                   <div>
                     <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                       Цена ($) *
                     </label>
-                    <input
+                    <CustomInput
                       type="number"
                       name="price"
                       value={formData.price}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="1500"
-                      step="0.01"
                     />
                   </div>
                 </div>
@@ -311,7 +307,7 @@ export function AddTour() {
                     <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                       Вместимость (человек)
                     </label>
-                    <input
+                    <CustomInput
                       type="number"
                       name="capacity"
                       value={formData.capacity}
@@ -341,7 +337,7 @@ export function AddTour() {
                   <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     URL изображения
                   </label>
-                  <input
+                  <CustomInput
                     type="text"
                     name="image_url"
                     value={formData.image_url}
@@ -352,43 +348,8 @@ export function AddTour() {
                 </div>
               </div>
             </div>
-
-            {/* <div className="pb-6 border-b border-gray-200 dark:border-gray-800">
-              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Координаты локации</h2>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Широта
-                  </label>
-                  <input
-                    type="number"
-                    name="lat"
-                    value={formData.lat}
-                    onChange={handleInputChange}
-                    step="0.0001"
-                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="35.6762"
-                  />
-                </div>
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Долгота
-                  </label>
-                  <input
-                    type="number"
-                    name="lng"
-                    value={formData.lng}
-                    onChange={handleInputChange}
-                    step="0.0001"
-                    className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="139.6503"
-                  />
-                </div>
-              </div>
-            </div> */}
             <div className="pb-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="sm:flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Расписание тура</h2>
                 <button
                   type="button"

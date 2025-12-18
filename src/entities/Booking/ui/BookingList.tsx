@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { ImageWithFallback } from '../../../shared/ui/ImageWithFallback';
 import {
   Calendar,
@@ -33,6 +34,7 @@ const BookingList: React.FC<Props> = ({
     y: number;
     booking: BookingType;
   } | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClick = () => setMenuState(null);
@@ -42,7 +44,7 @@ const BookingList: React.FC<Props> = ({
 
   if (loading) {
     return (
-      <div className="p-6 space-y-4 max-h-[600px] overflow-y-auto">
+      <div className="p-6 space-y-4 max-h-[600px] overflow-hidden">
         {Array.from({ length: 6 }).map((_, i) => (
           <BookingSkeleton key={i} />
         ))}
@@ -51,7 +53,7 @@ const BookingList: React.FC<Props> = ({
   }
 
   return (
-    <div className="p-6 space-y-4 max-h-[600px] overflow-y-auto">
+    <div className="p-6 space-y-4 max-h-full overflow-y-auto">
       {bookings.map((booking) => {
         const tourId = String(
           (booking as any).tour_id ?? (booking as any).tourId ?? ''
@@ -72,7 +74,11 @@ const BookingList: React.FC<Props> = ({
               e.preventDefault();
               setMenuState({ x: e.clientX, y: e.clientY, booking });
             }}
-            className="flex flex-col md:flex-row gap-4 p-4 border border-gray-200 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-md group dark:border-gray-700"
+            onClick={() => navigate(`/bookings/${booking.id}`)}
+            role="group"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/bookings/${booking.id}`); } }}
+            className="cursor-pointer flex flex-col md:flex-row gap-4 p-4 border border-gray-200 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-md group dark:border-gray-700"
           >
             <div className="w-full h-40 md:w-24 md:h-24 overflow-hidden rounded-lg shadow-md flex-shrink-0">
               <ImageWithFallback
@@ -105,15 +111,17 @@ const BookingList: React.FC<Props> = ({
                   </span>
 
                   <button
-                    onClick={() => onEdit?.(booking)}
+                    onClick={(e) => { e.stopPropagation(); onEdit?.(booking); }}
                     className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+                    title="Редактировать"
                   >
-                    <Edit className="w-4 h-4" />
+                    <Edit className="w-4 h-4 dark:text-gray-400" />
                   </button>
 
                   <button
-                    onClick={() => onDelete?.(booking.id)}
+                    onClick={(e) => { e.stopPropagation(); onDelete?.(booking.id); }}
                     className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-red-600"
+                    title="Удалить"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -125,7 +133,7 @@ const BookingList: React.FC<Props> = ({
                   {tour.company_id ?? 'N/A'}
                 </span>
 
-                <span className="px-2 py-1 rounded-full flex items-center gap-1">
+                <span className="px-2 py-1 rounded-full flex items-center gap-1 dark:bg-gray-700 bg-gray-200 text-gray-800 dark:text-gray-300">
                   {(booking as any).status === 'Подтверждено' && (
                     <CheckCircle className="w-3 h-3" />
                   )}
@@ -138,7 +146,7 @@ const BookingList: React.FC<Props> = ({
                   {(booking as any).status ?? 'В ожидании'}
                 </span>
 
-                <span className="px-2 py-1 rounded-full flex items-center gap-1">
+                <span className="px-2 py-1 rounded-full flex items-center gap-1 dark:bg-gray-700 bg-gray-200 text-gray-800 dark:text-gray-300">
                   <DollarSign className="w-3 h-3" />
                   {(booking as any).payment_status ??
                     (booking as any).paymentStatus ??

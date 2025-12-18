@@ -5,7 +5,7 @@ interface ConfirmModalProps {
   open: boolean;
   title?: string;
   message?: string;
-  onClose?: () => void;
+  onClose?: (e?: React.MouseEvent) => void;
   autoCloseMs?: number;
 }
 
@@ -26,8 +26,11 @@ export default function ConfirmModal({ open, title, message, onClose, autoCloseM
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/40">
-      <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-lg shadow-xl p-6 flex items-center gap-4">
+    <div
+      className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/40"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) { onClose && onClose(e as any); } }}
+    >
+      <div role="dialog" aria-modal="true" className="max-w-md w-full bg-white dark:bg-gray-900 rounded-lg shadow-xl p-6 flex items-center gap-4">
         <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600">
           <CheckCircle className="w-6 h-6" />
         </div>

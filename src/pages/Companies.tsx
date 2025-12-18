@@ -63,10 +63,10 @@ export function Companies() {
 
   return (
     <div className="min-h-screen p-6 sm:p-8 dark:bg-gray-950">
-      <div className="flex flex-col justify-between mb-8 sm:flex-row sm:items-center">
-        <div className="w-full sm:w-auto">
-          <h1 className="mb-1 text-2xl font-semibold text-gray-900 sm:text-3xl dark:text-white">Компании</h1>
-          <p className="text-sm text-gray-600 sm:text-base dark:text-gray-400">Туроператоры и их статистика</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
+        <div className="w-full sm:w-auto mt-6 sm:mb-0">
+          <h1 className="mb-1 text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white">Компании</h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Туроператоры и их статистика</p>
         </div>
         <button onClick={handleAdd} className="inline-flex items-center justify-center w-full gap-2 px-3 py-2 mt-4 text-sm text-white bg-blue-600 rounded-md sm:w-auto sm:mt-0 sm:px-4 sm:py-2 sm:text-base sm:rounded-lg">
           <Plus className="w-4 h-4" />

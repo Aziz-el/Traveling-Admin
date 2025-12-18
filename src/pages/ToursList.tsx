@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { TourProps, TourType } from '../entities/Tour/model/type';
 import TourCardFull from '../entities/Tour/UI/TourCards/TourCardFull';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
-import TourCardSkeleton from '../entities/Tour/UI/TourCards/TourCardSkeleton';
+import TourCardSkeleton from '../entities/Tour/UI/TourSkeletons/TourCardSkeleton';
 import { useDebounce } from '../shared/hooks/useDebounce';
 import CustomInput from '../shared/ui/input';
 import { useCustomSearchParams } from '../shared/hooks/useCustomSearchParams';

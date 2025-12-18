@@ -32,14 +32,14 @@ export function Users() {
   }
 
   return (
-    <div className="h-full min-h-screen p-8 dark:bg-gray-950">
-      <div className="flex flex-col gap-3 mb-8 sm:flex-row sm:items-center sm:justify-between max-md:mt-5">
+    <div className="h-full min-h-[697px] p-8 dark:bg-gray-950">
+      <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between max-md:mt-5">
   <div>
     <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white">
       Пользователи
     </h1>
     <p className="mt-1 text-sm text-gray-600 sm:text-base dark:text-gray-400">
-     Список пользователей из бэкенда
+     Список пользователе
     </p>
   </div>
 </div>
@@ -88,7 +88,6 @@ export function Users() {
           <h2 className="text-gray-900 dark:text-white">Все пользователи</h2>
         </div>
 
-        {/* Mobile: card list */}
         <div className="md:hidden">
           <div className="p-4 space-y-3">
             {loading ? (
@@ -111,7 +110,6 @@ export function Users() {
           </div>
         </div>
 
-        {/* Desktop: table */}
         <div className="hidden overflow-x-auto md:block">
           <table className="w-full">
             <thead className="border-b border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
