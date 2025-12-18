@@ -28,13 +28,13 @@ export const useCompaniesStore = create<CompaniesState>((set) => ({
 
   fetchCompanies: async () => {
     set({ isLoading: true })
-    const res = await instance.get('/companies')
+    const res = await instance.get('/companies/')
     set({ companies: res.data.items, isLoading: false })
   },
 
   addCompany: async (data) => {
     set({ isLoading: true })
-    const res = await instance.post('/companies', data)
+    const res = await instance.post('/companies/', data)
     set(state => ({
       companies: [...state.companies, res.data],
       isLoading: false
@@ -52,7 +52,7 @@ export const useCompaniesStore = create<CompaniesState>((set) => ({
 
   deleteCompany: async (id) => {
     set({ isLoading: true })
-    await instance.delete(`/companies/${id}`)
+    await instance.delete(`/companies/${id}/`)
     set(state => ({
       companies: state.companies.filter(c => c.id !== id),
       isLoading: false

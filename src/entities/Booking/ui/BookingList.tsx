@@ -13,6 +13,8 @@ import {
 import { Booking as BookingType } from '../model/type';
 import { optimizeImageUrl } from '../../../shared/utils/imageRenderingOptimizator';
 import BookingSkeleton from '../../../shared/ui/skeletons/BookingSkeleton';
+import { useSearchParams } from 'react-router';
+import PaginationCustom from '../../../shared/ui/Pagination';
 
 type Props = {
   bookings: BookingType[];
@@ -34,7 +36,30 @@ const BookingList: React.FC<Props> = ({
     y: number;
     booking: BookingType;
   } | null>(null);
+  
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const ITEMS_PER_PAGE = 5;
+
+  
+  const pageFromUrl = Number(searchParams.get('page')) || 1;
+  const [page, setPage] = useState(pageFromUrl);
+
+  const handlePageChange = (newPage:number) => {
+    setPage(newPage);
+    searchParams.set('page', String(newPage));
+    setSearchParams(searchParams);
+  };
+
+ useEffect(() => {
+    setPage(pageFromUrl);
+  }, [pageFromUrl]);
+
+
+    const paginatedBookings = bookings.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
+  );
 
   useEffect(() => {
     const handleClick = () => setMenuState(null);
@@ -53,8 +78,8 @@ const BookingList: React.FC<Props> = ({
   }
 
   return (
-    <div className="p-6 space-y-4 max-h-full overflow-y-auto">
-      {bookings.map((booking) => {
+    <div className="p-6 space-y-4 max-h-full">
+      {paginatedBookings.map((booking) => {
         const tourId = String(
           (booking as any).tour_id ?? (booking as any).tourId ?? ''
         );
@@ -173,6 +198,13 @@ const BookingList: React.FC<Props> = ({
           </div>
         );
       })}
+              {bookings.length > ITEMS_PER_PAGE && (
+        <PaginationCustom
+          page={page}
+          count={Math.ceil(bookings.length / ITEMS_PER_PAGE)}
+          onChange={handlePageChange}
+        />
+      )}
     </div>
   );
 };

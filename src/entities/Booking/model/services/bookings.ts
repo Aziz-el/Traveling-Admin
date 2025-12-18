@@ -2,7 +2,7 @@ import instance from '../../../../shared/lib/axios/axios';
 import { BookingApi, BookingsListResponse } from '../type';
 
 export const fetchBookings = async (): Promise<BookingsListResponse> => {
-  const response = await instance.get<BookingsListResponse>('/bookings');
+  const response = await instance.get<BookingsListResponse>('/bookings/');
   return response.data;
 };
 
@@ -12,7 +12,7 @@ export const createBooking = async (payload: Partial<BookingApi>): Promise<Booki
     date: payload.date ? new Date(payload.date).toISOString() : undefined,
   } as Partial<BookingApi>;
 
-  const response = await instance.post<BookingApi>('/bookings', body, {
+  const response = await instance.post<BookingApi>('/bookings/', body, {
     headers: { 'Content-Type': 'application/json' },
   });
   return response.data;
@@ -21,7 +21,7 @@ export const createBooking = async (payload: Partial<BookingApi>): Promise<Booki
 export const updateBooking = async (id: number | string, payload: Partial<BookingApi>): Promise<BookingApi> => {
   const body = { ...payload, date: payload.date ? new Date(payload.date).toISOString() : undefined } as Partial<BookingApi>;
   try {
-    const response = await instance.patch<BookingApi>(`/bookings/${id}/status`, body 
+    const response = await instance.patch<BookingApi>(`/bookings/${id}/status/`, body 
       , { headers: { 'Content-Type': 'application/json' } }
     );
     return response.data;
@@ -36,16 +36,16 @@ export const updateBooking = async (id: number | string, payload: Partial<Bookin
 
 export const deleteBooking = async (id: number | string): Promise<void> => {
   try {
-    await instance.delete(`/bookings/${id}`);
+    await instance.delete(`/bookings/${id}/`);
     return;
   } catch (err: any) {
     if (err?.response?.status === 405) {
       try {
-        await instance.post(`/bookings/${id}/delete`);
+        await instance.post(`/bookings/${id}/delete/`);
         return;
       } catch (_) {}
       try {
-        await instance.post(`/bookings/${id}`, {}, { headers: { 'X-HTTP-Method-Override': 'DELETE' } });
+        await instance.post(`/bookings/${id}/`, {}, { headers: { 'X-HTTP-Method-Override': 'DELETE' } });
         return;
       } catch (_) {}
     }
