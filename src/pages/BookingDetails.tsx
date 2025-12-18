@@ -38,7 +38,7 @@ export default function BookingDetails() {
   if (!booking) return <div className="p-6">Бронирование не найдено</div>;
 
   const guests = Number(booking.participants_count ?? booking.guests ?? 1);
-  const tourPrice = Number(booking.tour?.price ?? booking.tour_price ?? 0);
+  const tourPrice = Number(tour?.price ?? 0);
   const totalAmount = tourPrice * guests;
 
   return (

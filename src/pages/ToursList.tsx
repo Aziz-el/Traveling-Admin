@@ -12,7 +12,9 @@ export function ToursList({  onSelectTour, selectedTourId }: TourProps) {
   let loading = useTourStore().loading;
   let {update} = useCustomSearchParams()
    let [search,setSerch] = useState("")
-  const debouncedQuery = useDebounce(search, 300); 
+
+  
+  const debouncedQuery = useDebounce(search, 800); 
   useEffect(() => {
     update("search",debouncedQuery)
 

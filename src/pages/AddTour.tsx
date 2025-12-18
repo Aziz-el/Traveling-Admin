@@ -283,7 +283,7 @@ export function AddTour() {
                       value={formData.company_id}
                       onChange={handleInputChange}
                       options={companies.map(c => ({ value: String(c.id), label: c.name }))}
-                      className=""
+                      className="text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
 

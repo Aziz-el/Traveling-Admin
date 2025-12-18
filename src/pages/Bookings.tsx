@@ -174,7 +174,7 @@ const conversionRate =
             </div>
             <span className="text-green-600 dark:text-green-400">+8%</span>
           </div>
-          <h3 className="mb-1 text-blue-700 dark:text-blue-300">Успешные бронирования</h3>
+          <h3 className="mb-1 text-blue-700 dark:text-blue-300">Отклоненные бронирования</h3>
           <p className="text-blue-900 dark:text-white">{cancelledCount}</p>
         </div>
 

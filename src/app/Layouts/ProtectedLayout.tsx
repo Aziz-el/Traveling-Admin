@@ -32,6 +32,6 @@ export default function ProtectedLayout({children}: {children: React.ReactNode})
         <main className="flex-1 p-4 ">{children}</main>
       </div>
     </div>
-    :<Navigate to="/" replace={true} />
+    :<Navigate to="/login" replace={true} />
   )
 }

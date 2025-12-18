@@ -1,4 +1,3 @@
-import React from 'react'
 import applications from "../entities/Applications/model/fakeData.json"
 import ApplicationCard from '../entities/Applications/ui/ApplicationsCard/ApplicationCard'
 import { ApplicationType } from '../entities/Applications/model/types'

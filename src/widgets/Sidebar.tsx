@@ -13,7 +13,7 @@ interface SidebarProps {
 
 export function Sidebar({ activeSection, setActiveSection, isDarkMode, toggleDarkMode, mobileOpen, onClose, onToggle }: SidebarProps) {
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: '', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'add-tour', label: 'Добавить тур', icon: Plus },
     { id: 'tours', label: 'Туры', icon: MapPin },
     { id: 'companies', label: 'Компании', icon: Building2 },

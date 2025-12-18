@@ -126,8 +126,14 @@ export default function TourCardFull({
             </button>
           </Link>
 
+<<<<<<< HEAD
           <button onClick={(e) => {e.stopPropagation() ; handleDelete(tour.id, tour.title);}}
             className="flex items-center justify-center flex-1 w-full gap-2 px-3 py-2 text-sm text-red-600 rounded-lg bg-red-50 dark:bg-red-950 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900"
+=======
+          <button
+            onClick={(e) => { e.stopPropagation(); handleDelete(tour?.id, tour?.title); }}
+            className="flex items-center justify-center flex-1 gap-2 px-4 py-2.5 text-sm font-medium text-red-600 transition-all duration-200 rounded-lg bg-red-50 dark:bg-red-950 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900"
+>>>>>>> deda606d82e2bbbb9a5a32fd8895fc55a312059f
           >
             <Trash2 className="w-4 h-4" />
             Удалить

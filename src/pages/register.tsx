@@ -8,7 +8,7 @@ export default function RegisterPage() {
   const [company, setCompany] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [role, setRole] = useState<'client' | 'admin' | 'company'>('client');
+  const [role, setRole] = useState('client');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agree, setAgree] = useState(false);
@@ -40,10 +40,8 @@ export default function RegisterPage() {
         full_name: fullName,
         email,
         phone,
-        role,
         password,
       };
-      if (role === 'company' && company.trim()) payload.company = company;
 
       const res = await instance.post('/auth/register', payload);
       const token = res?.data?.token || res?.data?.access || res?.data?.access_token;
@@ -110,22 +108,6 @@ export default function RegisterPage() {
                 <input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} type="password" className="w-full px-3 py-2 text-gray-900 bg-white border rounded-lg dark:bg-gray-800 dark:text-white" placeholder="••••••••" />
               </div>
             </div>
-
-              <div>
-                <label className="block mb-1 text-sm text-gray-700 dark:text-gray-300">Роль</label>
-                <div className="flex gap-3">
-                  <button type="button" onClick={() => setRole('client')} className={`px-3 py-2 rounded-lg ${role === 'client' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white'}`}>Клиент</button>
-                  <button type="button" onClick={() => setRole('admin')} className={`px-3 py-2 rounded-lg ${role === 'admin' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white'}`}>Админ</button>
-                  <button type="button" onClick={() => setRole('company')} className={`px-3 py-2 rounded-lg ${role === 'company' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white'}`}>Компания</button>
-                </div>
-              </div>
-
-            {role === 'company' && (
-              <div>
-                <label className="block mb-1 text-sm text-gray-700 dark:text-gray-300">Компания</label>
-                <input value={company} onChange={(e) => setCompany(e.target.value)} type="text" className="w-full px-3 py-2 text-gray-900 bg-white border rounded-lg dark:bg-gray-800 dark:text-white" placeholder="Название компании" />
-              </div>
-            )}
 
             <div className="flex items-center gap-3">
               <input id="agree" type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="w-4 h-4" />

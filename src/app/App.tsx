@@ -41,12 +41,12 @@ export default function App() {
     return (
       <ToastProvider>
       <Routes>
-          <Route path ="/" element={<Login />} />
+          <Route path ="Login" element={<Login />} />
           <Route path ="register" element={<Register />} />
           <Route path="*" element={
            <ProtectedLayout>
                 <Routes>
-                  <Route path='dashboard' element={<Dashboard onMapItemClick={handleMapItemClick} onSelectTour={handleSelectTour} selectedTourId={selectedTourId} />} />
+                  <Route path='/' element={<Dashboard onMapItemClick={handleMapItemClick} onSelectTour={handleSelectTour} selectedTourId={selectedTourId} />} />
                   <Route path='add-tour' element={<AddTour  />}/>
                   <Route path='tours' element={<ToursList 
   
