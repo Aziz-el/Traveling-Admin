@@ -5,16 +5,26 @@ import { TourType } from './type';
 export const useTourStore = create<{
     tours: TourType[],
     loading: boolean,
-    fetchTours: (params?:Record<string, string | number | undefined> | undefined) => void,
+    fetchTours: (params?:Record<string, string | number | undefined|null> | undefined) => Promise<any>,
     addTour: (tour: TourType
     ) => Promise<void>,
     updateTour: (id: string, updatedTour: any) => Promise<void>,
+    getTourById:(id: string|number)=>Promise<any>,
     deleteTour: (id: string) => Promise<void>,
     
 }>((set) => ({
     tours: [] as TourType[],
     loading: false,
-    fetchTours: async (params?:Record<string, string | number | undefined|undefined> | undefined) => {
+    getTourById :async (id:string|number) => {
+        
+        set({loading:true});
+        let res = instance.get(`/tours/${id}`)
+        res.then(re=>{
+            set({loading:false});
+        })
+        return res
+    },
+    fetchTours: async (params?:Record<string, string | number | undefined|null> | undefined) => {
         
         set({loading:true});
         let res = instance.get('/tours/',{params: params?params:[]})
@@ -22,6 +32,7 @@ export const useTourStore = create<{
             console.error("Failed to fetch tours:", error);
             set({loading:false});
         });
+        return res
     },
     addTour: async (tour: TourType) => {
         try {

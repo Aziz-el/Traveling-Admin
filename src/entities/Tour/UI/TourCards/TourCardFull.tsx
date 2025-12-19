@@ -9,6 +9,7 @@ import ConfirmDialog from '../../../../shared/ui/ConfirmDialog';
 import ConfirmModal from '../../../../shared/ui/ConfirmModal';
 import { useToast } from '../../../../shared/ui/Toast';
 import { useState } from 'react';
+import { useCustomSearchParams } from '../../../../shared/hooks/useCustomSearchParams';
 
 export default function TourCardFull({
   tour,
@@ -29,7 +30,6 @@ export default function TourCardFull({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmMsg, setConfirmMsg] = useState('');
   const { showToast } = useToast();
-
   const handleEdit = (tour: TourType) => {  
     setEditingTour?.(tour);
     setFormData?.(tour);
@@ -48,7 +48,7 @@ export default function TourCardFull({
     <>
     <div
       key={tour?.id}
-      onClick={() => { onSelectTour?.(tour?.id); navigate(`/tours/${tour?.id}`); }}
+      onClick={() => { onSelectTour?.(tour?.id); navigate(`/tours/${tour?.id}`) }}
       className={`relative bg-white dark:bg-gray-900 rounded-xl shadow-md border overflow-hidden hover:shadow-2xl transition-all duration-300 group cursor-pointer 
         ${selectedTourId === tour?.id
           ? 'border-blue-500 dark:border-blue-400 ring-2 ring-blue-100 dark:ring-blue-900'
@@ -115,7 +115,7 @@ export default function TourCardFull({
           </div>
         </div>
 
-        <div className="flex gap-3 @max-[420px]:flex-col @max-[420px]:gap-2">
+        <div className="flex gap-3 flex-col @max-[420px]:gap-2 ">
           <Link to={`/edit-tour/${tour.id}`} className="flex-1">
             <button
               onClick={(e) => e.stopPropagation()}
@@ -126,14 +126,8 @@ export default function TourCardFull({
             </button>
           </Link>
 
-<<<<<<< HEAD
           <button onClick={(e) => {e.stopPropagation() ; handleDelete(tour.id, tour.title);}}
             className="flex items-center justify-center flex-1 w-full gap-2 px-3 py-2 text-sm text-red-600 rounded-lg bg-red-50 dark:bg-red-950 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900"
-=======
-          <button
-            onClick={(e) => { e.stopPropagation(); handleDelete(tour?.id, tour?.title); }}
-            className="flex items-center justify-center flex-1 gap-2 px-4 py-2.5 text-sm font-medium text-red-600 transition-all duration-200 rounded-lg bg-red-50 dark:bg-red-950 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900"
->>>>>>> deda606d82e2bbbb9a5a32fd8895fc55a312059f
           >
             <Trash2 className="w-4 h-4" />
             Удалить

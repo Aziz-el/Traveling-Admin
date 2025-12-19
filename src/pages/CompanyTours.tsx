@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router'
 import { useTourStore } from '../entities/Tour/model/useTourStore'
 import TourCardFull from '../entities/Tour/UI/TourCards/TourCardFull'
@@ -8,20 +8,84 @@ import { Building2, Clock, Globe, MapPin } from 'lucide-react'
 import CustomInput from '../shared/ui/input'
 import { useDebounce } from '../shared/hooks/useDebounce'
 import { useCustomSearchParams } from '../shared/hooks/useCustomSearchParams'
+import { TourType } from '../entities/Tour/model/type'
 
 export default function CompanyTours() {
   const { id } = useParams()
-  const { tours, fetchTours, loading } = useTourStore()
+  const { loading } = useTourStore()
+  const toursStore = useTourStore()
   const { fetchCompanies, companies } = useCompaniesStore()
-  let {update}= useCustomSearchParams()
-  let [search,setSerch] = useState("")
-  const debouncedQuery = useDebounce(search, 300); 
+  const { update } = useCustomSearchParams()
+  
+  const [search, setSearch] = useState("")
+  const [page, setPage] = useState(1)
+  const [allTours, setAllTours] = useState<TourType[][]>([])
+  const [isFetching, setIsFetching] = useState(false)
+  
+  const debouncedQuery = useDebounce(search, 800)
+  const bottomRef = useRef<HTMLDivElement>(null)
+
+  // Сброс при изменении поиска
+  useEffect(() => {
+    setPage(0)
+    setAllTours([])
+  }, [debouncedQuery])
+
+  // Загрузка данных
   useEffect(() => {
     if (!id) return
-    update("search",debouncedQuery)
-    fetchCompanies()
-    fetchTours({ company_id: id ,search :debouncedQuery})
-  }, [id,debouncedQuery])
+    
+    setIsFetching(true)
+    update("search", debouncedQuery)
+    if (page === 0) {
+      fetchCompanies()
+    }
+    
+    if (page !== 0) {
+      toursStore
+        .fetchTours({ 
+          company_id: id, 
+          search: debouncedQuery, 
+          page, 
+          per_page: 12 
+        })
+        .then(() => {
+          setAllTours(prev =>
+            page === 1
+              ? [toursStore.tours]
+              : [...prev, toursStore.tours]
+          )
+        })
+        .finally(() => setIsFetching(false))
+    }
+  }, [id, debouncedQuery, page])
+
+  // Intersection Observer для бесконечного скролла
+  useEffect(() => {
+    if (!bottomRef.current) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (
+          entry.isIntersecting &&
+          !loading &&
+          !isFetching &&
+          toursStore.tours.length > 0
+        ) {
+          setTimeout(() => {
+            setPage(prev => prev + 1)
+          }, 100)
+        }
+      },
+      { 
+        threshold: 0,
+        rootMargin: '500px' // Загружаем за 500px до конца
+      }
+    )
+
+    observer.observe(bottomRef.current)
+    return () => observer.disconnect()
+  }, [loading, isFetching, toursStore.tours.length])
 
   const company = companies.find(el => el.id == (id ?? -1))
 
@@ -54,23 +118,41 @@ export default function CompanyTours() {
           </div>
         </div>
       </div>
+
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
         <h2 className="mb-2 text-xl font-semibold dark:text-white sm:mb-0">Туры компании</h2>
-         <CustomInput value={search} name='search' onChange={(e)=> setSerch(e.target.value)} placeholder='Поиск' className='sm:max-w-[200px]' />
+        <CustomInput 
+          value={search} 
+          name='search' 
+          onChange={(e) => setSearch(e.target.value)} 
+          placeholder='Поиск' 
+          className='sm:max-w-[200px]' 
+        />
       </div>
-      {loading ? (
+
+      {loading && allTours.length === 0 ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {Array.from({ length: 8 }).map((_, i) => (
+          {Array.from({ length: 12 }).map((_, i) => (
             <TourCardSkeleton key={i} />
           ))}
         </div>
       ) : (
         <>
-          {tours.length > 0 ? (
+          {allTours.length > 0 || (loading || isFetching) ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {tours.map(tour => (
-                <TourCardFull key={tour.id} tour={tour} />
-              ))}
+              {allTours.map((pageTours, pageIndex) =>
+                pageTours.map(tour => (
+                  <TourCardFull
+                    key={`${pageIndex}-${tour.id}`}
+                    tour={tour}
+                  />
+                ))
+              )}
+
+              {(loading || isFetching) && allTours.length > 0 &&
+                Array.from({ length: 6 }).map((_, i) => (
+                  <TourCardSkeleton key={`loading-${i}`} />
+                ))}
             </div>
           ) : (
             <div className="py-12 text-center text-gray-500">
@@ -79,6 +161,8 @@ export default function CompanyTours() {
           )}
         </>
       )}
+
+      <div ref={bottomRef} className="h-4 mt-12" />
     </div>
   )
 }

@@ -29,7 +29,7 @@
         const token = response?.data?.token || response?.data?.access || response?.data?.access_token;
         if (token) {
           try { localStorage.setItem('token', token); } catch {}
-          navigate('/dashboard');
+          navigate('/');
         } else {
           setError('Не удалось получить токен. Проверьте данные.');
         }

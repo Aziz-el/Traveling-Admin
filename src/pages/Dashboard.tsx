@@ -10,6 +10,10 @@ import TourCardMid from '../entities/Tour/UI/TourCards/TourCardMid';
 import { useBookingStore } from '../entities/Booking/model/useBookingStore';
 import TourCardMiniSkeleton from '../entities/Tour/UI/TourSkeletons/TourCardMiniSkeleton';
 import TourCardMidSkeleton from '../entities/Tour/UI/TourSkeletons/TourCardMidSkeleton';
+import { useEffect, useState } from 'react';
+import { useCustomSearchParams } from '../shared/hooks/useCustomSearchParams';
+import instance from '../shared/lib/axios/axios';
+import { TourType } from '../entities/Tour/model/type';
 
 interface DashboardProps {
   onMapItemClick?: (tourId: string, x: number, y: number) => void;
@@ -18,8 +22,19 @@ interface DashboardProps {
 }
 
 export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: DashboardProps) {
-  let tours = useTourStore().tours;
-  const activeTours = tours.filter(t => t.is_active === true);
+  let {tours,fetchTours} = useTourStore()
+  let [page,setPage] = useState(1)
+  let {update} = useCustomSearchParams()
+  useEffect(()=>{
+    fetchTours({page:page,per_page:8})
+    update("page",`${page}`)
+  },[])
+  const [activeTours,setActive] = useState([] as TourType[])
+   instance.get("tours/",{
+    params:{
+      sort_by:"rating"
+    }
+  }).then(res=>setActive(res.data.items))
   const totalRevenue = tours.reduce((sum, tour) => sum + tour.price, 0);
   const avgPrice = tours.length > 0 ? totalRevenue / tours.length : 0; 
   const bookings =useBookingStore().bookings;
@@ -88,7 +103,7 @@ export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: Das
           <div className="p-6">
             <div className="grid grid-cols-1 gap-3 2xl:grid-cols-1">
               {activeTours.length == 0 ? <> {Array.from({ length: 4 }).map((_, index) => <TourCardMiniSkeleton  key={index}/>)}
-              </> : <>{activeTours.slice(0, 5).map((tour) => (
+              </> : <>{activeTours.slice(0, 4).map((tour) => (
                 <TourCardMini key={tour.id} tour={tour} onSelectTour={onSelectTour}/>
               ))}</>}
             </div>
