@@ -18,13 +18,12 @@ export const CustomCalendar: React.FC<CustomDateTimePickerProps> = ({ name, valu
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const handleChange = (dateTime: string) => {
     onChange({ target: { name, value: dateTime } } as unknown as React.ChangeEvent<HTMLInputElement>);
-    setIsOpen(false);
   };
 
   return (
