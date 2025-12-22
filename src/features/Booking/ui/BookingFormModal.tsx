@@ -33,7 +33,7 @@ export const BookingFormModal: React.FC<Props> = ({ open, onClose, tours, onSucc
     const DD = pad(d.getDate());
     const hh = pad(d.getHours());
     const mm = pad(d.getMinutes());
-    return `${YYYY}-${MM}-${DD}T${hh}:${mm}`;
+    return `${DD}-${MM}-${YYYY} ${hh}:${mm}`;
   };
 
   useEffect(() => {

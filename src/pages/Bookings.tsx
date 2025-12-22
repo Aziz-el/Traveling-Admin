@@ -74,7 +74,7 @@ export function Bookings() {
   const handleNavigateToTour = (tourId: string) => {
     const tour = tours.find(t => String(t.id) === String(tourId));
     if (tour) {
-      navigate(`/tours/${tour.id}`);
+      navigate(`/tours/${tour.id}/`);
     }
   };
 

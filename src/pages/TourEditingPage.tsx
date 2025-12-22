@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import  { useEffect, useState } from 'react'
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 import { TourType } from '../entities/Tour/model/type';
 import { useNavigate, useParams } from 'react-router';
@@ -12,8 +12,8 @@ export default function TourEditingPage() {
 console.log(tour);
 
     let onUpdateTour = toursStore.updateTour;
-    const [confirmOpen, setConfirmOpen] = React.useState(false);
-    const [confirmMsg, setConfirmMsg] = React.useState('');
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmMsg, setConfirmMsg] = useState('');
     const [editingTour, setEditingTour] = useState<TourType | null | undefined>(null);
     const [formData, setFormData] = useState<TourType | null |undefined>(null);
     useEffect(() => {

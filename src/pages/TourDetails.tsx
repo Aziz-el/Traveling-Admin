@@ -5,19 +5,23 @@ import { useTourStore } from '../entities/Tour/model/useTourStore';
 import { MapPin, Star, Users, Clock, DollarSign, CheckCircle, Book } from 'lucide-react';
 import ConfirmModal from '../shared/ui/ConfirmModal';
 import { BookingFormModal } from '../features/Booking/ui/BookingFormModal';
+import { TourType } from '../entities/Tour/model/type';
 
 export default function TourDetails() {
   let toursStore = useTourStore();
   let tours = toursStore.tours;
+  let [tour,setTour] = useState({} as TourType)
+  const { id} = useParams();
 
-  useEffect(() => {
-    toursStore.fetchTours();
-  }, []);
-
-  const { id } = useParams();
   const navigate = useNavigate();
-
-  const tour = tours.find(t => t.id == id);
+  console.log(tours);
+  
+ useEffect(()=>{
+   toursStore.getTourById(id ? id : 0).then(el=>{
+    setTour(el.data)
+  }
+  )
+ },[])
 
   const [createOpen, setCreateOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);

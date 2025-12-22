@@ -1,5 +1,4 @@
-// Companies.tsx
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useCompaniesStore } from '../entities/Companies/model/useCompanyStore'
 import { useTourStore } from '../entities/Tour/model/useTourStore'
 import { Plus } from 'lucide-react'
