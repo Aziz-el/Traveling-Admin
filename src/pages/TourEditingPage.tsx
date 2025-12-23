@@ -8,9 +8,12 @@ export default function TourEditingPage() {
     let toursStore = useTourStore()
     let id = useParams().id;
     let navigate = useNavigate();
-    const tour = toursStore.tours.find(t=>t.id == id)
-console.log(tour);
-
+    const [tour ,setTour ] = useState<TourType>()
+   useEffect(()=>{
+     toursStore.getTourById(`${id}`).then(el=>{
+      setTour(el.data)
+    })
+   },[])
     let onUpdateTour = toursStore.updateTour;
     const [confirmOpen, setConfirmOpen] = React.useState(false);
     const [confirmMsg, setConfirmMsg] = React.useState('');
@@ -162,26 +165,26 @@ console.log(tour);
         <div className="space-y-4">
           <h3 className="font-medium dark:text-white">Расписание</h3>
 
-          {["day1", "day2", "day3"].map((day) => (
-            <div key={day} className="p-4 border rounded-lg dark:border-gray-700">
+          {Object.values(tour? tour.schedule : {}).map((day,index) => (
+            <div key={day.title} className="p-4 border rounded-lg dark:border-gray-700">
               <p className="mb-2 font-medium dark:text-white">
-                {day.toUpperCase()}
+                {day.title.toUpperCase()}
               </p>
 
               <input
                 type="text"
-                value={formData?.schedule?.[day]?.title || ""}
+                value={formData?.schedule?.[`day_${index+1}`]?.title || formData?.schedule?.[`day${index+1}`]?.desc||""}
                 onChange={(e) =>
-                  handleScheduleChange(day, "title", e.target.value)
+                  handleScheduleChange(day.title, "title", e.target.value)
                 }
                 placeholder="Название"
                 className="w-full px-4 py-2 mb-2 bg-white border rounded-lg dark:bg-gray-800 dark:text-white"
               />
 
               <textarea
-                value={formData?.schedule?.[day]?.desc || ""}
+                value={formData?.schedule?.[`day_${index+1}`]?.desc || formData?.schedule?.[`day${index+1}`]?.desc||""}
                 onChange={(e) =>
-                  handleScheduleChange(day, "desc", e.target.value)
+                  handleScheduleChange(day.desc, "desc", e.target.value)
                 }
                 placeholder="Описание"
                 rows={2}

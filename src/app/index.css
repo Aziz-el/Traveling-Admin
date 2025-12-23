@@ -190,3 +190,7 @@ html {
   font-size: var(--font-size);
 }
 
+button{
+  cursor:pointer;
+  transition: all 0.5s;
+}

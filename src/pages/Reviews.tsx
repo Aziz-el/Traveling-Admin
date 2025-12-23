@@ -100,7 +100,7 @@ export default function Reviews() {
   };
 
   return (
-    <div className="p-8 dark:bg-[#0a0a0f] min-h-[697px] overflow-x-hidden">
+    <div className="p-8 dark:bg-[#0a0a0f] min-h-[670px] overflow-x-hidden">
      <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between max-md:mt-5">
   <div>
     <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white">

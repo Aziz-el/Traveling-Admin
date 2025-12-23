@@ -23,11 +23,6 @@ import Applications from '../pages/Applications';
 export default function App() {
   const [selectedTourId, setSelectedTourId] = useState<string | null>(null);
   const [miniCard, setMiniCard] = useState<{ tourId: string; x: number; y: number } | null>(null);
-  let toursStore = useTourStore();
-  let toursData = toursStore.tours;
-  useEffect(() => {
-    toursStore.fetchTours();
-  }, []);
     
   const handleSelectTour = (id: string) => {
     setSelectedTourId(id);

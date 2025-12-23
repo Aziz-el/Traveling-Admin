@@ -120,7 +120,7 @@ export default function TourDetails() {
               </div>
             </div>
           </div>
-
+          
           <aside className="lg:col-span-1">
             <div className="sticky top-20 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
@@ -139,10 +139,40 @@ export default function TourDetails() {
                 <Users className="w-4 h-4" /> {tour.capacity}
               </div>
               <button className="w-full mb-3 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold" onClick={() => setCreateOpen(true)}>Забронировать</button>
-              <button className="w-full mb-2 px-4 py-2 border border-gray-200 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50">Посмотреть на карте</button>
+              <button className="w-full mb-2 px-4 py-2 border border-gray-200 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Посмотреть на карте</button>
               <div className="text-xs text-gray-500 text-center mt-3">Быстрое бронирование · Гарантия лучшей цены</div>
             </div>
           </aside>
+          {tour.schedule && Object.keys(tour.schedule).length > 0 && (
+  <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-800">
+    <h2 className="text-lg font-semibold dark:text-white mb-4">
+      Расписание тура
+    </h2>
+
+    <div className="space-y-4">
+      {Object.entries(tour.schedule).map(([key, item]) => (
+        <div
+          key={key}
+          className="flex gap-4 p-4 rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950"
+        >
+          <div className="w-10 h-10 flex items-center justify-center rounded-md bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400">
+            <Book className="w-5 h-5" />
+          </div>
+
+          <div>
+            <div className="text-sm font-medium text-gray-900 dark:text-white">
+              {item.title}
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              {item.desc}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
         </div>
       </div>
       <BookingFormModal open={createOpen} onClose={() => { setCreateOpen(false); }} tours={tours} onSuccess={(m) => { setConfirmMsg(m ?? 'Бронирование успешно создано'); setConfirmOpen(true); }} />
