@@ -9,9 +9,12 @@ import {
   Sun,
   Star,
   Menu,
-  Dock
+  Dock,
+  LucideProps
 } from 'lucide-react'
 import { Link } from 'react-router'
+import checkAuth from '../features/Auth/model/services/checkAuth'
+import { ForwardRefExoticComponent, useEffect, useState } from 'react'
 
 interface SidebarProps {
   activeSection?: string
@@ -32,7 +35,7 @@ export function Sidebar({
   onClose,
   onToggle
 }: SidebarProps) {
-  const menuItems = [
+  const menuItemsAdmin = [
     { id: '', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'add-tour', label: 'Добавить тур', icon: Plus },
     { id: 'tours', label: 'Туры', icon: MapPin },
@@ -43,6 +46,40 @@ export function Sidebar({
     { id: 'applications', label: 'Заявки', icon: Dock }
   ]
 
+  const menuItemsCompany = [
+    { id: '', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'add-tour', label: 'Добавить тур', icon: Plus },
+    { id: 'tours', label: 'Туры', icon: MapPin },
+    { id: 'companies', label: 'Моя компании', icon: Building2 },
+    { id: 'bookings', label: 'Мои Ббронирования', icon: CalendarCheck },
+    { id: 'reviews', label: 'Мои отзывы', icon: Star },
+    { id: 'applications', label: 'Мои заявки', icon: Dock }
+  ]
+  const menuItemsClient = [
+    { id: '', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'companies', label: 'Моя компании', icon: Building2 },
+    { id: 'tours', label: 'Туры', icon: MapPin },
+    { id: 'bookings', label: 'Мои Бронирования', icon: CalendarCheck },
+    { id: 'reviews', label: 'Мои Отзывы', icon: Star },
+    { id: 'applications', label: 'Мои Заявки', icon: Dock }
+  ]
+  let [role,setRole] = useState()
+
+  useEffect(()=>{
+    checkAuth()?.then(res=>{
+      setRole(res.data.role)
+    })
+  }  ,[])
+  let menuItems:{id:string,label:string,icon:ForwardRefExoticComponent<Omit<LucideProps, "ref">>}[] = []
+  if(role=="admin"){
+    menuItems = menuItemsAdmin
+  }
+  else if(role == "client"){
+    menuItems = menuItemsClient
+  }
+  else if(role == "company"){
+    menuItems = menuItemsCompany
+  }
   return (
     <>
       {/* Mobile topbar (до 1024px) */}

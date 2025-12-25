@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { TourProps, TourType } from '../entities/Tour/model/type'
 import TourCardFull from '../entities/Tour/UI/TourCards/TourCardFull'
 import { useTourStore } from '../entities/Tour/model/useTourStore'

@@ -2,8 +2,6 @@
 import { StatsCard } from '../shared/components/StatsCard';
 import { InteractiveMap } from '../shared/components/InteractiveMap';
 import { MapPin, Users, DollarSign, TrendingUp } from 'lucide-react';
-import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
-import { formatDateRange } from '../shared/utils/formatDate';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 import TourCardMini from '../entities/Tour/UI/TourCards/TourCardMini';
 import TourCardMid from '../entities/Tour/UI/TourCards/TourCardMid';
@@ -30,11 +28,13 @@ export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: Das
     update("page",`${page}`)
   },[])
   const [activeTours,setActive] = useState([] as TourType[])
-   instance.get("tours/",{
+  useEffect(()=>{
+    instance.get("tours/",{
     params:{
       sort_by:"rating"
     }
   }).then(res=>setActive(res.data.items))
+  },[])
   const totalRevenue = tours.reduce((sum, tour) => sum + tour.price, 0);
   const avgPrice = tours.length > 0 ? totalRevenue / tours.length : 0; 
   const bookings =useBookingStore().bookings;

@@ -10,17 +10,17 @@ interface CompanyModalProps {
 
 export function CompanyModal({ open, initialData, onClose, onSave }: CompanyModalProps) {
   const [form, setForm] = useState<CompanyForm>({
-    name: '',
-    address: '',
+    company_name: '',
+    company_address: '',
     work_hours: '',
-    website: ''
+    company_website: ''
   })
 
   useEffect(() => {
     if (initialData) {
       setForm(initialData)
     } else {
-      setForm({ name: '', address: '', work_hours: '', website: '' })
+      setForm({ company_name: '', company_address: '', work_hours: '', company_website: '' })
     }
   }, [initialData])
 
@@ -44,15 +44,15 @@ export function CompanyModal({ open, initialData, onClose, onSave }: CompanyModa
 
         <div className="space-y-3">
           <input
-            value={form.name}
-            onChange={e => setForm({ ...form, name: e.target.value })}
+            value={form.company_name}
+            onChange={e => setForm({ ...form, company_name: e.target.value })}
             placeholder="Название компании"
             className="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
           />
 
           <input
-            value={form.address}
-            onChange={e => setForm({ ...form, address: e.target.value })}
+            value={form.company_address}
+            onChange={e => setForm({ ...form, company_address: e.target.value })}
             placeholder="Адрес"
             className="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
           />
@@ -65,8 +65,8 @@ export function CompanyModal({ open, initialData, onClose, onSave }: CompanyModa
           />
 
           <input
-            value={form.website}
-            onChange={e => setForm({ ...form, website: e.target.value })}
+            value={form.company_website}
+            onChange={e => setForm({ ...form, company_website: e.target.value })}
             placeholder="Сайт"
             className="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
           />

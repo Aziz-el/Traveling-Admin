@@ -25,13 +25,11 @@ export default function CompanyTours() {
   const debouncedQuery = useDebounce(search, 800)
   const bottomRef = useRef<HTMLDivElement>(null)
 
-  // Сброс при изменении поиска
   useEffect(() => {
     setPage(0)
     setAllTours([])
   }, [debouncedQuery])
 
-  // Загрузка данных
   useEffect(() => {
     if (!id) return
     
@@ -60,7 +58,6 @@ export default function CompanyTours() {
     }
   }, [id, debouncedQuery, page])
 
-  // Intersection Observer для бесконечного скролла
   useEffect(() => {
     if (!bottomRef.current) return
 
@@ -79,7 +76,7 @@ export default function CompanyTours() {
       },
       { 
         threshold: 0,
-        rootMargin: '500px' // Загружаем за 500px до конца
+        rootMargin: '500px' 
       }
     )
 

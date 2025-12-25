@@ -5,7 +5,6 @@ import { useTourStore } from '../entities/Tour/model/useTourStore';
 import { MapPin, Star, Users, Clock, DollarSign, CheckCircle, Book } from 'lucide-react';
 import ConfirmModal from '../shared/ui/ConfirmModal';
 import { BookingFormModal } from '../features/Booking/ui/BookingFormModal';
-import { useCustomSearchParams } from '../shared/hooks/useCustomSearchParams';
 import { TourType } from '../entities/Tour/model/type';
 
 export default function TourDetails() {

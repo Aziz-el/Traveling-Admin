@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import  instance from '../shared/lib/axios/axios';
 import {  Plane} from 'lucide-react';
 import { Link } from 'react-router';

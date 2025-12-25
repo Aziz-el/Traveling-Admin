@@ -3,9 +3,9 @@ export type Company = {
   name: string;
 };
 export interface CompanyForm {
-    id?: number
-  name: string
-  address: string
+  id?: number
+  company_name: string
+  company_address: string
   work_hours: string
-  website: string
+  company_website: string
 }
