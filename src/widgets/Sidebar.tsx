@@ -50,15 +50,15 @@ export function Sidebar({
     { id: '', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'add-tour', label: 'Добавить тур', icon: Plus },
     { id: 'tours', label: 'Туры', icon: MapPin },
-    { id: 'companies', label: 'Моя компании', icon: Building2 },
+    { id: 'my-company', label: 'Моя компании', icon: Building2 },
     { id: 'bookings', label: 'Мои Ббронирования', icon: CalendarCheck },
     { id: 'reviews', label: 'Мои отзывы', icon: Star },
     { id: 'applications', label: 'Мои заявки', icon: Dock }
   ]
   const menuItemsClient = [
     { id: '', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'my-company', label: 'Моя компании', icon: Building2 },
     { id: 'tours', label: 'Туры', icon: MapPin },
+    { id: 'companies', label: 'Компании', icon: Building2 },
     { id: 'bookings', label: 'Мои Бронирования', icon: CalendarCheck },
     { id: 'reviews', label: 'Мои Отзывы', icon: Star },
     { id: 'applications', label: 'Мои Заявки', icon: Dock }

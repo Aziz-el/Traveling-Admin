@@ -13,7 +13,6 @@ export function Companies() {
   const tours = useTourStore(state => state.tours)
   const { companies, fetchCompanies, updateCompany, isLoading } = useCompaniesStore()
   const {createApplication} = useApplicationStore()
-
   const [modalOpen, setModalOpen] = useState(false)
   const [editingId, setEditingId] = useState<number | null | undefined>(null)
   const [editingCompany, setEditingCompany] = useState<CompanyForm>({
