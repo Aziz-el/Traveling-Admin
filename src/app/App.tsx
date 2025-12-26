@@ -20,6 +20,7 @@ import BookingDetails from '../pages/BookingDetails';
 import NotFound from '../pages/NotFound';
 import CompanyTours from '../pages/CompanyTours';
 import Applications from '../pages/Applications';
+import UserDetails from '../pages/UserDetails';
 export default function App() {
   const [selectedTourId, setSelectedTourId] = useState<string | null>(null);
   const [miniCard, setMiniCard] = useState<{ tourId: string; x: number; y: number } | null>(null);
@@ -60,6 +61,7 @@ export default function App() {
                   <Route path='bookings' element={<Bookings />}/>
                   <Route path='bookings/:id' element={<BookingDetails />} />
                   <Route path='users' element={<Users />}/>
+                  <Route path='users/:id' element={<UserDetails />} />
                   {/* <Route path='routes' element={<RoutesPage />}/> */}
                   <Route path='reviews' element={<Reviews/>}/>
                   {/* <Route path='settings' element={<Settings />}/> */}

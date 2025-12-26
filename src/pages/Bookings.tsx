@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import {DollarSign, CheckCircle, Clock, CheckCircle2, TrendingUp, XCircle } from 'lucide-react';
 import { useCompaniesStore } from '../entities/Companies/model/useCompanyStore';
 import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 
 import { useBookingStore } from '../entities/Booking/model/useBookingStore';
-import BookingList from '../entities/Booking/ui/BookingList';
-import BookingFormModal from '../features/Booking/ui/BookingFormModal';
-import BookingEditModal from '../features/Booking/ui/BookingEditModal';
+const BookingList = lazy(() => import('../entities/Booking/ui/BookingList'));
+const BookingFormModal = lazy(() => import('../features/Booking/ui/BookingFormModal'));
+const BookingEditModal = lazy(() => import('../features/Booking/ui/BookingEditModal'));
 import ConfirmModal from '../shared/ui/ConfirmModal';
 import ConfirmDialog from '../shared/ui/ConfirmDialog';
 import { useToast } from '../shared/ui/Toast';
@@ -18,21 +18,70 @@ import { useNavigate } from 'react-router';
 export function Bookings() {
   const tours = useTourStore().tours;
   const { companies } = useCompaniesStore();
-  const bookingStore = useBookingStore();
+  const bookingsRaw = useBookingStore((s) => s.bookings);
+  const fetchBookings = useBookingStore((s) => s.fetchBookings);
+  const addBooking = useBookingStore((s) => s.addBooking);
+  const removeBooking = useBookingStore((s) => s.removeBooking);
+
   const [loadingBookings, setLoadingBookings] = useState(true);
-  const bookingsRaw = bookingStore.bookings; 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
-    (async () => {
-      setLoadingBookings(true);
-      try {
-        await bookingStore.fetchBookings();
-      } finally {
-        setLoadingBookings(false);
-      }
-    })();
+    let mounted = true;
+    setLoadingBookings(true);
+    fetchBookings()
+      .catch((err) => console.debug('Fetch bookings failed', err))
+      .finally(() => { if (mounted) setLoadingBookings(false); });
+    return () => { mounted = false; };
+  }, [fetchBookings]);
+
+  const bookings = useMemo(() => bookingsRaw.map(b => ({
+    id: String(b.id),
+    tourId: String((b as any).tour_id ?? (b as any).tourId ?? ''),
+    title: (b as any).title ?? '',
+    image_url: (b as any).image_url ?? '',
+    date: b.date,
+    status: (b as any).status ? String((b as any).status) : 'В ожидании',
+    paymentStatus: (b as any).payment_status ?? 'Ожидает оплаты',
+    amount: (b as any).amount ?? 0,
+    guests: (b as any).participants_count ?? (b as any).guests ?? 1,
+  })), [bookingsRaw]);
+
+  const toursMap: Record<string, any> = useMemo(() => {
+    const m: Record<string, any> = {};
+    tours.forEach(t => { m[String(t.id)] = t; });
+    return m;
+  }, [tours]);
+
+  const onEdit = useCallback((b: any) => { setEditingBooking(b); setEditOpen(true); }, []);
+  const onDelete = useCallback((id: any) => { setPendingDelete(Number(id)); setDialogOpen(true); }, []);
+  const handleCreateChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setNewBooking((prev: any) => ({ ...prev, [name]: name === 'amount' || name === 'guests' ? Number(value) : value }));
   }, []);
+
+  const handleNavigateToTour = useCallback((tourId: string) => {
+    const tour = tours.find(t => String(t.id) === String(tourId));
+    if (tour) {
+      navigate(`/tours/${tour.id}/`);
+    }
+  }, [navigate, tours]);
+
+  const getTourById = useCallback((id: string) => {
+    return tours.find(t => String(t.id) === String(id));
+  }, [tours]);
+
+  const stats = useMemo(() => {
+    const totalBookings = bookings.length;
+    const confirmedCount = bookings.filter(b => b.status === 'confirmed').length;
+    const pendingCount = bookings.filter(b => b.status === 'pending').length;
+    const cancelledCount = bookings.filter(b => b.status === 'cancelled').length;
+    const totalGuests = bookings.reduce((sum, b) => sum + Number(b.guests || 0), 0);
+    const totalRevenue = bookings.filter(b => b.status === 'confirmed').reduce((sum, b) => sum + Number(b.amount || 0), 0);
+    const averageCheck = confirmedCount > 0 ? Math.round(totalRevenue / confirmedCount) : 0;
+    const conversionRate = totalBookings > 0 ? Math.round((confirmedCount / totalBookings) * 100) : 0;
+    return { totalBookings, confirmedCount, pendingCount, cancelledCount, totalGuests, totalRevenue, averageCheck, conversionRate };
+  }, [bookings]);
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editingBooking, setEditingBooking] = useState<any>(null);
@@ -51,33 +100,6 @@ export function Bookings() {
     guests: 1,
   });
 
-  const bookings = bookingsRaw.map(b => ({
-    id: String(b.id),
-    tourId: String((b as any).tour_id ?? (b as any).tourId ?? ''),
-    title: (b as any).title ?? '',
-    image_url: (b as any).image_url ?? '',
-    date: b.date,
-    status: (b as any).status ? String((b as any).status) : 'В ожидании',
-    paymentStatus: (b as any).payment_status ?? 'Ожидает оплаты',
-    amount: (b as any).amount ?? 0,
-    guests: (b as any).participants_count ?? (b as any).guests ?? 1,
-  }));
-
-  const toursMap: Record<string, any> = {};
-  tours.forEach(t => { toursMap[String(t.id)] = t; });
-
-  const handleCreateChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setNewBooking((prev: any) => ({ ...prev, [name]: name === 'amount' || name === 'guests' ? Number(value) : value }));
-  };
-
-  const handleNavigateToTour = (tourId: string) => {
-    const tour = tours.find(t => String(t.id) === String(tourId));
-    if (tour) {
-      navigate(`/tours/${tour.id}/`);
-    }
-  };
-
 
 
   const handleCreateSave = async () => {
@@ -87,7 +109,7 @@ export function Bookings() {
     }
 
     try {
-      await bookingStore.addBooking({
+      await addBooking({
         tour_id: Number(newBooking.tourId),
         participants_count: Number(newBooking.guests || 1),
         date: newBooking.date,
@@ -101,34 +123,6 @@ export function Bookings() {
     }
   };
 
-  const getTourById = (id: string) => {
-    return tours.find(t => String(t.id) === String(id));
-  };
-
-const totalBookings = bookings.length;
-
-const confirmedCount = bookings.filter(b => b.status === 'confirmed').length;
-const pendingCount = bookings.filter(b => b.status === 'pending').length;
-const cancelledCount = bookings.filter(b => b.status === 'cancelled').length;
-
-const totalGuests = bookings.reduce(
-  (sum, b) => sum + Number(b.guests || 0),
-  0
-);
-
-const totalRevenue = bookings
-  .filter(b => b.status === 'confirmed')
-  .reduce((sum, b) => sum + Number(b.amount || 0), 0);
-
-const averageCheck =
-  confirmedCount > 0
-    ? Math.round(totalRevenue / confirmedCount)
-    : 0;
-
-const conversionRate =
-  totalBookings > 0
-    ? Math.round((confirmedCount / totalBookings) * 100)
-    : 0;
 
 
   return (
@@ -150,10 +144,10 @@ const conversionRate =
             <div className="p-3 bg-white shadow-sm dark:bg-gray-800 rounded-xl">
               <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
-            <span className="text-green-600 dark:text-green-400">{confirmedCount}%</span>
+            <span className="text-green-600 dark:text-green-400">{stats.conversionRate}%</span>
           </div>
           <h3 className="mb-1 text-green-700 dark:text-green-300">Подтверждено</h3>
-          <p className="text-green-900 dark:text-white">{confirmedCount}</p>
+          <p className="text-green-900 dark:text-white">{stats.confirmedCount}</p>
         </div>
 
         <div className="p-6 transition-all border border-yellow-200 shadow-sm bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950 dark:to-yellow-900 rounded-xl dark:border-yellow-800 hover:shadow-lg hover:scale-105">
@@ -161,10 +155,10 @@ const conversionRate =
             <div className="p-3 bg-white shadow-sm dark:bg-gray-800 rounded-xl">
               <Clock className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
             </div>
-            <span className="text-yellow-600 dark:text-yellow-400">{pendingCount}%</span>
+            <span className="text-yellow-600 dark:text-yellow-400">{stats.pendingCount}</span>
           </div>
           <h3 className="mb-1 text-yellow-700 dark:text-yellow-300">В ожидании</h3>
-          <p className="text-yellow-900 dark:text-white">{pendingCount}</p>
+          <p className="text-yellow-900 dark:text-white">{stats.pendingCount}</p>
         </div>
 
         <div className="p-6 transition-all border border-blue-200 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-xl dark:border-blue-800 hover:shadow-lg hover:scale-105">
@@ -175,7 +169,7 @@ const conversionRate =
             <span className="text-green-600 dark:text-green-400">+8%</span>
           </div>
           <h3 className="mb-1 text-blue-700 dark:text-blue-300">Отклоненные бронирования</h3>
-          <p className="text-blue-900 dark:text-white">{cancelledCount}</p>
+          <p className="text-blue-900 dark:text-white">{stats.cancelledCount}</p>
         </div>
 
         <div className="p-6 transition-all border border-purple-200 shadow-sm bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 rounded-xl dark:border-purple-800 hover:shadow-lg hover:scale-105">
@@ -186,7 +180,7 @@ const conversionRate =
             <span className="text-green-600 dark:text-green-400">+15%</span>
           </div>
           <h3 className="mb-1 text-purple-700 dark:text-purple-300">Общая выручка</h3>
-          <p className="text-purple-900 dark:text-white">${totalRevenue.toLocaleString()}</p>
+          <p className="text-purple-900 dark:text-white">${stats.totalRevenue.toLocaleString()}</p>
         </div>
       </div>
 
@@ -197,7 +191,9 @@ const conversionRate =
               <h2 className="text-gray-900 dark:text-white">Все бронирования</h2>
               <p className="text-gray-600 dark:text-gray-400">Полный список бронирований</p>
             </div>
-            <BookingList loading={loadingBookings} bookings={bookingsRaw} toursMap={toursMap} onEdit={(b: any)=>{ setEditingBooking(b); setEditOpen(true); }} onDelete={(id: any)=>{ setPendingDelete(Number(id)); setDialogOpen(true); }} />
+            <Suspense fallback={<div className="p-6">Загрузка списка...</div>}>
+                <BookingList loading={loadingBookings} bookings={bookingsRaw} toursMap={toursMap} onEdit={onEdit} onDelete={onDelete} />
+              </Suspense>
           </div>
         </div>
 
@@ -219,7 +215,7 @@ const conversionRate =
                   <span className="text-blue-700 dark:text-blue-300">Всего бронирований</span>
                   <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
-                <p className="text-blue-900 dark:text-white">{bookings.length}</p>
+                <p className="text-blue-900 dark:text-white">{stats.totalBookings}</p>
               </div>
 
               <div className="p-4 border border-green-200 rounded-lg bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 dark:border-green-800">
@@ -227,7 +223,7 @@ const conversionRate =
                   <span className="text-green-700 dark:text-green-300">Всего гостей</span>
                   <Users className="w-5 h-5 text-green-600 dark:text-green-400" />
                 </div>
-                <p className="text-green-900 dark:text-white">{totalGuests}</p>
+                <p className="text-green-900 dark:text-white">{stats.totalGuests}</p>
               </div>
 
               <div className="p-4 border border-purple-200 rounded-lg bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 dark:border-purple-800">
@@ -236,7 +232,7 @@ const conversionRate =
                   <DollarSign className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
                 <p className="text-purple-900 dark:text-white">
-                  ${averageCheck.toLocaleString()}
+                  ${stats.averageCheck.toLocaleString()}
                 </p>
               </div>
 
@@ -246,7 +242,7 @@ const conversionRate =
                   <TrendingUp className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                 </div>
                 <p className="text-orange-900 dark:text-white">
-                  {conversionRate}%
+                  {stats.conversionRate}%
                 </p>
               </div>
             </div>
@@ -285,12 +281,14 @@ const conversionRate =
           </div>
         </div>
       </div>
-      <BookingFormModal open={createOpen} onClose={() => { setCreateOpen(false); }} tours={tours} onSuccess={(m) => { setConfirmMsg(m ?? 'Бронирование успешно создано'); setConfirmOpen(true); }} />
-      <BookingEditModal open={editOpen} booking={editingBooking} onClose={() => { setEditOpen(false); setEditingBooking(null); }} onSuccess={(m) => { setConfirmMsg(m ?? 'Бронирование обновлено'); setConfirmOpen(true); }} />
+      <Suspense fallback={<div className="p-6">Загрузка...</div>}>
+        <BookingFormModal open={createOpen} onClose={() => { setCreateOpen(false); }} tours={tours} onSuccess={(m) => { setConfirmMsg(m ?? 'Бронирование успешно создано'); setConfirmOpen(true); }} />
+        <BookingEditModal open={editOpen} booking={editingBooking} onClose={() => { setEditOpen(false); setEditingBooking(null); }} onSuccess={(m) => { setConfirmMsg(m ?? 'Бронирование обновлено'); setConfirmOpen(true); }} />
+      </Suspense>
       <ConfirmDialog open={dialogOpen} title="Подтвердите удаление" message={pendingDelete ? 'Вы действительно хотите удалить это бронирование? Это действие нельзя отменить.' : ''} onConfirm={async () => {
         if (!pendingDelete) return;
         try {
-          await bookingStore.removeBooking(Number(pendingDelete));
+          await removeBooking(Number(pendingDelete));
           setConfirmMsg('Бронирование удалено');
           setConfirmOpen(true);
         } catch (err) {

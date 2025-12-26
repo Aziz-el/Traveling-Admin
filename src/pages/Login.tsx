@@ -1,59 +1,43 @@
   import { useState } from 'react';
-  import { Plane, } from 'lucide-react';
-  import { Link, Navigate, useNavigate } from 'react-router';
-  import instance from '../shared/lib/axios/axios';
-
+import { Plane, Lock } from 'lucide-react';
+import { Link, Navigate, useNavigate } from 'react-router';
+import { login as loginService } from '../entities/Users/model/services/auth';
+import { useAuth } from '../shared/hooks/useAuth';
   export default function Login() {
     const [formData, setFormData] = useState({ username: '', password: '' });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);  
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setError(null);
-      setLoading(true);
-      try {
-        const params = new URLSearchParams();
-  params.append("username", formData.username.trim());
-  params.append("password", formData.password);
+  const [error, setError] = useState<string | null>(null);
+  const { login, logout, user } = useAuth();
+  const navigate = useNavigate();
 
-  const response = await instance.post(
-    "/auth/login",
-    params, 
-    {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await login(formData.username, formData.password);
+      if (res.ok) {
+        navigate('/');
+      } else {
+        setError(res.error || 'Ошибка входа');
       }
+    } catch (err) {
+      setError('Ошибка входа: неверный логин или пароль.');
+    } finally {
+      setLoading(false);
     }
-  );
+  };
 
-        const token = response?.data?.token || response?.data?.access || response?.data?.access_token;
-        if (token) {
-          try { localStorage.setItem('token', token); } catch {}
-          navigate('/');
-        } else {
-          setError('Не удалось получить токен. Проверьте данные.');
-        }
-      } catch (err) {
-        console.error('Login error', err);
-        setError('Ошибка входа: неверный email или пароль, либо сервер недоступен.');
-      } finally {
-        setLoading(false);
-      }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+  const token = localStorage.getItem('token')
+
+    const handleLogout = () => {
+      logout();
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-    const token = localStorage.getItem('token')
-    const navigate = useNavigate();
-    
-      const handleLogout = () => {
-        try { localStorage.removeItem('token'); } catch {}
-        // refresh to update layout/state
-        window.location.reload();
-      };
-
-      return (
+    return (
         <div className='relative flex items-center justify-center min-h-screen p-4'>
         <div className="absolute inset-0 z-0">
           <img
@@ -65,13 +49,12 @@
         </div>
         <div className="bg-white relative bg-opacity-90 dark:bg-gray-800 dark:bg-opacity-90 p-8 rounded-lg shadow-lg w-full max-w-[500px]">
           <div className="flex flex-col items-center justify-center mb-6">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600">
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md">
               <Plane className="w-6 h-6 text-white" />
             </div>
-            <div className="flex items-center">
-              <h1 className='text-[20px] font-medium dark:text-white/90'>
-                Вход
-              </h1>
+            <div className="flex items-center mt-3 gap-3">
+              <h1 className='text-[20px] font-semibold dark:text-white/90'>Вход</h1>
+              <div className="text-sm text-gray-500 dark:text-gray-400">{user ? `Вас зовут ${user.full_name}` : 'Введите данные для входа'}</div>
             </div>
           </div>
           {token && (
