@@ -57,7 +57,7 @@ export function Sidebar({
   ]
   const menuItemsClient = [
     { id: '', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'companies', label: 'Моя компании', icon: Building2 },
+    { id: 'my-company', label: 'Моя компании', icon: Building2 },
     { id: 'tours', label: 'Туры', icon: MapPin },
     { id: 'bookings', label: 'Мои Бронирования', icon: CalendarCheck },
     { id: 'reviews', label: 'Мои Отзывы', icon: Star },
