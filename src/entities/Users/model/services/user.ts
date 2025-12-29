@@ -7,8 +7,17 @@ export const fetchUsers = async (): Promise<UsersResponse> => {
 };
 
 export const getCurrentUser = async (): Promise<UserItem | null> => {
-    const response = await instance.get<UserItem>("/users/");
-    return response.data || null;
+    try {
+        const response = await instance.get<UserItem>("/auth/me");
+        return response.data || null;
+    } catch (e) {
+        try {
+            const response = await instance.get<UserItem>(`/users/`);
+            return response.data || null;
+        } catch (err) {
+            return null;
+        }
+    }
 }
 
 export const getUserById = async (id: number | string): Promise<UserItem> => {
@@ -17,7 +26,7 @@ export const getUserById = async (id: number | string): Promise<UserItem> => {
 }
 
 export const updateUser = async (id: number | string, payload: Partial<UserItem>): Promise<UserItem> => {
-    const response = await instance.put<UserItem>(`/users/${id}/`, payload);
+    const response = await instance.put<UserItem>(`/users/${id}`, payload);
     return response.data;
 }
 

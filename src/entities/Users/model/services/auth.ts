@@ -17,8 +17,12 @@ export async function login(payload: { username: string; password: string }): Pr
     });
 
     const token = res?.data?.token || res?.data?.access || res?.data?.access_token;
+    const refreshToken = res?.data?.refresh || res?.data?.refresh_token;
     if (token) {
       try { localStorage.setItem('token', token); } catch (e) {}
+      if (refreshToken) {
+        try { localStorage.setItem('refreshToken', refreshToken); } catch (e) {}
+      }
       return { ok: true, token };
     }
 
@@ -30,7 +34,7 @@ export async function login(payload: { username: string; password: string }): Pr
 }
 
 export function logout() {
-  try { localStorage.removeItem('token'); } catch (e) {}
+  try { localStorage.removeItem('token'); localStorage.removeItem('refreshToken'); } catch (e) {}
 }
 
 export async function checkAuth() {

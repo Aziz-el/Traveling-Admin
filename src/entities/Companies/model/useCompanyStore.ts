@@ -1,7 +1,7 @@
 
 import { create } from 'zustand'
 import instance from '../../../shared/lib/axios/axios'
-import { CompanyForm } from './types'
+import { CompanyForm, MyCompanyType } from './types'
 
 type Company = {
   id: number
@@ -19,6 +19,7 @@ type CompaniesState = {
   addCompany: (data: CompanyForm) => Promise<void>
   updateCompany: (id: number | undefined, data: CompanyForm) => Promise<void>
   deleteCompany: (id: number) => Promise<void>
+  getMyCompany:() => Promise<MyCompanyType>
 }
 
 export const useCompaniesStore = create<CompaniesState>((set) => ({
@@ -57,5 +58,10 @@ export const useCompaniesStore = create<CompaniesState>((set) => ({
       companies: state.companies.filter(c => c.id !== id),
       isLoading: false
     }))
+  }
+  ,
+  getMyCompany: async ()=>{
+    let res = await instance.get("/companies/my/")
+    return res.data 
   }
 }))

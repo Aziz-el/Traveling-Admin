@@ -1,6 +1,7 @@
 import { useState, } from 'react';
 import { Star, ThumbsUp, Trash2, Edit } from 'lucide-react';
 import { ReviewItem } from '../model/types';
+import { CustomSelect } from '../../../shared/ui/select';
 
 interface Props {
   review: ReviewItem;
@@ -43,15 +44,17 @@ export default function ReviewCard({
           <div className={`text-xs px-2 py-1 rounded-full ${review.status === 'Опубликован' ? 'bg-green-100 text-green-700' : review.status === 'Отклонен' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>{review.status}</div>
 
           {currentUserRole === 'admin' && (
-            <select
-              value={review.status}
+            <CustomSelect
+              name="status"
+              options={[
+                { value: 'Опубликован', label: 'Опубликован' },
+                { value: 'На модерации', label: 'На модерации' },
+                { value: 'Отклонен', label: 'Отклонен' },
+              ]}
+              value={review.status || 'На модерации'}
               onChange={(e) => onChangeStatus && onChangeStatus(review.id, e.target.value as any)}
-              className="text-xs rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#0b1220] px-2 py-1"
             >
-              <option value="Опубликован">Опубликован</option>
-              <option value="На модерации">На модерации</option>
-              <option value="Отклонен">Отклонен</option>
-            </select>
+            </CustomSelect>
           )}
         </div>
       </div>
@@ -65,35 +68,10 @@ export default function ReviewCard({
         ))}
       </div>
 
-      {isEditing ? (
-        <>
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="w-full rounded p-2 border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#061018] mb-3 dark:text-gray-100" 
-          />
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={() => {
-                onUpdate({ ...review, comment: text });
-                setIsEditing(false);
-              }}
-              className="btn-primary"
-            >
-              Сохранить
-            </button>
-            <button onClick={() => setIsEditing(false)} className="px-3 py-1 rounded border">Отмена</button>
-          </div>
-        </>
-      ) : (
-        <p className="mb-3 text-sm text-gray-800 dark:text-gray-200">{review.comment}</p>
-      )}
-
-      <div className="flex gap-3 items-center">
+      <div className="flex gap-3 items-center mt-3 ">
         {canEdit && (
           <>
-            <button onClick={() => setIsEditing(true)} className="p-2 rounded hover:bg-gray-100"><Edit /></button>
-            <button onClick={() => onDelete(review.id)} className="p-2 rounded text-red-500 hover:bg-red-50"><Trash2 /></button>
+            <button onClick={() => { console.log('ReviewCard onDelete', review.id); onDelete(review.id); }} className="p-2 rounded text-red-500 hover:bg-red-50"><Trash2 /></button>
           </>
         )}
       </div>

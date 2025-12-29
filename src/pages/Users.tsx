@@ -34,7 +34,7 @@ export function Users() {
   }
 
   return (
-    <div className="h-full min-h-[697px] p-8 dark:bg-gray-950">
+    <div className="h-full min-h-[670px] p-8 dark:bg-gray-950">
       <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between max-md:mt-5">
   <div>
     <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-white">

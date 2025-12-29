@@ -28,11 +28,13 @@ export function Dashboard({  onMapItemClick, onSelectTour, selectedTourId }: Das
     update("page",`${page}`)
   },[])
   const [activeTours,setActive] = useState([] as TourType[])
-   instance.get("tours/",{
+  useEffect(()=>{
+    instance.get("tours/",{
     params:{
       sort_by:"rating"
     }
   }).then(res=>setActive(res.data.items))
+  },[])
   const totalRevenue = tours.reduce((sum, tour) => sum + tour.price, 0);
   const avgPrice = tours.length > 0 ? totalRevenue / tours.length : 0; 
   const bookings =useBookingStore().bookings;

@@ -7,18 +7,20 @@ import ConfirmModal from '../shared/ui/ConfirmModal';
 import CompanyCard from '../entities/Companies/ui/CompanyCards/CompanyCard'
 import { CompanyCardSkeleton } from '../entities/Companies/ui/CompanyCards/CompanySkeletonCard'
 import { CompanyForm } from '../entities/Companies/model/types'
+import { useApplicationStore } from '../entities/Applications/model/useApplicationStore'
 
 export function Companies() {
   const tours = useTourStore(state => state.tours)
-  const { companies, fetchCompanies, addCompany, updateCompany, isLoading } = useCompaniesStore()
+  const { companies, fetchCompanies, updateCompany, isLoading } = useCompaniesStore()
+  const {createApplication} = useApplicationStore()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editingId, setEditingId] = useState<number | null | undefined>(null)
   const [editingCompany, setEditingCompany] = useState<CompanyForm>({
-    name: '',
-    address: '',
+    company_name: '',
+    company_address: '',
     work_hours: '',
-    website: ''
+    company_website: ''
   })
 
   useEffect(() => {
@@ -42,7 +44,7 @@ export function Companies() {
 
   const handleAdd = () => {
     setEditingId(null)
-    setEditingCompany({ name: '', address: '', work_hours: '', website: '' })
+    setEditingCompany({ company_name: '', company_address: '', work_hours: '', company_website: '' })
     setModalOpen(true)
   }
 
@@ -50,7 +52,7 @@ export function Companies() {
     if (editingId !== null) {
       await updateCompany(editingId, data)
     } else {
-      await addCompany(data)
+      await createApplication(data)
     }
     setModalOpen(false)
     setConfirmMsg(editingId !== null ? 'Компания обновлена' : 'Компания создана')

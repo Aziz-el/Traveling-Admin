@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { fetchUsers } from '../entities/Users/model/services/user';
 import { Plus } from 'lucide-react';
 import ReviewForm from '../entities/Reviews/ui/ReviewForm';
 import ReviewsList from '../entities/Reviews/ui/ReviewsList';
@@ -26,7 +27,7 @@ export default function Reviews() {
   interface ReviewFormValues { tourId: string; rating: number; comment: string }
   const [formValues, setFormValues] = useState<ReviewFormValues>({ tourId: '', rating: 5, comment: '' });
   const updateFormValues = (v: Partial<ReviewFormValues>) => setFormValues((s) => ({ ...s, ...v }));
-  // Auth state (use central hook)
+
   const { user: authUser, loading: authLoading, refresh: refreshAuth } = useAuth();
   const currentUserId = authUser?.id ? String(authUser.id) : null;
   const currentUserName = authUser?.full_name ?? null;
@@ -34,6 +35,7 @@ export default function Reviews() {
   const currentUserRole = authUser?.role ?? null;
 
   const [loadingReviews, setLoadingReviews] = useState(true);
+  const [usersMap, setUsersMap] = useState<Record<string, string>>({});
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmMsg, setConfirmMsg] = useState('');
 
@@ -48,6 +50,15 @@ export default function Reviews() {
       setLoadingReviews(true);
       try {
         await fetchReviews();
+        try {
+          const usersResp = await fetchUsers();
+          const map: Record<string, string> = {};
+          (usersResp.items || []).forEach((u: any) => {
+            if (u && u.id != null) map[String(u.id)] = u.full_name || u.name || '';
+          });
+          setUsersMap(map);
+        } catch (e) {
+        }
       } finally {
         setLoadingReviews(false);
       }
@@ -68,12 +79,19 @@ export default function Reviews() {
     return () => obs.disconnect();
   }, [sentinelRef, hasNext, loadingMore, loadMore]);
 
-  const filteredReviews = reviews.filter((review) => {
+  const mappedReviews = reviews.map((review) => {
+    const ownerKey = review.ownerId ? String(review.ownerId) : undefined;
+    const nameFromMap = ownerKey ? usersMap[ownerKey] : undefined;
+    const resolvedName = review.userName || (ownerKey === currentUserId ? currentUserName || undefined : nameFromMap);
+    return { ...review, userName: resolvedName || review.userName };
+  });
+
+  const filteredReviews = mappedReviews.filter((review) => {
     const matchesRating = filterRating ? review.rating === filterRating : true;
     const matchesStatus = filterStatus === 'all' ? true : review.status === filterStatus;
     const q = searchQuery.trim().toLowerCase();
     const tourName = (review.tourName || '').toLowerCase();
-    const userName = (review.ownerId === currentUserId && currentUserName) ? currentUserName.toLowerCase() : (review.userName || '').toLowerCase();
+    const userName = (review.userName || '').toLowerCase();
     const comment = (review.comment || '').toLowerCase();
     const matchesSearch = q === '' ? true : (tourName.includes(q) || userName.includes(q) || comment.includes(q));
     return matchesRating && matchesStatus && matchesSearch;
@@ -129,6 +147,7 @@ export default function Reviews() {
   };
 
   const handleDeleteReview = async (id: string) => {
+    console.log('Page handleDeleteReview', id);
     await deleteReview(id);
     setConfirmMsg('Отзыв удалён');
     setConfirmOpen(true);
@@ -150,7 +169,7 @@ export default function Reviews() {
   };
 
   return (
-    <div className="p-6 sm:p-8 dark:bg-[#0a0a0f] min-h-[60vh] overflow-x-hidden relative">
+    <div className="p-6 sm:p-8 dark:bg-[#0a0a0f] min-h-[743px] overflow-x-hidden relative">
       <div className="pointer-events-none absolute -right-10 -top-10 w-64 h-64 rounded-full bg-gradient-to-br from-blue-300 to-indigo-400 opacity-30 blur-3xl animate-float" />
      <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between max-md:mt-5">
   <div>
@@ -201,6 +220,7 @@ export default function Reviews() {
         setEditingReview={setEditingReview}
         onDelete={handleDeleteReview}
         onUpdate={async (r) => {
+          console.log('Page onUpdate called', r.id, r.comment);
           if (containsProfanity(r.comment)) {
             await updateReview(r.id, { comment: r.comment, is_moderated: false, status: 'Отклонен' } as any);
             setConfirmMsg('Отзыв отклонён из-за нецензурной лексики');

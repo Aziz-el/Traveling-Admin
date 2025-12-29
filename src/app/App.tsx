@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Dashboard } from '../pages/Dashboard';
 import { AddTour } from '../pages/AddTour';
 import { ToursList } from '../pages/ToursList';
@@ -20,15 +20,11 @@ import BookingDetails from '../pages/BookingDetails';
 import NotFound from '../pages/NotFound';
 import CompanyTours from '../pages/CompanyTours';
 import Applications from '../pages/Applications';
+import MyCompany from '../pages/MyCompany';
 import UserDetails from '../pages/UserDetails';
 export default function App() {
   const [selectedTourId, setSelectedTourId] = useState<string | null>(null);
   const [miniCard, setMiniCard] = useState<{ tourId: string; x: number; y: number } | null>(null);
-  let toursStore = useTourStore();
-  let toursData = toursStore.tours;
-  useEffect(() => {
-    toursStore.fetchTours();
-  }, []);
     
   const handleSelectTour = (id: string) => {
     setSelectedTourId(id);
@@ -58,6 +54,7 @@ export default function App() {
                   <Route path='edit-tour/:id' element={<TourEditingPage />} />
                   <Route path="companies/:id/tours" element={<CompanyTours />}/>
                   <Route path='companies' element={<Companies />}/>
+                  <Route path='my-company' element={<MyCompany/>}/>
                   <Route path='bookings' element={<Bookings />}/>
                   <Route path='bookings/:id' element={<BookingDetails />} />
                   <Route path='users' element={<Users />}/>

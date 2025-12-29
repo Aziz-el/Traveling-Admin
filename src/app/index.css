@@ -205,3 +205,7 @@ html {
   .animate-fadeup { animation: fadeInUp .36s ease-out both; }
 }
 
+button{
+  cursor:pointer;
+  transition: all 0.5s;
+}

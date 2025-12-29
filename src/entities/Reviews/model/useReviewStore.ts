@@ -3,13 +3,13 @@ import { ReviewItem, ApiReview } from './types';
 import { fetchReviews as fetchReviewsService, createReview as createReviewService, updateReview as updateReviewService, deleteReview as deleteReviewService } from './services/reviews';
 
 interface ReviewStore {
-  reviews: ReviewItem[]; // nested roots
-  allItems: ReviewItem[]; // flat list of fetched items
+  reviews: ReviewItem[]; 
+  allItems: ReviewItem[]; 
   page: number;
   perPage: number;
   hasNext: boolean;
-  loading: boolean; // initial loading
-  loadingMore: boolean; // loading additional pages
+  loading: boolean; 
+  loadingMore: boolean; 
   fetchReviews: (page?: number, perPage?: number, append?: boolean) => Promise<void>;
   loadMore: () => Promise<void>;
   resetReviews: () => void;
@@ -182,35 +182,6 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
   }
 }));
 
-function attachReplyRecursive(list: ReviewItem[], parentId: string, reply: ReviewItem): ReviewItem[] {
-  return list.map(item => {
-    if (item.id === parentId) {
-      return { ...item, replies: [reply, ...(item.replies || [])] };
-    }
-    if (item.replies && item.replies.length) {
-      return { ...item, replies: attachReplyRecursive(item.replies, parentId, reply) };
-    }
-    return item;
-  });
-}
-
-function updateRecursive(list: ReviewItem[], id: string, changes: Partial<ReviewItem>): ReviewItem[] {
-  return list.map(item => {
-    if (item.id === id) {
-      return { ...item, ...changes } as ReviewItem;
-    }
-    if (item.replies && item.replies.length) {
-      return { ...item, replies: updateRecursive(item.replies, id, changes) };
-    }
-    return item;
-  });
-}
-
-function removeRecursive(list: ReviewItem[], id: string): ReviewItem[] {
-  return list
-    .filter(item => item.id !== id)
-    .map(item => ({ ...item, replies: item.replies ? removeRecursive(item.replies, id) : [] }));
-}
 
 function mapApiToUi(a: ApiReview): ReviewItem {
   const likedBy = (a as any).liked_by ? (a as any).liked_by.map((x: number) => String(x)) : [];
@@ -227,11 +198,6 @@ function mapApiToUi(a: ApiReview): ReviewItem {
     userName: a.author_id ? `User ${a.author_id}` : undefined,
     tourName: `${a.target_type} ${a.target_id}`,
     date: a.created_at ? a.created_at.split('T')[0] : undefined,
-    likes: likedBy.length,
-    dislikes: dislikedBy.length,
-    likedBy,
-    dislikedBy,
-    replies: [],
     status: a.is_moderated ? 'Опубликован' : 'На модерации',
     ownerId: a.author_id ? String(a.author_id) : undefined,
     parentId: (a as any).parent_id ? String((a as any).parent_id) : null,

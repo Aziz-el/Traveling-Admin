@@ -6,7 +6,6 @@ import TourCardSkeleton from '../entities/Tour/UI/TourSkeletons/TourCardSkeleton
 import { useDebounce } from '../shared/hooks/useDebounce'
 import CustomInput from '../shared/ui/input'
 import { useCustomSearchParams } from '../shared/hooks/useCustomSearchParams'
-
 export function ToursList({ onSelectTour, selectedTourId }: TourProps) {
   const toursStore = useTourStore()
   const { loading } = toursStore
@@ -18,13 +17,13 @@ export function ToursList({ onSelectTour, selectedTourId }: TourProps) {
   const [isFetching, setIsFetching] = useState(false)
 
   const debouncedQuery = useDebounce(search, 800)
-  const bottomRef = useRef<HTMLDivElement>(null)
-
+  const bottomRef = useRef<HTMLDivElement>(null)  
   useEffect(() => {
-    setPage(0)
+    setPage(1)
     setAllTours([])
   }, [debouncedQuery])
-
+  console.log(page);
+  
   useEffect(() => {
     setIsFetching(true)
     update('search', debouncedQuery)
@@ -60,7 +59,7 @@ export function ToursList({ onSelectTour, selectedTourId }: TourProps) {
       },
       { 
         threshold: 0,
-        rootMargin: '500px' 
+        rootMargin: '600px' 
       }
     )
 
