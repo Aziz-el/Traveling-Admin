@@ -2,9 +2,9 @@ import RatingSkeleton from './RatingSkeleton';
 
 export default function ReviewSkeleton() {
   return (
-    <div className="bg-white dark:bg-[#13131a] rounded-xl p-6 border border-gray-200 dark:border-gray-800/50 animate-pulse">
+    <div className="rounded-2xl p-6 bg-gradient-to-tr from-indigo-50 to-pink-50 dark:from-indigo-900 dark:to-pink-900 animate-pulse shadow-md">
       <div className="flex flex-col sm:flex-row items-start gap-4 mb-4">
-        <div className="w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-700 flex-shrink-0" />
+        <div className="w-14 h-14 rounded-full bg-gray-300 dark:bg-gray-700 flex-shrink-0" />
         <div className="flex-1 w-full">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
             <div className="w-full sm:w-auto">

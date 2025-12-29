@@ -1,11 +1,31 @@
-import instance from "../../../../shared/lib/axios/axios";
+import { create } from 'zustand'
+import instance from '../../../../shared/lib/axios/axios'
 
-export default  function checkAuth () : Promise<any> | undefined{
-    try{
-        let res  = instance.get("/auth/check-auth")
-        return res
-    }
-    catch(err){
-        return undefined
-    }
+type AuthState = {
+  role: string | null
+  loading: boolean
+  checkAuth: () => Promise<void>
 }
+
+ const useAuthStore = create<AuthState>((set) => ({
+  role: null,
+  loading: false,
+
+  checkAuth: async () => {
+    try {
+      set({ loading: true })
+      const res = await instance.get('/auth/check-auth')
+      set({
+        role: res.data.role,
+        loading: false
+      })
+    } catch (e) {
+      set({
+        role: null,
+        loading: false
+      })
+    }
+  }
+}))
+
+export default useAuthStore

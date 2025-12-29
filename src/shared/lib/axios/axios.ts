@@ -15,25 +15,33 @@ const instance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-});
-instance.interceptors.request.use((config => {
-    const token = localStorage.getItem('token');
-    if (token) {
-        config.headers = config.headers || {} as any;
-        (config.headers as any).Authorization = `Bearer ${token}`;
-    }
-    return config;
-}));
+})
+
+instance.interceptors.request.use(config => {
+  const token = localStorage.getItem('token')
+
+  if (token) {
+    config.headers = config.headers ?? {}
+    config.headers.Authorization = `Bearer ${token}`
+  }
+
+  return config
+})
 
 instance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (err) => {
-    if (err && err?.response?.status === 401)
-      localStorage.removeItem('token');
-    return Promise.reject(err);
-  }
-);
+  response => response,
+  error => {
+    if (error?.response?.status === 401) {
+      localStorage.removeItem('token')
 
-export default instance;
+      if (window.location.pathname !== '/login' &&
+          window.location.pathname !== '/register') {
+        window.location.replace('/login')
+      }
+    }
+
+    return Promise.reject(error)
+  }
+)
+
+export default instance

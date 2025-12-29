@@ -1,120 +1,90 @@
 import React, { useState } from 'react'
 import { ApplicationType } from '../../model/types'
-import { Check, X, RotateCcw } from 'lucide-react'
+import { Check, X, Clock, Trash2 } from 'lucide-react'
+import useAuthStore from '../../../../features/Auth/model/services/checkAuth'
+import { useApplicationStore } from '../../model/useApplicationStore'
 
-interface ApplicationCardProps {
+interface Props {
   application: ApplicationType
-  onChangeStatus?: (
-    id: number,
-    status: 'подтвержден' | 'отклонен' | 'ожидает'
-  ) => void
+  onRejectClick?: (app: ApplicationType) => void
 }
 
-export default function ApplicationCard({ application, onChangeStatus }: ApplicationCardProps) {
+export default function ApplicationCard({ application, onRejectClick }: Props) {
+  const { role } = useAuthStore()
+  const { approveApplication, deleteApplication } = useApplicationStore()
   const [status, setStatus] = useState<ApplicationType['status']>(application.status)
 
-  const handleApprove = () => {
-    setStatus('подтвержден')
-    onChangeStatus?.(application.id, 'подтвержден')
+  const isAdmin = role === 'admin'
+  const isClient = role === 'client'
+
+  const approve = () => {
+    setStatus('approved')
+    approveApplication(application.id)
   }
 
-  const handleReject = () => {
-    setStatus('отклонен')
-    onChangeStatus?.(application.id, 'отклонен')
-  }
-
-  const handleBack = () => {
-    setStatus('ожидает')
-    onChangeStatus?.(application.id, 'ожидает')
+  const remove = () => {
+    deleteApplication(application.id)
   }
 
   return (
-    <div
-      className={`relative bg-white dark:bg-gray-900 rounded-xl shadow-md border overflow-hidden transition-all duration-300
-        ${status === 'подтвержден'
-          ? 'border-green-500 ring-2 ring-green-100 dark:ring-green-900'
-          : status === 'отклонен'
-          ? 'border-red-500 ring-2 ring-red-100 dark:ring-red-900'
-          : status === 'ожидает'
-          ? 'border-yellow-500 ring-2 ring-yellow-100 dark:ring-yellow-900'
-          : 'border-gray-200 dark:border-gray-800'}`}
-    >
-      <div className="p-4 sm:p-5">
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-            {application.sender}
-          </h3>
+    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 sm:p-5  transition-shadow hover:shadow-md">
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white break-words">
+          {application.company_name}
+        </h3>
 
-          {status !== 'ожидает' && (
-            <span
-              className={`px-2.5 py-1 text-xs font-semibold rounded-full
-                ${status === 'подтвержден'
-                  ? 'bg-green-500 text-white'
-                  : status === 'отклонен'
-                  ? 'bg-red-500 text-white'
-                  : 'bg-yellow-500 text-white'}`}
-            >
-              {status}
-            </span>
-          )}
-        </div>
-
-        {status === 'ожидает' ? (
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={handleApprove}
-              className="flex items-center justify-center gap-2 px-3 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700"
-            >
-              <Check className="w-4 h-4" />
-              Подтвердить
-            </button>
-
-            <button
-              onClick={handleBack}
-              className="flex items-center justify-center gap-2 px-3 py-2 text-yellow-700 bg-yellow-200 rounded-lg hover:bg-yellow-300 dark:bg-yellow-950 dark:text-yellow-400"
-            >
-              <RotateCcw className="w-4 h-4" />
-              На доработку
-            </button>
-
-            <button
-              onClick={handleReject}
-              className="flex items-center justify-center gap-2 px-3 py-2 text-red-600 bg-red-200 rounded-lg hover:bg-red-300 dark:bg-red-950 dark:text-red-400"
-            >
-              <X className="w-4 h-4" />
-              Отклонить
-            </button>
-          </div>
-        ) : (
-          <div
-            className={`flex items-center gap-2 py-3 px-4 rounded-lg
-              ${status === 'подтвержден'
-                ? 'bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900'
-                : status === 'отклонен'
-                ? 'bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900'
-                : 'bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-900'}`}
+        {(isClient || status !== 'pending') && (
+          <button
+            onClick={remove}
+            className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
           >
-            {status === 'подтвержден' && <Check className="w-5 h-5 text-green-600" />}
-            {status === 'отклонен' && <X className="w-5 h-5 text-red-600" />}
-            {status === 'ожидает' && <RotateCcw className="w-5 h-5 text-yellow-600" />}
+            <Trash2 className="w-5 h-5" />
+          </button>
+        )}
+      </div>
 
-            <span
-              className={`text-base font-semibold
-                ${status === 'подтвержден'
-                  ? 'text-green-700'
-                  : status === 'отклонен'
-                  ? 'text-red-700'
-                  : 'text-yellow-700'}`}
-            >
-              {status === 'подтвержден'
-                ? 'Подтверждено'
-                : status === 'отклонен'
-                ? 'Отклонено'
-                : 'ожидает'}
-            </span>
+      <div className="mt-3">
+        {status === 'pending' && (
+          <div className="flex items-center gap-2 text-yellow-600 dark:text-yellow-400 text-sm sm:text-base">
+            <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
+            Ожидает
+          </div>
+        )}
+
+        {status === 'approved' && (
+          <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm sm:text-base">
+            <Check className="w-4 h-4 sm:w-5 sm:h-5" />
+            Подтверждено
+          </div>
+        )}
+
+        {status === 'rejected' && (
+          <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm sm:text-base">
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
+            Отклонено
           </div>
         )}
       </div>
+
+      {isAdmin && status === 'pending' && (
+        <div className="flex flex-col sm:flex-row gap-2 mt-4">
+          <button
+            onClick={approve}
+            className="flex items-center justify-center gap-2 px-3 py-2 text-sm sm:text-[14px] bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+          >
+            <Check className="w-4 h-4" />
+            Подтвердить
+          </button>
+
+          <button
+            onClick={() => onRejectClick?.(application)}
+            className="flex items-center justify-center gap-2 px-3 py-2 text-sm sm:text-[14px] bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+          >
+            <X className="w-4 h-4" />
+            Отклонить
+          </button>
+        </div>
+      )}
     </div>
   )
 }

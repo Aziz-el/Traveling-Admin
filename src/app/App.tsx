@@ -20,11 +20,14 @@ import BookingDetails from '../pages/BookingDetails';
 import NotFound from '../pages/NotFound';
 import CompanyTours from '../pages/CompanyTours';
 import Applications from '../pages/Applications';
+import UserDetails from '../pages/UserDetails';
 import MyCompany from '../pages/MyCompany';
+import CompanyLayout from './Layouts/CompanyLayout';
+import AdminLayout from './Layouts/AdminLayout';
 export default function App() {
   const [selectedTourId, setSelectedTourId] = useState<string | null>(null);
   const [miniCard, setMiniCard] = useState<{ tourId: string; x: number; y: number } | null>(null);
-    
+
   const handleSelectTour = (id: string) => {
     setSelectedTourId(id);
   };
@@ -43,25 +46,49 @@ export default function App() {
            <ProtectedLayout>
                 <Routes>
                   <Route path='/' element={<Dashboard onMapItemClick={handleMapItemClick} onSelectTour={handleSelectTour} selectedTourId={selectedTourId} />} />
-                  <Route path='add-tour' element={<AddTour  />}/>
                   <Route path='tours' element={<ToursList 
   
                       onSelectTour={handleSelectTour}
                       selectedTourId={selectedTourId}
                     />} />
-                  <Route path='tours/:id' element={<TourDetails />} />
-                  <Route path='edit-tour/:id' element={<TourEditingPage />} />
-                  <Route path="companies/:id/tours" element={<CompanyTours />}/>
                   <Route path='companies' element={<Companies />}/>
-                  <Route path='my-company' element={<MyCompany/>}/>
+                  <Route path="companies/:id/tours" element={<CompanyTours />}/>
                   <Route path='bookings' element={<Bookings />}/>
                   <Route path='bookings/:id' element={<BookingDetails />} />
-                  <Route path='users' element={<Users />}/>
-                  {/* <Route path='routes' element={<RoutesPage />}/> */}
+                  <Route path='tours/:id' element={<TourDetails />} />
                   <Route path='reviews' element={<Reviews/>}/>
-                  {/* <Route path='settings' element={<Settings />}/> */}
+                   <Route path="applications" element={<Applications />} />
+                  <Route path ="*" element={
+                    <CompanyLayout>
+                      <Routes>
+                      <Route path='add-tour' element={<AddTour  />}/>
+                      <Route path='edit-tour/:id' element={<TourEditingPage />} />
+                      <Route path='my-company' element={<MyCompany/>}/>
+                      
+                      </Routes>
+                    </CompanyLayout>
+
+                  } />
+                   <Route path ="*" element={
+                    <AdminLayout>
+                      <Routes>
+                        <Route path='users' element={<Users />}/>
+                        <Route path='users/:id' element={<UserDetails />} />
+                       
+                      </Routes>
+                    </AdminLayout>
+
+                  } />
                   <Route path='*' element={<NotFound />} />
-                  <Route path="applications" element={<Applications />} />
+    
+                  
+                  
+                  
+                  
+                  {/* <Route path='routes' element={<RoutesPage />}/> */}
+                  {/* <Route path='settings' element={<Settings />}/> */}
+                  
+                  
                 </Routes>
             
             </ProtectedLayout>

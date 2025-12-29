@@ -117,9 +117,17 @@ export function ToursList({ onSelectTour, selectedTourId }: TourProps) {
             Array.from({ length: 8 }).map((_, i) => (
               <TourCardSkeleton key={`loading-${i}`} />
             ))}
+           
         </div>
       )}
-
+       {
+              !loading && allTours.length === 0 ?(<div className="relative flex items-center justify-center min-h-[200px] sm:min-h-[300px]">
+  <h1 className="text-sm sm:text-base text-gray-600 dark:text-gray-400 text-center px-4">
+    Пока что пусто
+  </h1>
+</div>
+) : ""
+            }
       <div ref={bottomRef} className="h-4 mt-12" />
     </div>
   )

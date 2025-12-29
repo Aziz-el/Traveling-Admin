@@ -89,7 +89,14 @@ export function Companies() {
             ))
         }
       </div>
+      {
+        !isLoading && companies.length ===0 && <div className="relative flex items-center justify-center min-h-[200px] sm:min-h-[300px]">
+  <h1 className="text-sm sm:text-base text-gray-600 dark:text-gray-400 text-center px-4">
+    Пока что пусто
+  </h1>
+</div>
 
+      }
       <CompanyModal
         open={modalOpen}
         initialData={editingCompany}

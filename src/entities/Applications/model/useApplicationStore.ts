@@ -8,7 +8,7 @@ type ApplicationState = {
     fetchApplications:(params?:Record<string,string|number>)=>void,
     createApplication:(data:{})=>void,
     approveApplication:(id:number)=>void,
-    rejectApplication:(id:number)=>void,
+    rejectApplication:(id:number,reason:string)=>void,
     deleteApplication:(id:number)=>void,
     getApplicationById:(id:number)=>Promise<any>,
 }
@@ -41,9 +41,11 @@ export const useApplicationStore = create<ApplicationState>((set,get) => ({
             get().fetchApplications()
         })
     },
-    rejectApplication:(id:number) =>{
+    rejectApplication:(id:number,reason:string) =>{
         set({loading:true})
-        let res = instance.post(`/applications/${id}/reject`)
+        let res = instance.post(`/applications/${id}/reject`,{
+            rejection_reason:reason
+        })
          res.then((res)=>{
             set({loading:false})
             get().fetchApplications()

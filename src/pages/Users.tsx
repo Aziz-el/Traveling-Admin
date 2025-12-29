@@ -1,11 +1,13 @@
 import { Users as UsersIcon, UserCheck, UserX } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useUserStore } from '../entities/Users/model/useUserStore';
 import UsersSkeleton from '../shared/ui/skeletons/UsersSkeleton';
 
 export function Users() {
   const users = useUserStore((s) => s.users);
   const fetchUsers = useUserStore((s) => s.fetchUsers);
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -39,7 +41,7 @@ export function Users() {
       Пользователи
     </h1>
     <p className="mt-1 text-sm text-gray-600 sm:text-base dark:text-gray-400">
-     Список пользователе
+     Список пользователей
     </p>
   </div>
 </div>
@@ -96,7 +98,7 @@ export function Users() {
               ))
             ) : (
               users.map((user) => (
-                <div key={user.id} className="p-4 bg-white border border-gray-200 rounded-lg dark:bg-gray-900 dark:border-gray-800">
+                <div key={user.id} onClick={()=>navigate(`/users/${user.id}`  )} className="p-4 cursor-pointer bg-white border border-gray-200 rounded-lg dark:bg-gray-900 dark:border-gray-800">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-sm font-medium text-gray-900 dark:text-white">{user.full_name}</div>
@@ -136,7 +138,7 @@ export function Users() {
                 ))
               ) : (
                 users.map((user) => (
-                  <tr key={user.id} className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <tr key={user.id} onClick={() => navigate(`/users/${user.id}`)}  className="transition-colors cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
                     <td className="px-6 py-4 text-gray-900 dark:text-white">#{user.id}</td>
                     <td className="px-6 py-4 text-gray-900 dark:text-white">{user.full_name}</td>
                     <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{user.email}</td>

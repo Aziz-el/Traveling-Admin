@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Navigate } from 'react-router';
 import { Sidebar } from '../../widgets/Sidebar';
+import useAuthStore from '../../features/Auth/model/services/checkAuth';
 
 export default function ProtectedLayout({children}: {children: React.ReactNode}) {
    const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -24,6 +25,10 @@ export default function ProtectedLayout({children}: {children: React.ReactNode})
     setMobileOpen(false);
     document.body.style.overflow = 'auto';
   }
+    let {checkAuth} = useAuthStore()
+    useEffect(()=>{
+      checkAuth()
+    },[])
   return (
     token ?
     <div className={isDarkMode ? 'dark' : ''}>

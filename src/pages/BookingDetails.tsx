@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import { useBookingStore } from '../entities/Booking/model/useBookingStore';
 import { Calendar, DollarSign, Users } from 'lucide-react';
 import BookingDetailsSkeleton from '../shared/ui/skeletons/BookingDetailsSkeleton';
 import { useTourStore } from '../entities/Tour/model/useTourStore';
 import { optimizeImageUrl } from '../shared/utils/imageRenderingOptimizator';
+import { ImageWithFallback } from '../shared/ui/ImageWithFallback';
 
 export default function BookingDetails() {
   const toursStore = useTourStore();
@@ -16,26 +17,45 @@ export default function BookingDetails() {
   const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState<any | null>(null);
 
-  const tour = tours.find(t => String(t.id) === String(booking?.tour_id));
+  const tour = useMemo(() => {
+    const id = booking?.tour_id ?? booking?.tour?.id;
+    return tours.find(t => String(t.id) === String(id));
+  }, [tours, booking]);
 
   useEffect(() => {
     if (!id) return;
     (async () => {
       setLoading(true);
-      const existing = bookingStore.bookings.find(b => String(b.id) === String(id));
-      if (existing) {
-        setBooking(existing);
+      try {
+        const existing = bookingStore.bookings.find(b => String(b.id) === String(id));
+        if (existing) {
+          setBooking(existing);
+          return;
+        }
+        const fetched = await bookingStore.fetchBooking(Number(id));
+        setBooking(fetched ?? null);
+      } catch (err) {
+        console.debug('Fetch booking failed', err);
+        setBooking(null);
+      } finally {
         setLoading(false);
-        return;
       }
-      const fetched = await bookingStore.fetchBooking(Number(id));
-      setBooking(fetched ?? null);
-      setLoading(false);
     })();
-  }, [id]);
+  }, [id, bookingStore]);
 
   if (loading) return <BookingDetailsSkeleton />;
-  if (!booking) return <div className="p-6">Бронирование не найдено</div>;
+  if (!booking) return (
+    <div className="p-6">
+      <div className="max-w-md mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 text-center">
+        <h3 className="text-lg font-semibold mb-2">Бронирование не найдено</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Запрошенное бронирование не существует или было удалено.</p>
+        <div className="flex gap-3 justify-center">
+          <button onClick={() => navigate(-1)} className="px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg">Назад</button>
+          <Link to="/bookings" className="px-3 py-2 bg-blue-600 text-white rounded-lg">Все бронирования</Link>
+        </div>
+      </div>
+    </div>
+  );
 
   const guests = Number(booking.participants_count ?? booking.guests ?? 1);
   const tourPrice = Number(tour?.price ?? 0);
@@ -68,8 +88,8 @@ export default function BookingDetails() {
             <div className="flex flex-col md:flex-row gap-6">
               <div className="w-full md:w-56 h-40 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
                 {tour?.image_url || booking.tour?.image_url ? (
-                  <img
-                    src={optimizeImageUrl(tour?.image_url ?? booking.tour?.image_url, 800)}
+                  <ImageWithFallback
+                    src={optimizeImageUrl(tour?.image_url ?? booking.tour?.image_url, 800) ?? ''}
                     alt={tour?.title ?? booking.title}
                     className="w-full h-full object-cover"
                   />

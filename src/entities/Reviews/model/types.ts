@@ -9,6 +9,9 @@ export interface ApiReview {
   author_id?: number;
   created_at?: string;
   is_moderated?: boolean;
+  liked_by?: number[];
+  disliked_by?: number[];
+  parent_id?: number | null;
 }
 
 export interface ReviewsResponse {
@@ -36,6 +39,11 @@ export interface ReviewItem {
   tourName?: string;
   date?: string;
   likes?: number;
+  dislikes?: number;
+  likedBy?: string[];
+  dislikedBy?: string[];
+  replies?: ReviewItem[];
   status?: ReviewStatus;
   ownerId?: string;
+  parentId?: string | null;
 }
