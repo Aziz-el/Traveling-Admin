@@ -22,7 +22,6 @@ export function ToursList({ onSelectTour, selectedTourId }: TourProps) {
     setPage(1)
     setAllTours([])
   }, [debouncedQuery])
-  console.log(page);
   
   useEffect(() => {
     setIsFetching(true)

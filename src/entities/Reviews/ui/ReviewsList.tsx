@@ -37,7 +37,7 @@ export default function ReviewsList(props: Props) {
     return (
       <div className="bg-white dark:bg-[#13131a] rounded-xl p-12 border text-center">
         <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-        <h3>Отзывы не найдены</h3>
+        <h3 className='text-gray-800 dark:text-gray-300'>Отзывы не найдены</h3>
         <p className="text-gray-500">Добавьте первый отзыв</p>
       </div>
     );

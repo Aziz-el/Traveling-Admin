@@ -69,8 +69,6 @@ export default function TourEditingPage() {
       }
     }))
   }
-  console.log(tour);
-  
   return (
     <div className="max-w-3xl p-6 mx-auto">
 

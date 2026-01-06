@@ -132,22 +132,9 @@ export default function Reviews() {
     }
   };
 
-  const handleUpdateReview = async () => {
-    if (editingReview) {
-      if (containsProfanity(editingReview.comment)) {
-        await updateReview(editingReview.id, { comment: editingReview.comment, is_moderated: false, status: 'Отклонен' } as any);
-        setConfirmMsg('Отзыв отклонён из-за нецензурной лексики');
-      } else {
-        await updateReview(editingReview.id, { ...editingReview, is_moderated: true, status: 'Опубликован' } as any);
-        setConfirmMsg('Отзыв успешно обновлён и опубликован');
-      }
-      setEditingReview(null);
-      setConfirmOpen(true);
-    }
-  };
+
 
   const handleDeleteReview = async (id: string) => {
-    console.log('Page handleDeleteReview', id);
     await deleteReview(id);
     setConfirmMsg('Отзыв удалён');
     setConfirmOpen(true);
@@ -220,7 +207,6 @@ export default function Reviews() {
         setEditingReview={setEditingReview}
         onDelete={handleDeleteReview}
         onUpdate={async (r) => {
-          console.log('Page onUpdate called', r.id, r.comment);
           if (containsProfanity(r.comment)) {
             await updateReview(r.id, { comment: r.comment, is_moderated: false, status: 'Отклонен' } as any);
             setConfirmMsg('Отзыв отклонён из-за нецензурной лексики');

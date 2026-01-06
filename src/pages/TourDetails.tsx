@@ -14,8 +14,6 @@ export default function TourDetails() {
   const { id} = useParams();
 
   const navigate = useNavigate();
-  console.log(tours);
-  
  useEffect(()=>{
    toursStore.getTourById(id ? id : 0).then(el=>{
     setTour(el.data)

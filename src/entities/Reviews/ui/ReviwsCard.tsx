@@ -69,9 +69,9 @@ export default function ReviewCard({
       </div>
 
       <div className="flex gap-3 items-center mt-3 ">
-        {canEdit && (
+          {canEdit && (
           <>
-            <button onClick={() => { console.log('ReviewCard onDelete', review.id); onDelete(review.id); }} className="p-2 rounded text-red-500 hover:bg-red-50"><Trash2 /></button>
+            <button onClick={() => onDelete(review.id)} className="p-2 rounded text-red-500 hover:bg-red-50"><Trash2 /></button>
           </>
         )}
       </div>

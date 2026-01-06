@@ -8,7 +8,6 @@ import { Building2, Clock, Globe, MapPin } from 'lucide-react'
 import CustomInput from '../shared/ui/input'
 import { useDebounce } from '../shared/hooks/useDebounce'
 import { useCustomSearchParams } from '../shared/hooks/useCustomSearchParams'
-import { TourType } from '../entities/Tour/model/type'
 import checkAuth from '../features/Auth/model/services/checkAuth'
 import { MyCompanyType } from '../entities/Companies/model/types'
 
@@ -21,7 +20,7 @@ export default function MyCompany() {
         setCompany(el)
     })
     },[])
-    console.log(company);
+    
 
 
   return (
@@ -65,7 +64,7 @@ export default function MyCompany() {
         />
       </div>
 
-      {isLoading && company?.tours.length === 0 ? (
+      {isLoading && (company?.tours?.length ?? 0) === 0 ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 12 }).map((_, i) => (
             <TourCardSkeleton key={i} />
@@ -73,7 +72,7 @@ export default function MyCompany() {
         </div>
       ) : (
         <>
-          {company?.tours.length > 0  || (isLoading) ? (
+          {(company?.tours?.length ?? 0) > 0 || (isLoading) ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {company?.tours.map((pageTours, pageIndex) =>
                 pageTours.map(tour => (
@@ -84,7 +83,7 @@ export default function MyCompany() {
                 ))
               )}
 
-              {(isLoading) && company?.tours.length > 0 &&
+              {(isLoading) && (company?.tours?.length ?? 0) > 0 &&
                 Array.from({ length: 6 }).map((_, i) => (
                   <TourCardSkeleton key={`loading-${i}`} />
                 ))}

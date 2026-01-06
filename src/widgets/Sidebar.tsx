@@ -10,11 +10,13 @@ import {
   Star,
   Menu,
   Dock,
-  LucideProps
+  LucideProps,
+  X
 } from 'lucide-react'
 import { Link } from 'react-router'
 import checkAuth from '../features/Auth/model/services/checkAuth'
 import { ForwardRefExoticComponent, useEffect, useState } from 'react'
+import SidebarSkeleton from '../shared/ui/skeletons/SidebarSkeleton'
 
 interface SidebarProps {
   activeSection?: string
@@ -51,7 +53,7 @@ export function Sidebar({
     { id: 'add-tour', label: 'Добавить тур', icon: Plus },
     { id: 'tours', label: 'Туры', icon: MapPin },
     { id: 'companies', label: 'Моя компании', icon: Building2 },
-    { id: 'bookings', label: 'Мои Ббронирования', icon: CalendarCheck },
+    { id: 'bookings', label: 'Мои Бронирования', icon: CalendarCheck },
     { id: 'reviews', label: 'Мои отзывы', icon: Star },
     { id: 'applications', label: 'Мои заявки', icon: Dock }
   ]
@@ -63,13 +65,26 @@ export function Sidebar({
     { id: 'reviews', label: 'Мои Отзывы', icon: Star },
     { id: 'applications', label: 'Мои Заявки', icon: Dock }
   ]
-  let [role,setRole] = useState()
+  
+  const [role, setRole] = useState<string | null | undefined>(undefined)
 
-  useEffect(()=>{
-    checkAuth()?.then(res=>{
-      setRole(res.data.role)
-    })
-  }  ,[])
+useEffect(() => {
+  const loadRole = async () => {
+    try {
+      const res = await checkAuth()
+      setRole(res?.data?.role ?? null)
+    } catch (e) {
+      setRole(null)
+    }
+  }
+
+  loadRole()
+}, [])
+
+  if (role === undefined) {
+    return <SidebarSkeleton />
+  }
+
   let menuItems:{id:string,label:string,icon:ForwardRefExoticComponent<Omit<LucideProps, "ref">>}[] = []
   if(role=="admin"){
     menuItems = menuItemsAdmin
@@ -80,15 +95,25 @@ export function Sidebar({
   else if(role == "company"){
     menuItems = menuItemsCompany
   }
+
+
+
+
   return (
     <>
       <div className="fixed top-0 left-0 right-0 z-40 flex items-center h-12 px-3 bg-white border-b border-gray-200 lg:hidden dark:bg-gray-900 dark:border-gray-800">
-        <button
-          onClick={onToggle}
-          className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
-        >
-          <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-        </button>
+          <button
+            onClick={mobileOpen ? onClose : onToggle}
+            className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
+            {mobileOpen ? (
+              <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+            ) : (
+              <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+            )}
+          </button>
+
+
         <h1 className="ml-3 text-blue-600 dark:text-blue-400">
           TravelAdmin
         </h1>
@@ -115,7 +140,7 @@ export function Sidebar({
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
+                 <Icon className="w-5 h-5" />
                   <span>{item.label}</span>
                 </button>
               )
