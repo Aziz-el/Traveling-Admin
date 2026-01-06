@@ -11,6 +11,7 @@ export default function CompanyLayout({children}:{children:any}) {
     else{
         return (
     <>
+    
     {children}
     </>
   )
