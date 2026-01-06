@@ -1,4 +1,3 @@
-import React from 'react'
 import useAuthStore from '../../features/Auth/model/services/checkAuth'
 import { redirect, useNavigate } from 'react-router'
 
@@ -11,6 +10,7 @@ export default function CompanyLayout({children}:{children:any}) {
     else{
         return (
     <>
+    
     {children}
     </>
   )

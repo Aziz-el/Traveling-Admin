@@ -1,4 +1,3 @@
-import React from 'react'
 import useAuthStore from '../../features/Auth/model/services/checkAuth'
 import { redirect, useNavigate } from 'react-router'
 

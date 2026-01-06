@@ -3,7 +3,6 @@ import {
   Plus,
   MapPin,
   Building2,
-  Users,
   CalendarCheck,
   Moon,
   Sun,
@@ -11,12 +10,12 @@ import {
   Menu,
   Dock,
   LucideProps,
-  X
+  X,
+  Users
 } from 'lucide-react'
 import { Link } from 'react-router'
-import checkAuth from '../features/Auth/model/services/checkAuth'
-import { ForwardRefExoticComponent, useEffect, useState } from 'react'
-import SidebarSkeleton from '../shared/ui/skeletons/SidebarSkeleton'
+import { ForwardRefExoticComponent, useEffect } from 'react'
+import useAuthStore from '../features/Auth/model/services/checkAuth'
 
 interface SidebarProps {
   activeSection?: string
@@ -37,14 +36,20 @@ export function Sidebar({
   onClose,
   onToggle
 }: SidebarProps) {
+    const { role, loading, checkAuth } = useAuthStore()
+
+  useEffect(() => {
+    checkAuth()
+  }, [])
+
   const menuItemsAdmin = [
     { id: '', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'add-tour', label: 'Добавить тур', icon: Plus },
     { id: 'tours', label: 'Туры', icon: MapPin },
     { id: 'companies', label: 'Компании', icon: Building2 },
     { id: 'bookings', label: 'Бронирования', icon: CalendarCheck },
-    { id: 'users', label: 'Пользователи', icon: Users },
     { id: 'reviews', label: 'Отзывы', icon: Star },
+    { id: 'users', label: 'Пользователи', icon: Users },
     { id: 'applications', label: 'Заявки', icon: Dock }
   ]
 
@@ -52,48 +57,47 @@ export function Sidebar({
     { id: '', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'add-tour', label: 'Добавить тур', icon: Plus },
     { id: 'tours', label: 'Туры', icon: MapPin },
-    { id: 'companies', label: 'Моя компании', icon: Building2 },
-    { id: 'bookings', label: 'Мои Бронирования', icon: CalendarCheck },
+    { id: 'companies', label: 'Компании', icon: Building2 },
+    { id: 'my-company', label: 'Моя компании', icon: Building2 },
+    { id: 'bookings', label: 'Мои бронирования', icon: CalendarCheck },
+    { id: 'reviews', label: 'Мои отзывы', icon: Star },
+  ]
+
+  const menuItemsClient = [
+    { id: '', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'tours', label: 'Туры', icon: MapPin },
+    { id: 'companies', label: 'Компании', icon: Building2 },
+    { id: 'bookings', label: 'Мои бронирования', icon: CalendarCheck },
     { id: 'reviews', label: 'Мои отзывы', icon: Star },
     { id: 'applications', label: 'Мои заявки', icon: Dock }
   ]
-  const menuItemsClient = [
-    { id: '', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'my-company', label: 'Моя компании', icon: Building2 },
-    { id: 'tours', label: 'Туры', icon: MapPin },
-    { id: 'bookings', label: 'Мои Бронирования', icon: CalendarCheck },
-    { id: 'reviews', label: 'Мои Отзывы', icon: Star },
-    { id: 'applications', label: 'Мои Заявки', icon: Dock }
-  ]
-  
-  const [role, setRole] = useState<string | null | undefined>(undefined)
 
-useEffect(() => {
-  const loadRole = async () => {
-    try {
-      const res = await checkAuth()
-      setRole(res?.data?.role ?? null)
-    } catch (e) {
-      setRole(null)
-    }
-  }
+  let menuItems: {
+    id: string
+    label: string
+    icon: ForwardRefExoticComponent<Omit<LucideProps, 'ref'>>
+  }[] = []
 
-  loadRole()
-}, [])
+  if (role === 'admin') menuItems = menuItemsAdmin
+  if (role === 'company') menuItems = menuItemsCompany
+  if (role === 'client') menuItems = menuItemsClient
 
-  if (role === undefined) {
-    return <SidebarSkeleton />
-  }
-
-  let menuItems:{id:string,label:string,icon:ForwardRefExoticComponent<Omit<LucideProps, "ref">>}[] = []
-  if(role=="admin"){
-    menuItems = menuItemsAdmin
-  }
-  else if(role == "client"){
-    menuItems = menuItemsClient
-  }
-  else if(role == "company"){
-    menuItems = menuItemsCompany
+  if (loading) {
+    return (
+      <aside className="sticky top-0 left-0 hidden lg:flex flex-col w-64 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-800">
+          <div className="h-6 w-32 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+        </div>
+        <div className="flex-1 p-4 space-y-2">
+          {Array.from({ length: 7 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-11 rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse"
+            />
+          ))}
+        </div>
+      </aside>
+    )
   }
 
 
