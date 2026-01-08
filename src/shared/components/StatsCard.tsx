@@ -1,4 +1,5 @@
 import { LucideIcon } from 'lucide-react';
+import { memo } from 'react';
 
 interface StatsCardProps {
   title: string;
@@ -8,7 +9,7 @@ interface StatsCardProps {
   trendUp: boolean;
 }
 
-export function StatsCard({ title, value, icon: Icon, trend, trendUp }: StatsCardProps) {
+function StatsCardComponent({ title, value, icon: Icon, trend, trendUp }: StatsCardProps) {
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-4">
@@ -24,3 +25,5 @@ export function StatsCard({ title, value, icon: Icon, trend, trendUp }: StatsCar
     </div>
   );
 }
+
+export const StatsCard = memo(StatsCardComponent);

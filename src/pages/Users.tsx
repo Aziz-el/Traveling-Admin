@@ -1,10 +1,9 @@
 import { Users as UsersIcon, UserCheck, UserX } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import { useNavigate } from 'react-router';
 import { useUserStore } from '../entities/Users/model/useUserStore';
 import UsersSkeleton from '../shared/ui/skeletons/UsersSkeleton';
-
-export function Users() {
+export const Users = memo(function Users() {
   const users = useUserStore((s) => s.users);
   const fetchUsers = useUserStore((s) => s.fetchUsers);
   const navigate = useNavigate();
@@ -163,4 +162,4 @@ export function Users() {
       </div>
     </div>
   );
-}
+});

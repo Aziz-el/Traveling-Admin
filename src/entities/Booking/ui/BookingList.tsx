@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import { useNavigate } from 'react-router';
 import { ImageWithFallback } from '../../../shared/ui/ImageWithFallback';
 import {
@@ -14,7 +14,7 @@ import { Booking as BookingType } from '../model/type';
 import { optimizeImageUrl } from '../../../shared/utils/imageRenderingOptimizator';
 import BookingSkeleton from '../../../shared/ui/skeletons/BookingSkeleton';
 import { useSearchParams } from 'react-router';
-import PaginationCustom from '../../../shared/ui/Pagination';
+import PaginationCustom from '../../../shared/ui/pagination';
 
 type Props = {
   bookings: BookingType[];
@@ -209,4 +209,4 @@ const BookingList: React.FC<Props> = ({
   );
 };
 
-export default BookingList;
+export default memo(BookingList);

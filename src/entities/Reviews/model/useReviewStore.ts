@@ -85,7 +85,7 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
 
   createReview: async (r) => {
     try {
-      const created = await createReviewService(r as Partial<ApiReview>);
+      const created = await createReviewService(r as unknown as Partial<ApiReview>);
       const ui = mapApiToUi(created);
       set((s) => {
         const merged = [ui, ...s.allItems.filter(it => it.id !== ui.id)];
@@ -118,7 +118,7 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
     try {
       let updated: ApiReview | null = null;
       try {
-        updated = await updateReviewService(id, payload as Partial<ApiReview>);
+        updated = await updateReviewService(id, payload as unknown as Partial<ApiReview>);
       } catch (e) {
         console.debug('Partial update failed or ignored by backend, applying local update only');
       }

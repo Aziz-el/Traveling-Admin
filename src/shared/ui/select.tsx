@@ -12,7 +12,7 @@ interface CustomSelectProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   placeholder?: string;
-  className?: string; // дополнительный класс
+  className?: string; 
 }
 
 export function CustomSelect({

@@ -1,5 +1,5 @@
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import { MapPin, Navigation, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import { Button } from '../../shared/ui/button';
 import { useTourStore } from '../../entities/Tour/model/useTourStore';
@@ -24,7 +24,7 @@ interface InteractiveMapProps {
   selectedTour?: string | null; // id or title
 }
 
-export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick, onSelectTour, selectedTour }: InteractiveMapProps) {
+function InteractiveMapComponent({ tours: propTours, selectedRoute, onMapItemClick, onSelectTour, selectedTour }: InteractiveMapProps) {
   const storeTours = useTourStore().tours as Tour[];
   const tours = propTours ?? storeTours;
   const [hoveredTour, setHoveredTour] = useState<string | null>(null);
@@ -534,3 +534,5 @@ export function InteractiveMap({ tours: propTours, selectedRoute, onMapItemClick
     </div>
   );
 }
+
+export const InteractiveMap = memo(InteractiveMapComponent);

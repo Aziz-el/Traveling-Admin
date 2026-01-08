@@ -1,4 +1,4 @@
-import React from 'react';
+import { memo } from 'react';
 import { ReviewItem } from '../model/types';
 import ReviewCard from './ReviwsCard';
 import ReviewSkeleton from '../../../shared/ui/skeletons/ReviewSkeleton';
@@ -20,7 +20,7 @@ interface Props {
   replyingIds?: string[];
 }
 
-export default function ReviewsList(props: Props) {
+function ReviewsList(props: Props) {
   const { reviews, loading, loadingMore } = props;
 
   if (loading) {
@@ -58,3 +58,5 @@ export default function ReviewsList(props: Props) {
     </div>
   );
 }
+
+export default memo(ReviewsList);

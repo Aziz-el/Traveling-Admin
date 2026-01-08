@@ -41,11 +41,11 @@ export const deleteBooking = async (id: number | string): Promise<void> => {
   } catch (err: any) {
     if (err?.response?.status === 405) {
       try {
-        await instance.post(`/bookings/${id}/delete/`);
+        await instance.post(`/bookings/${id}/delete`);
         return;
       } catch (_) {}
       try {
-        await instance.post(`/bookings/${id}/`, {}, { headers: { 'X-HTTP-Method-Override': 'DELETE' } });
+        await instance.post(`/bookings/${id}`, {}, { headers: { 'X-HTTP-Method-Override': 'DELETE' } });
         return;
       } catch (_) {}
     }

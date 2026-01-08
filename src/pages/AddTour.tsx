@@ -173,7 +173,7 @@ export function AddTour() {
       lng: formData.lng ? parseFloat(formData.lng) : undefined
     };
 
-    addTour(tour);
+    addTour(tour as any);
     setConfirmMsg('Тур успешно создан');
     setConfirmOpen(true);
 
