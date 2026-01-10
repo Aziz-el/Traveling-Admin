@@ -38,11 +38,11 @@ interface ScheduleDay {
 
 export function AddTour() {
   const addTour = useTourStore().addTour;
-    let companyStore = useCompaniesStore()
+  let companyStore = useCompaniesStore()
   const companies = companyStore.companies
-  useEffect(()=>{
-   companyStore.fetchCompanies()
-  },[])
+  useEffect(() => {
+    companyStore.fetchCompanies()
+  }, [])
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
@@ -69,7 +69,7 @@ export function AddTour() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    
+
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData(prev => ({ ...prev, [name]: checked }));
@@ -192,7 +192,7 @@ export function AddTour() {
     });
     setScheduleItems([{ key: 'day_1', title: '', desc: '' }]);
     setPreviewTour(null);
-  
+
   };
 
   return (
@@ -207,7 +207,7 @@ export function AddTour() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="pb-6 border-b border-gray-200 dark:border-gray-800">
               <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Основная информация</h2>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -271,7 +271,7 @@ export function AddTour() {
 
             <div className="pb-6 border-b border-gray-200 dark:border-gray-800">
               <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Детали тура</h2>
-              
+
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -348,6 +348,46 @@ export function AddTour() {
                 </div>
               </div>
             </div>
+
+
+
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+
+                <CustomInput
+                  name="lat"
+                  value={formData.lat}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      lat: e.target.value,
+                    })
+                  }
+                  className="text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+
+                <CustomInput
+                  type="number"
+                  name="lng"
+                  value={formData.lng}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      lng: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+
+                />
+              </div>
+            </div>
+
+
+
             <div className="pb-6">
               <div className="sm:flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Расписание тура</h2>
@@ -379,7 +419,7 @@ export function AddTour() {
                         </button>
                       )}
                     </div>
-                    
+
                     <div className="space-y-3">
                       <input
                         type="text"

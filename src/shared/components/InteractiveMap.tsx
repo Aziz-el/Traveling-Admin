@@ -289,29 +289,6 @@ function InteractiveMapComponent({ tours: propTours, selectedRoute, onMapItemCli
                   repeatCount="indefinite"
                 />
               </path>
-
-              {/* Стрелка направления */}
-              <defs>
-                <marker
-                  id={`arrow-${tour.id}`}
-                  markerWidth="10"
-                  markerHeight="10"
-                  refX="5"
-                  refY="3"
-                  orient="auto"
-                  markerUnits="strokeWidth"
-                >
-                  <path d="M0,0 L0,6 L9,3 z" fill="#3b82f6" />
-                </marker>
-              </defs>
-              
-              <path
-                d={`M ${midX} ${midY - controlOffset} L ${end.x} ${end.y}`}
-                fill="none"
-                stroke="transparent"
-                strokeWidth="3"
-                markerEnd={`url(#arrow-${tour.id})`}
-              />
               
 
               {/* Точка старта */}
@@ -340,41 +317,6 @@ function InteractiveMapComponent({ tours: propTours, selectedRoute, onMapItemCli
                     r="18"
                     fill="none"
                     stroke="#10b981"
-                    strokeWidth="2"
-                    opacity="0.5"
-                  >
-                    <animate attributeName="r" from="18" to="24" dur="1.5s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" from="0.5" to="0" dur="1.5s" repeatCount="indefinite" />
-                  </circle>
-                )}
-              </g>
-
-              {/* Точка финиша */}
-              <g
-                className="cursor-pointer pointer-events-auto"
-                onMouseEnter={() => setHoveredTour(tour.id)}
-                onMouseLeave={() => setHoveredTour(null)}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onMapItemClick?.(tour.id, end.x, end.y);
-                  onSelectTour?.(tour.id);
-                }}
-              >
-                <circle
-                  cx={end.x}
-                  cy={end.y}
-                  r={isHovered ? 12 : 9}
-                  fill="#ef4444"
-                  stroke="white"
-                  strokeWidth="3"
-                />
-                {isHovered && (
-                  <circle
-                    cx={end.x}
-                    cy={end.y}
-                    r="18"
-                    fill="none"
-                    stroke="#ef4444"
                     strokeWidth="2"
                     opacity="0.5"
                   >
@@ -451,7 +393,7 @@ function InteractiveMapComponent({ tours: propTours, selectedRoute, onMapItemCli
         )}
       </div>
 
-      {/* Легенда */}
+      {/* Легенда
       <div className="absolute p-3 bg-white border rounded-lg shadow-lg pointer-events-auto bottom-4 left-4 border-slate-200">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
@@ -475,7 +417,7 @@ function InteractiveMapComponent({ tours: propTours, selectedRoute, onMapItemCli
             </div>
           )}
         </div>
-      </div>
+      </div> */}
       
 
       {/* Информация о туре */}

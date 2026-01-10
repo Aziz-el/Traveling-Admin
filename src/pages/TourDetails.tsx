@@ -136,7 +136,7 @@ export default function TourDetails() {
                 <Users className="w-4 h-4" /> {tour.capacity}
               </div>
               <button className="w-full mb-3 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold" onClick={() => setCreateOpen(true)}>Забронировать</button>
-              <button className="w-full mb-2 px-4 py-2 border border-gray-200 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Посмотреть на карте</button>
+
               <div className="text-xs text-gray-500 text-center mt-3">Быстрое бронирование · Гарантия лучшей цены</div>
             </div>
           </aside>

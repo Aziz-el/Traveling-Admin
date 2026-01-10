@@ -9,7 +9,6 @@
     plugins: [
       react(),
       tailwindcss(),
-      // generate bundle report when ANALYZE env var is set
       ...(process.env.ANALYZE === 'true' ? [visualizer({ filename: 'build/bundle-report.html', open: false })] : []),
     ],
     resolve: {
